@@ -1,0 +1,3 @@
+[submodule "MDP-Arduino"]
+	path = MDP-Arduino
+	url = git@github.com:GPHofficial/MDP-Arduino.git
