@@ -2,8 +2,8 @@ package environment;
 
 public class Square {
 	
-	String symbol = " ";	
-	boolean acc = true;
+	public String symbol = " ";	
+	public boolean acc = true;
 	
 	public Square(String symbol){			
 		this.symbol = symbol;					

@@ -4,9 +4,10 @@ import environment.Square;
 
 public class Arena {	
 
-	Square arr[][];
-	int n = 0;
-	int m = 0;
+	public Square arr[][];
+	
+	public int n = 0;
+	public int m = 0;
 
 	public Arena(int n, int m){		
 		this.n = n;
@@ -33,7 +34,7 @@ public class Arena {
 		else if ((j>=this.m)||(j<0)) {
 			return false;
 		}
-		else if (this.arr[i][j].symbol.equals("S")||this.arr[i][j].symbol.equals("G")||this.arr[i][j].symbol.equals("X")) {
+		else if (this.arr[i][j].symbol.equals("X")) {
 			return false;
 		}
 		return true;
