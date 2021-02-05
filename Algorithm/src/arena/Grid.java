@@ -12,16 +12,17 @@ public class Grid {
     private int pos[] = new int[2];
 
 
-    public Grid(Types a, int x, int y){
+    public Grid(Types a, int x, int y) {
         this.type = a;
         this.x = x;
         this.y = y;
-        if (this.type == Types.OBSTACLE){
+        if (this.type == Types.OBSTACLE) {
             this.acc = Acc.FALSE;
+        } else {
+            this.acc = Acc.TRUE;
         }
-        pos[0] = x;
-        pos[1] = y;
-
+        pos[0] = y;
+        pos[1] = x;
     }
 
     public Types getType() {
@@ -32,15 +33,15 @@ public class Grid {
         this.type = a;
     }
 
-    public int[] get_pos(){
+    public int[] getPos() {
         return this.pos;
     }
 
-    public Acc get_acc(){
+    public Acc getAcc() {
         return this.acc;
     }
 
-    public void set_acc(Acc acc){
+    public void setAcc(Acc acc) {
         this.acc = acc;
     }
 }
