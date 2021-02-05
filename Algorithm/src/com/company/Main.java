@@ -15,6 +15,5 @@ public class Main {
         Arena arena = new Arena(20,15);
         arena.make_arena(obs);
         arena.get_view();
-
     }
 }
