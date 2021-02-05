@@ -7,8 +7,8 @@ public class Grid {
 
     private Types type;
     private Acc acc;
-    private int x;
-    private int y;
+    public int x;
+    public int y;
     private int pos[] = new int[2];
 
 
@@ -21,7 +21,7 @@ public class Grid {
         } else {
             this.acc = Acc.TRUE;
         }
-        pos[0] = y;
+        pos[0] = 19-y;
         pos[1] = x;
     }
 

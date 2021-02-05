@@ -2,14 +2,14 @@ package com.company;
 
 import arena.Arena;
 import utility.Map_Descriptor;
-import utility.File_Read;
+import utility.File_Utility;
 
 public class Main {
 
     public static void main(String[] args) {
 
-        String path = "example_1.txt";
-        String[] p_string=  File_Read.read_file(path);
+        String path = "example_2.txt";
+        String[] p_string=  File_Utility.read_file(path);
         int[][] obs = Map_Descriptor.get_map(p_string[0],p_string[1]);
 
         Arena arena = new Arena(20,15);

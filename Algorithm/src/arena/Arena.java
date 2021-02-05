@@ -10,9 +10,9 @@ import values.*;
 
 public class Arena {
 
-    int m; //number of rows
-    int n; //number of columns
-    Grid[][] arena;
+    public int m; //number of rows
+    public int n; //number of columns
+    public Grid[][] arena;
 
     public Arena(int m, int n) {
         this.m = m;
@@ -23,7 +23,7 @@ public class Arena {
     public void make_arena(int[][] temp) {
         for (int i = 0; i < temp.length; i++) {
             for (int j = 0; j < temp[0].length; j++) {
-                int y = 19 - i;
+                int y = i;
                 int x = j;
                 if (temp[i][j] == 1) {
                     this.arena[i][j] = new Grid(Types.OBSTACLE, x, y);
