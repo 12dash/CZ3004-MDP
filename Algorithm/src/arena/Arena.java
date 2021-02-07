@@ -8,6 +8,8 @@ package arena;
 
 import values.*;
 
+import java.util.ArrayList;
+
 public class Arena {
 
     public int m; //number of rows
@@ -36,11 +38,12 @@ public class Arena {
 
     public void get_view() {
         for (int i = 0; i < this.arena.length; i++) {
+            System.out.print("|");
             for (int j = 0; j < this.arena[0].length; j++) {
                 if (Types.OBSTACLE == this.arena[i][j].getType())
-                    System.out.print(1);
+                    System.out.print("X|");
                 else {
-                    System.out.print(0);
+                    System.out.print(" |");
                 }
             }
             System.out.println();
@@ -49,11 +52,12 @@ public class Arena {
 
     public void get_acc_view() {
         for (int i = 0; i < this.arena.length; i++) {
+            System.out.print("|");
             for (int j = 0; j < this.arena[0].length; j++) {
                 if (Acc.FALSE == this.arena[i][j].getAcc())
-                    System.out.print(1);
+                    System.out.print("X|");
                 else {
-                    System.out.print(0);
+                    System.out.print(" |");
                 }
             }
             System.out.println();
@@ -61,18 +65,20 @@ public class Arena {
     }
 
     public void check_cell_modify_acc(int i, int j) {
-        if (((i >= 0) && (i < this.m)) && ((j >= 0) && (j < this.n))) {
-            if (this.arena[i][j].getAcc() == Acc.TRUE) {
-                this.arena[i][j].setAcc(Acc.FALSE);
+        if (((i >= 0) && (i < this.n)) && ((j >= 0) && (j < this.m))) {
+            if (this.arena[j][i].getAcc() == Acc.TRUE) {
+                this.arena[j][i].setAcc(Acc.FALSE);
             }
         }
     }
 
     public void add_neighbour_padding(int i, int j) {
         int x = j;
+        int y = i;
+
         int x_1 = j - 1;
         int x_2 = j + 1;
-        int y = i;
+
         int y_1 = i - 1;
         int y_2 = i + 1;
 
@@ -107,4 +113,39 @@ public class Arena {
         }
     }
 
+    public void display_solution(ArrayList<Grid> path) {
+
+        String[][] solution = new String[this.m][this.n];
+
+        for (int i = 0; i < this.m; i++) {
+
+            for (int j = 0; j < this.n; j++) {
+
+                if (this.arena[i][j].getType() == Types.OBSTACLE)
+                    solution[i][j] = "1";
+                else {
+                    solution[i][j] = " ";
+                }
+            }
+        }
+
+        for (int i = 0; i < path.size(); i++) {
+            Grid temp = path.get(i);
+            solution[temp.y][temp.x] = "O";
+        }
+        System.out.println("\nSolution");
+
+        for (int j = 0; j < 15; j++) {
+            System.out.print(j + "|");
+
+        }
+        System.out.println();
+        for (int i = 0; i < this.m; i++) {
+            System.out.print("|");
+            for (int j = 0; j < this.n; j++) {
+                System.out.print(solution[i][j] + "|");
+            }
+            System.out.println(" " + i);
+        }
+    }
 }
