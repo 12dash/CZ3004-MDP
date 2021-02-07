@@ -19,11 +19,7 @@ public class DepthFirstSearch {
 
         if ((x >= 0) && (x < a.n) && (y >= 0) && (y < a.m)) {
             Grid temp = a.arena[y][x];
-            if (temp.getAcc() == Acc.TRUE) {
-                return true;
-            } else {
-                return false;
-            }
+            return temp.getAcc() == Acc.TRUE;
         }
         return false;
     }
@@ -54,15 +50,15 @@ public class DepthFirstSearch {
                 break;
             }
             case East: {
-                pos_S =new int[]{x+1,y};
-                pos_L =new int[]{x,y+1};
-                pos_R = new int[]{x,y-1} ;
+                pos_S = new int[]{x + 1, y};
+                pos_L = new int[]{x, y + 1};
+                pos_R = new int[]{x, y - 1};
                 break;
             }
             case West: {
-                pos_S =new int[]{x-1,y};
-                pos_L =new int[]{x,y-1};
-                pos_R = new int[]{x,y+1};
+                pos_S = new int[]{x - 1, y};
+                pos_L = new int[]{x, y - 1};
+                pos_R = new int[]{x, y + 1};
                 break;
             }
         }
