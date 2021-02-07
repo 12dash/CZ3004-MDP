@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity"
+    android:paddingHorizontal="10dp"
+    android:orientation="vertical">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <view
+            android:layout_width="470dp"
+            class="com.example.mdpbluetoothtest.MazeView"
+            android:layout_gravity="center"
+            android:id="@+id/mazeView"
+            android:layout_height="600dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            />
+
+        <LinearLayout
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Current Status"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/mazeView"
+                android:background="@color/design_default_color_primary"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                android:textColor="@color/design_default_color_on_primary"
+                android:textAlignment="center"/>
+
+            <TextView
+                android:id="@+id/currentStatusTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Unavailable"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/mazeView"
+                android:textAlignment="center"/>
+
+            <TextView
+                android:id="@+id/robotXCoordinateTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0"
+                />
+            <TextView
+                android:id="@+id/robotYCoordinateTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0"
+                />
+            <TextView
+                android:id="@+id/robotDirectionTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Direction unavil"
+                />
+
+
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <RelativeLayout
+            android:id="@+id/arrowControlViewGroup"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp">
+
+            <ImageView
+                android:id="@+id/arrowLeftBtn"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:src="@drawable/ic_arrow_left"
+                android:layout_marginTop="50dp"
+                />
+
+            <ImageView
+                android:id="@+id/arrowUpBtn"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:src="@drawable/ic_arrow_up"
+                android:layout_toRightOf="@id/arrowLeftBtn"/>
+
+            <ImageView
+                android:id="@+id/arrowRightBtn"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:src="@drawable/ic_arrow_right"
+                android:layout_marginTop="50dp"
+                android:layout_toRightOf="@id/arrowUpBtn"/>
+
+            <Switch
+                android:id="@+id/phoneTiltSwitch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:splitTrack="false"
+                android:layout_below="@id/arrowRightBtn"
+                android:layout_centerHorizontal="true"
+                android:text="TILT" />
+
+            <Switch
+                android:id="@+id/manualAutoToggleBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/phoneTiltSwitch"
+                android:text="MANUAL"
+                />
+
+            <Button
+                android:id="@+id/updateButton"
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:clickable="true"
+                android:text="UPDATE"
+                android:layout_below="@id/manualAutoToggleBtn"/>
+
+        </RelativeLayout>
+
+        <LinearLayout
+            android:id="@+id/raceViewGroup"
+            android:layout_toRightOf="@id/arrowControlViewGroup"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <Button
+                android:id="@+id/fastestPathBtn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Fastest"
+                />
+            <Button
+                android:id="@+id/explorationPathBtn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Exploration"
+                />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/setPointsViewGroup"
+            android:layout_toRightOf="@id/raceViewGroup"
+            android:orientation="vertical"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            >
+
+            <ToggleButton
+                android:id="@+id/setStartPointToggleBtn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textOff="Set Startpoint"
+                android:textOn="Cancel"
+                android:backgroundTint="@color/purple_500"
+                android:textColor="@color/white"
+                />
+
+            <ToggleButton
+                android:id="@+id/setWayPointToggleBtn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textOn="Cancel"
+                android:textOff="Set Waypoint"
+                android:layout_below="@+id/setStartPointToggleBtn"
+                android:backgroundTint="@color/purple_500"
+                android:textColor="@color/white"
+                />
+            <Button
+                android:id="@+id/resetMapBtn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Reset Map"
+                />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/editMapViewGroup"
+            android:layout_toRightOf="@id/raceViewGroup"
+            android:layout_below="@+id/setPointsViewGroup"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <ImageButton
+                android:id="@+id/obstacleImageBtn"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginTop="16dp"
+                android:scaleType="centerCrop"
+                android:tint="@color/black"
+                app:srcCompat="@drawable/ic_launcher_foreground" />
+
+            <ImageButton
+                android:id="@+id/clearImageBtn"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginTop="16dp"
+                android:scaleType="centerCrop"
+                android:tint="@color/black"
+                app:srcCompat="@drawable/ic_launcher_foreground" />
+
+            <ImageButton
+                android:id="@+id/exploredImageBtn"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginTop="16dp"
+                android:scaleType="centerCrop"
+                android:tint="@color/black"
+                app:srcCompat="@drawable/ic_launcher_foreground" />
+
+            <ImageButton
+                android:id="@+id/directionChangeImageBtn"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginTop="16dp"
+                android:scaleType="centerCrop"
+                android:tint="@color/black"
+                app:srcCompat="@drawable/ic_launcher_foreground" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+</LinearLayout>
