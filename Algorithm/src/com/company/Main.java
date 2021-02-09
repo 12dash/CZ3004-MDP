@@ -1,5 +1,6 @@
 package com.company;
 
+import algo.AStar;
 import algo.DepthFirstSearch;
 import arena.Arena;
 import robot.Robot;
@@ -10,7 +11,7 @@ public class Main {
 
     public static void main(String[] args) {
 
-        String path = "example_2.txt";
+        String path = "example_5.txt";
         String[] p_string=  File_Utility.read_file(path);
         int[][] obs = Map_Descriptor.get_map(p_string[0],p_string[1]);
 
@@ -18,7 +19,7 @@ public class Main {
         arena.make_arena(obs);
         arena.add_padding();
 
-        DepthFirstSearch search = new DepthFirstSearch();
+        AStar search = new AStar();
         Robot robot = new Robot();
         search.start_search(arena, arena.arena[18][1], arena.arena[1][13], robot, true);
         arena.display_solution(robot.path);
