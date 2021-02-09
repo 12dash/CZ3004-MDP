@@ -15,35 +15,27 @@ public class DepthFirstSearch {
     Stack<String> movement = new Stack<>();
     Mapping mapping = new Mapping();
 
+    public void check_add_neighbors(Arena a, int[] pos, String move) {
+        if (a.check_acc(this.visited, pos)) {
+            if (!this.stack.contains(a.arena[pos[1]][pos[0]])) {
+                this.stack.push(a.arena[pos[1]][pos[0]]);
+                this.movement.push(move);
+                this.mapping.add_pair(this.robot.cur, a.arena[pos[1]][pos[0]]);
+            }
+        }
+    }
+
     public void get_neighbors(Arena a, Grid b) {
 
-        ArrayList<int[]> next_positions = this.robot.get_next_positions(a,b);
+        ArrayList<int[]> next_positions = this.robot.get_next_positions(a, b);
 
         int[] pos_S = next_positions.get(0);
         int[] pos_R = next_positions.get(1);
         int[] pos_L = next_positions.get(2);
 
-        if (a.check_acc(this.visited, pos_R)) {
-            if (!this.stack.contains(a.arena[pos_R[1]][pos_R[0]])) {
-                this.stack.push(a.arena[pos_R[1]][pos_R[0]]);
-                this.movement.push("R");
-                this.mapping.add_pair(this.robot.cur, a.arena[pos_R[1]][pos_R[0]]);
-            }
-        }
-        if (a.check_acc(this.visited, pos_L)) {
-            if (!this.stack.contains(a.arena[pos_L[1]][pos_L[0]])) {
-                this.stack.push(a.arena[pos_L[1]][pos_L[0]]);
-                this.movement.push("L");
-                this.mapping.add_pair(this.robot.cur, a.arena[pos_L[1]][pos_L[0]]);
-            }
-        }
-        if (a.check_acc(this.visited, pos_S)) {
-            if (!this.stack.contains(a.arena[pos_S[1]][pos_S[0]])) {
-                this.stack.push(a.arena[pos_S[1]][pos_S[0]]);
-                this.movement.push("S");
-                this.mapping.add_pair(this.robot.cur, a.arena[pos_S[1]][pos_S[0]]);
-            }
-        }
+        check_add_neighbors(a, pos_R, "R");
+        check_add_neighbors(a, pos_L, "L");
+        check_add_neighbors(a, pos_S, "S");
     }
 
     public void start_search(Arena a, Grid s, Grid e, Robot r, boolean Goal_state) {
