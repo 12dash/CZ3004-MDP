@@ -64,6 +64,17 @@ public class Arena {
         }
     }
 
+    public boolean check_acc(ArrayList<Grid> visited, int[] pos) {
+        int x = pos[0];
+        int y = pos[1];
+
+        if ((x >= 0) && (x < this.n) && (y >= 0) && (y < this.m) && (!visited.contains(this.arena[y][x]))) {
+            Grid temp = this.arena[y][x];
+            return temp.getAcc() == Acc.TRUE;
+        }
+        return false;
+    }
+
     public void check_cell_modify_acc(int i, int j) {
         if (((i >= 0) && (i < this.n)) && ((j >= 0) && (j < this.m))) {
             if (this.arena[j][i].getAcc() == Acc.TRUE) {
