@@ -5,8 +5,8 @@ Connection between RPI and Algorithm via IP Socket.
 """
 class Algorithm:
     #Testing using own wifi instead of RPI remember to change to correct IP address
-    WIFI_IP = '192.168.1.175'
-    #WIFI_IP = '192.168.8.8'
+    #WIFI_IP = '192.168.1.175'
+    WIFI_IP = '192.168.8.8'
     WIFI_PORT = 8080
     HEADER = 512
     FORMAT = 'UTF-8'
@@ -80,3 +80,23 @@ class Algorithm:
             print("[ERROR] Message can't be send to Algorithm")
             print("Error message (Algorithm): " + str(error))
             raise error
+
+"""
+This is testing connection between algorithm and rpi to check if the coding works.
+Remember to comment block the code once testing is successful 
+"""
+if __name__ == '__main__':
+    ser = Algorithm()
+    ser.start_connection()
+#this flush function will flush any input output buffer. 
+#to avoid receiving or sending weird or incomplete data at the start of the communication
+    ser.flush()
+
+    while true:
+        msg = "Hi Algorithm from RPI"
+        ser.send_to_client()
+        if ser.in_waiting > 0:
+            print("Reading from Algorithm:")
+            ser.read_from_client()
+
+        ser.stop_connection()
