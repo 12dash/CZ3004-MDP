@@ -20,14 +20,30 @@ class PcConnectionClient:
     msg = msg.encode(FORMAT)
     self.client.send(msg)
 
+  def read_from_server(self):
+    while self.connected:
+      msg = self.client.recv(HEADER).decode(FORMAT)
+      print(f"[SERVER] {msg}")
+      if msg == DISCONNECT_MESSAGE:
+          self.connected = False
+      
+    print(f"[CONNECTION CLOSE] Algorithm at {self.server_ip}")
+    self.client.close()
+
+
 
 if __name__ == '__main__':
   client = PcConnectionClient()
   client.start_connection()
-  while client.connected:
-    msg = input("Send message:")
-    client.send_to_server(msg)
-    if msg == DISCONNECT_MESSAGE:
-      client.connected = False
 
+  # Sending to server
+  # while client.connected:
+  #   msg = input("Send message:")
+  #   client.send_to_server(msg)
+  #   if msg == DISCONNECT_MESSAGE:
+  #     client.connected = False
+
+
+  # Reading from server
+  client.read_from_server()
   

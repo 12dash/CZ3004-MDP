@@ -46,9 +46,7 @@ class PcConnectionServer:
     
     def send_to_client(self, msg):
         try:
-            print("To Algorithm: ")
-            print(msg)
-            message = msg.encode(FORMAT)
+            msg = msg.encode(FORMAT)
             self.client_conn.send(msg)
         except Exception as error:
             print("[ERROR] Message can't be send to Algorithm")
@@ -69,4 +67,13 @@ class PcConnectionServer:
 if __name__ == '__main__':
     server = PcConnectionServer()
     server.start_connection()
-    server.read_from_client()
+
+    # Reading from client
+    # server.read_from_client()
+
+    #Sending to client
+    while server.connected:
+        msg = input("Send message:")
+        server.send_to_client(msg)
+        if msg == DISCONNECT_MESSAGE:
+            server.connected = False
