@@ -1,5 +1,5 @@
 from Algorithm import *
-#from Arduino import *
+from Arduino import *
 
 import threading
 
@@ -15,7 +15,7 @@ class MainThread(threading.Thread):
     def run(self):
         print("[STARTING ALL CONNECTIONS]")
         #initialise the connections
-        self.algo.start_connection()    
+        #self.algo.start_connection()    
         #self.arduino.start_connection()
 
 """
@@ -29,6 +29,6 @@ if __name__ == "__main__":
     #this is temporary till proper threading is done
     mainThread.start()
     #waiting the thread to finish executing b4 terminating the program
-    mainThread.join()
+    #mainThread.join()
     print("Done main thread")
 

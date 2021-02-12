@@ -51,17 +51,21 @@ class Arduino:
 This is testing connection between arduino and rpi to check the coding works.
 Remember to comment block the code once testing is successful 
 """
-#    if __name__ == '__main__':
-#        ser = Arduino()
-#        ser.start_connection()
-#        #this flush function will flush any input output buffer. 
-#        #to avoid receiving or sending weird or incomplete data at the start of the communication
-#       ser.flush()
+"""
+This is testing connection between arduino and rpi to check the coding works.
+Remember to comment block the code once testing is successful 
+"""
+if __name__ == '__main__':
+    ser = Arduino()
+    ser.start_connection()
+#this flush function will flush any input output buffer. 
+#to avoid receiving or sending weird or incomplete data at the start of the communication
+    ser.flush()
 
-#       while true:
-#          msg = "Hi Arduino from RPI"
-#          ser.write_to_arduino(msg)
-#          if ser.in_waiting > 0:
-#             ser.read_from_arduino()
+    while true:
+        msg = "Hi Arduino from RPI"
+        ser.write_to_arduino(msg)
+        if ser.in_waiting > 0:
+            ser.read_from_arduino()
 
-#        ser.stop_connection()
+    ser.stop_connection()
