@@ -7,7 +7,7 @@ import robot.Robot;
 import java.util.ArrayList;
 import java.util.Stack;
 
-public class AStar {
+public class Greedy {
 
     Robot robot = null;
     ArrayList<Grid> visited = new ArrayList<>();
@@ -25,9 +25,9 @@ public class AStar {
         }
     }
 
-
-    public int calculate_cost(Grid next, Grid end) {
-        return -1*(Math.abs((next.x - end.x)) + Math.abs((next.y - end.y)));
+    public double calculate_cost(Grid next, Grid end, String s) {
+        double cost = -1*(Math.abs((next.x - end.x)) + Math.abs((next.y - end.y)));
+        return cost;
     }
 
     public void get_neighbors(Arena a, Grid b, Grid end) {
@@ -38,14 +38,14 @@ public class AStar {
         int[] pos_R = next_positions.get(1);
         int[] pos_L = next_positions.get(2);
 
-        int cost_S = calculate_cost(a.arena[pos_S[1]][pos_S[0]], end);
-        int cost_L = calculate_cost(a.arena[pos_L[1]][pos_L[0]], end);
-        int cost_R = calculate_cost(a.arena[pos_R[1]][pos_R[0]], end);
+        double cost_S = calculate_cost(a.arena[pos_S[1]][pos_S[0]], end, "S");
+        double cost_L = calculate_cost(a.arena[pos_L[1]][pos_L[0]], end, "L");
+        double cost_R = calculate_cost(a.arena[pos_R[1]][pos_R[0]], end, "R");
 
         ArrayList<int[]> pos = new ArrayList<>();
         ArrayList<String> move = new ArrayList<>();
 
-        if (cost_S <= cost_L) {
+        if (cost_S < cost_L) {
             if (cost_S < cost_R) {
                 pos.add(pos_S);
                 move.add("S");
@@ -93,19 +93,19 @@ public class AStar {
                 move.add("S");
             }
         }
-
         check_add_neighbors(a, pos.get(0), move.get(0));
         check_add_neighbors(a, pos.get(1), move.get(1));
         check_add_neighbors(a, pos.get(2), move.get(2));
-
     }
+
+
 
     public void start_search(Arena a, Grid s, Grid e, Robot r, boolean Goal_state) {
 
         //Initializing the Robot
         this.robot = r;
-        this.robot.cur = s;
-        this.robot.or = Orientation.North;
+        this.robot.cur = r.cur;
+        this.robot.or = r.or;
 
         Grid next_grid;
         String next_move;
@@ -126,7 +126,6 @@ public class AStar {
             this.robot.or = next_or;
             this.robot.add_node();
 
-            a.display_solution(this.robot.path);
             if (this.robot.path.size() > 1) {
                 this.robot.fix_path(next_grid, this.mapping);
             }

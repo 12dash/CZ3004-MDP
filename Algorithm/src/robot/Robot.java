@@ -1,5 +1,6 @@
 package robot;
 
+import values.Acc;
 import values.Orientation;
 import algo.Mapping;
 import arena.*;
@@ -14,7 +15,7 @@ public class Robot {
     public ArrayList<Grid> path = new ArrayList<Grid>();
     public ArrayList<Orientation> orientations = new ArrayList<Orientation>();
 
-    public void robot(Grid cur, Orientation or) {
+    public Robot(Grid cur, Orientation or) {
         this.cur = cur;
         this.or = or;
     }
@@ -132,5 +133,6 @@ public class Robot {
             temp = this.path.get(this.path.size() - 2);
         }
     }
+
 
 }

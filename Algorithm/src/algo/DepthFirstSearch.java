@@ -42,8 +42,8 @@ public class DepthFirstSearch {
 
         //Initializing the Robot
         this.robot = r;
-        this.robot.cur = s;
-        this.robot.or = Orientation.North;
+        this.robot.cur = r.cur;
+        this.robot.or = r.or;
 
         Grid next_grid;
         String next_move;

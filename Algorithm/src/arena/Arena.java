@@ -145,16 +145,16 @@ public class Arena {
             solution[temp.y][temp.x] = "O";
         }
         System.out.println("\nSolution");
-
+        System.out.print("\t");
         for (int j = 0; j < 15; j++) {
-            System.out.print(j + "|");
+            System.out.print(j + "\t|");
 
         }
         System.out.println();
         for (int i = 0; i < this.m; i++) {
-            System.out.print("|");
+            System.out.print("\t|");
             for (int j = 0; j < this.n; j++) {
-                System.out.print(solution[i][j] + "|");
+                System.out.print(solution[i][j] + "\t|");
             }
             System.out.println(" " + i);
         }
