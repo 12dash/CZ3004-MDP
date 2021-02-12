@@ -5,10 +5,10 @@ Connection between RPI and Algorithm via IP Socket.
 """
 class Algorithm:
     #Testing using own wifi instead of RPI remember to change to correct IP address
-    #WIFI_IP = '192.168.1.175'
+    WIFI_IP = '192.168.1.175'
     #WIFI_IP = '192.168.8.20'
     #This is the IP address for RPI
-    WIFI_IP = '192.168.8.8'
+    #WIFI_IP = '192.168.8.8'
     WIFI_PORT = 8080
     HEADER = 512
     FORMAT = 'utf-8'
@@ -59,9 +59,8 @@ class Algorithm:
 
     def read_from_client(self):
         try:
-            #print("We are in read_from_client() ")
-
-            receive_msg = self.client_conn.recv(HEADER).decode(FORMAT)
+            print("We are in read_from_client() ")
+            receive_msg = self.client_conn.recv(512).decode('utf-8')
 
             #if msg_length have content
             if len(receive_msg) > 0:             
@@ -101,7 +100,7 @@ if __name__ == '__main__':
     while True:
         print("Type something: ")
         send_msg = input()
-        print ("Write to PC(): %s " %send_msg)
+        print ("Write to PC(): %s " % send_msg)
         pc.send_to_client(send_msg)
 
         print("read from algorithm: ")
