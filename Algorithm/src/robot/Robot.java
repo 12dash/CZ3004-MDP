@@ -15,9 +15,14 @@ public class Robot {
     public ArrayList<Grid> path = new ArrayList<Grid>();
     public ArrayList<Orientation> orientations = new ArrayList<Orientation>();
 
-    public Robot(Grid cur, Orientation or) {
-        this.cur = cur;
+    public Robot(Orientation or) {
+        this.cur = null;
         this.or = or;
+
+    }
+
+    public void setCur(Grid cur){
+        this.cur = cur;
     }
 
     public void add_node() {

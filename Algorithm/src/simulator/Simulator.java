@@ -2,9 +2,10 @@ package simulator;
 
 import arena.Arena;
 import arena.ArenaConstants;
-//import mapTemp.Map;
+import robot.Robot;
 import utility.File_Utility;
 import utility.Map_Descriptor;
+import values.Orientation;
 
 import javax.swing.*;
 import java.awt.*;
@@ -20,11 +21,8 @@ public class Simulator {
 
     private static Robot bot;
 
-    //private static Map realMap = null;              // real map
-    //private static Map exploredMap = null;          // exploration map
-
-    private static Arena realArena = null;
-    private static Arena exploredArena =null;
+    private static Arena realArena = null;            // real arena
+    private static Arena exploredArena =null;         // exploration map
 
     //-- private static int timeLimit = 3600;            // time limit
     //-- private static int coverageLimit = 300;         // coverage limit
@@ -38,27 +36,20 @@ public class Simulator {
      */
     public static void main(String[] args){
 
-
+        bot = new Robot(Orientation.East);
         if (!realRun) {
-            realArena = new Arena(ArenaConstants.ARENA_ROWS, ArenaConstants.ARENA_COLS);
+            realArena = new Arena(ArenaConstants.ARENA_ROWS, ArenaConstants.ARENA_COLS, bot);
             realArena.make_arena();
             realArena.setAllUnexplored();
         }
 
-        exploredArena = new Arena(ArenaConstants.ARENA_ROWS, ArenaConstants.ARENA_COLS);
+        exploredArena = new Arena(ArenaConstants.ARENA_ROWS, ArenaConstants.ARENA_COLS, bot);
         exploredArena.make_arena();
         exploredArena.setAllUnexplored();
 
-
-        Arena arena = new Arena(ArenaConstants.ARENA_ROWS,ArenaConstants.ARENA_COLS);
-        arena.make_arena();
-        arena.add_padding();
-
+        bot.setCur(realArena.arena[18][1]);
 
         //-- if (realRun) comm.openConnection();
-
-        //-- bot = new Robot(RobotConstants.START_ROW, RobotConstants.START_COL, realRun);
-
         displayAll();
     }
 
@@ -150,18 +141,17 @@ public class Simulator {
                     final JTextField loadTF = new JTextField(15);
                     JButton loadMapButton = new JButton("Load");
 
-
-
                     loadMapButton.addMouseListener(new MouseAdapter() {
                         public void mousePressed(MouseEvent e) {
                             loadMapDialog.setVisible(false);
 
                             String[] p_string = File_Utility.read_file(loadTF.getText());
                             int[][] obs = Map_Descriptor.get_map(p_string[0], p_string[1]);
-                            realArena.make_arena(obs);
+                            realArena.setAllExplored();
+                            realArena.update_arena(obs);
+                            realArena.get_view();
 
                             CardLayout cl = ((CardLayout) _mapCards.getLayout());
-
                             cl.show(_mapCards, "REAL_MAP");
                             realArena.repaint();
                         }
@@ -170,11 +160,22 @@ public class Simulator {
                     loadMapDialog.add(loadTF);
                     loadMapDialog.add(loadMapButton);
                     loadMapDialog.setVisible(true);
-
                 }
 
             });
             _buttons.add(btn_LoadMap);
+
+            // Fastest Path Button
+            JButton btn_FastestPath = new JButton("Fastest Path");
+            formatButton(btn_FastestPath);
+            btn_FastestPath.addMouseListener(new MouseAdapter() {
+                public void mousePressed(MouseEvent e) {
+                    CardLayout cl = ((CardLayout) _mapCards.getLayout());
+                    cl.show(_mapCards, "EXPLORATION");
+                    //new FastestPath().execute();
+                }
+            });
+            _buttons.add(btn_FastestPath);
         }
     }
 }
