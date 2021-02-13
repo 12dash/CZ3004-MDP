@@ -77,3 +77,8 @@ if __name__ == '__main__':
         server.send_to_client(msg)
         if msg == DISCONNECT_MESSAGE:
             server.connected = False
+            
+        print("Read from algorithm: ")
+        server.read_from_client()
+
+    server.stop_connection()

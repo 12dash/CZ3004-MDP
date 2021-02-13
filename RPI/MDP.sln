@@ -8,6 +8,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{CFD5743A-A377-41F8-AEF7-6C661B591554}"
 	ProjectSection(SolutionItems) = preProject
 		Algorithm.py = Algorithm.py
+		Algorithm_Client.py = Algorithm_Client.py
 		Android.py = Android.py
 		Arduino.py = Arduino.py
 	EndProjectSection
