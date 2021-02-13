@@ -18,7 +18,7 @@ public class AStar {
     Robot robot;
 
     private int heuristic_cost(Grid cur, String move) {
-        int cost = (int) (-1 * (Math.abs((cur.x - this.end.x)) + Math.abs((cur.y - this.end.y))));
+        int cost = (-1 * (Math.abs((cur.x - this.end.x)) + Math.abs((cur.y - this.end.y))));
         return cost;
     }
 
