@@ -95,6 +95,7 @@ public class AStar {
 
     private void get_path(){
         ArrayList<Grid> path = new ArrayList<>();
+        ArrayList<Orientation> orientation = new ArrayList<Orientation>();
         Node temp = this.visited.get(this.visited.size()-1);
         path.add(temp.cur_grid);
         while(true){
@@ -103,9 +104,11 @@ public class AStar {
                 break;
             }
             path.add(0,temp.cur_grid);
+            orientation.add(0,temp.or);
 
         }
         this.robot.path = path;
+        this.robot.orientations = orientation;
     }
 
     public void start_search(Arena arena, Grid start, Grid end, Robot robot, boolean Goal_State) {
