@@ -8,9 +8,10 @@ package arena;
 
 import values.*;
 
+import javax.swing.*;
 import java.util.ArrayList;
 
-public class Arena {
+public class Arena extends JPanel {
 
     public int m; //number of rows
     public int n; //number of columns
@@ -20,6 +21,14 @@ public class Arena {
         this.m = m;
         this.n = n;
         this.arena = new Grid[this.m][this.n];
+    }
+
+    public void make_arena() {
+        for (int i = 0; i < arena.length; i++) {
+            for (int j = 0; j < arena[0].length; j++) {
+                this.arena[i][j] = new Grid(Types.FREE, i, j);
+            }
+        }
     }
 
     public void make_arena(int[][] temp) {
@@ -123,6 +132,42 @@ public class Arena {
             }
         }
     }
+
+    /**
+     * Sets all cells in the grid to an explored state.
+     */
+    public void setAllExplored() {
+        for (int row = 0; row < arena.length; row++) {
+            for (int col = 0; col < arena[0].length; col++) {
+                arena[row][col].setExplored(true);
+            }
+        }
+    }
+
+    /**
+     * Sets all cells in the grid to an unexplored state except for the START & GOAL zone.
+     */
+    public void setAllUnexplored() {
+        for (int row = 0; row < arena.length; row++) {
+            for (int col = 0; col < arena[0].length; col++) {
+                if (inStartZone(row, col) || inGoalZone(row, col)) {
+                    arena[row][col].setExplored(true);
+                } else {
+                    arena[row][col].setExplored(false);
+                }
+            }
+        }
+    }
+
+    private boolean inStartZone(int row, int col) {
+        return row >= 0 && row <= 2 && col >= 0 && col <= 2;
+    }
+
+    private boolean inGoalZone(int row, int col) {
+        return (row <= ArenaConstants.GOAL_ROW + 1 && row >= ArenaConstants.GOAL_ROW - 1 && col <= ArenaConstants.GOAL_COL + 1 && col >= ArenaConstants.GOAL_COL - 1);
+    }
+
+
 
     public void display_solution(ArrayList<Grid> path) {
 

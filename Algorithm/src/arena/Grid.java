@@ -9,6 +9,7 @@ public class Grid {
     private Acc acc;
     public int x;
     public int y;
+    private boolean isExplored;
     private int pos[] = new int[2];
 
 
@@ -43,5 +44,13 @@ public class Grid {
 
     public void setAcc(Acc acc) {
         this.acc = acc;
+    }
+
+    public void setExplored(boolean explore){
+        this.isExplored = explore;
+    }
+
+    public boolean isExplored(){
+        return this.isExplored;
     }
 }
