@@ -162,11 +162,11 @@ public class Arena extends JPanel {
     }
 
     private boolean inStartZone(int row, int col) {
-        return row >= 0 && row <= 2 && col >= 0 && col <= 2;
+        return (row <= ArenaConstants.GOAL_ROW + 1 && row >= ArenaConstants.GOAL_ROW - 1 && col >= 0 && col <= 2);
     }
 
     private boolean inGoalZone(int row, int col) {
-        return (row <= ArenaConstants.GOAL_ROW + 1 && row >= ArenaConstants.GOAL_ROW - 1 && col <= ArenaConstants.GOAL_COL + 1 && col >= ArenaConstants.GOAL_COL - 1);
+        return (row >= 0 && row <= 2 && col <= ArenaConstants.GOAL_COL + 1 && col >= ArenaConstants.GOAL_COL - 1);
     }
 
 
