@@ -30,7 +30,7 @@ public class Arena extends JPanel {
     public void make_arena() {
         for (int i = 0; i < arena.length; i++) {
             for (int j = 0; j < arena[0].length; j++) {
-                this.arena[i][j] = new Grid(Types.FREE, i, j);
+                this.arena[i][j] = new Grid(Types.FREE, j, i);
             }
         }
     }
@@ -248,8 +248,8 @@ public class Arena extends JPanel {
 
         // Paint the robot on-screen.
         g.setColor(ArenaConstants.C_ROBOT);
-        int r = ArenaConstants.ARENA_ROWS - bot.cur.x;
-        int c = bot.cur.y;
+        int r = ArenaConstants.ARENA_ROWS - bot.cur.y;
+        int c = bot.cur.x;
 
         g.fillOval((c-1) * ArenaConstants.CELL_SIZE + ArenaConstants.ROBOT_X_OFFSET + ArenaConstants.MAP_X_OFFSET, ArenaConstants.MAP_H - (r * ArenaConstants.CELL_SIZE + ArenaConstants.ROBOT_Y_OFFSET), ArenaConstants.ROBOT_W, ArenaConstants.ROBOT_H);
 
