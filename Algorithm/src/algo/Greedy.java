@@ -32,7 +32,7 @@ public class Greedy {
 
     public void get_neighbors(Arena a, Grid b, Grid end) {
 
-        ArrayList<int[]> next_positions = this.robot.get_next_positions(a, b);
+        ArrayList<int[]> next_positions = this.robot.get_next_positions(b);
 
         int[] pos_S = next_positions.get(0);
         int[] pos_R = next_positions.get(1);

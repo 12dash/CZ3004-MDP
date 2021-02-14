@@ -7,7 +7,6 @@
 package arena;
 
 import values.*;
-import robot.Robot;
 
 import javax.swing.*;
 import java.awt.*;
@@ -17,14 +16,15 @@ public class Arena extends JPanel {
 
     public int m; //number of rows
     public int n; //number of columns
+
     public Grid[][] arena;
+
     public Robot bot;
 
-    public Arena(int m, int n, Robot bot) {
+    public Arena(int m, int n) {
         this.m = m;
         this.n = n;
         this.arena = new Grid[this.m][this.n];
-        this.bot = bot;
     }
 
     public void make_arena() {
@@ -138,38 +138,6 @@ public class Arena extends JPanel {
     /**
      * Sets all cells in the grid to an explored state.
      */
-    public void setAllExplored() {
-        for (int row = 0; row < arena.length; row++) {
-            for (int col = 0; col < arena[0].length; col++) {
-                arena[row][col].setExplored(true);
-            }
-        }
-    }
-
-    /**
-     * Sets all cells in the grid to an unexplored state except for the START & GOAL zone.
-     */
-    public void setAllUnexplored() {
-        for (int row = 0; row < arena.length; row++) {
-            for (int col = 0; col < arena[0].length; col++) {
-                if (inStartZone(row, col) || inGoalZone(row, col)) {
-                    arena[row][col].setExplored(true);
-                } else {
-                    arena[row][col].setExplored(false);
-                }
-            }
-        }
-    }
-
-    private boolean inStartZone(int row, int col) {
-        return (row <= ArenaConstants.GOAL_ROW + 1 && row >= ArenaConstants.GOAL_ROW - 1 && col >= 0 && col <= 2);
-    }
-
-    private boolean inGoalZone(int row, int col) {
-        return (row >= 0 && row <= 2 && col <= ArenaConstants.GOAL_COL + 1 && col >= ArenaConstants.GOAL_COL - 1);
-    }
-
-
 
     public void display_solution(ArrayList<Grid> path) {
 
@@ -208,79 +176,7 @@ public class Arena extends JPanel {
     }
 
 
-    /**
-     * Overrides JComponent's paintComponent() method. It creates a two-dimensional array of _DisplayCell objects
-     * to store the current map state. Then, it paints square cells for the grid with the appropriate colors as
-     * well as the robot on-screen.
-     */
-    public void paintComponent(Graphics g) {
-        // Create a two-dimensional array of _DisplayCell objects for rendering.
-        _DisplayGrid[][] _gridCells = new _DisplayGrid[ArenaConstants.ARENA_ROWS][ArenaConstants.ARENA_COLS];
-        for (int row = 0; row < ArenaConstants.ARENA_ROWS; row++) {
-            for (int col = 0; col < ArenaConstants.ARENA_COLS; col++) {
-                _gridCells[row][col] = new Arena._DisplayGrid(col * ArenaConstants.CELL_SIZE, (ArenaConstants.ARENA_ROWS - row) * ArenaConstants.CELL_SIZE, ArenaConstants.CELL_SIZE);
-            }
-        }
 
-        // Paint the cells with the appropriate colors.
-        for (int row = 0; row < ArenaConstants.ARENA_ROWS; row++) {
-            for (int col = 0; col < ArenaConstants.ARENA_COLS; col++) {
-                Color cellColor;
 
-                if (inStartZone(row, col))
-                    cellColor = ArenaConstants.C_START;
-                else if (inGoalZone(row, col))
-                    cellColor = ArenaConstants.C_GOAL;
-                else {
-                    if (!arena[row][col].isExplored())
-                        cellColor = ArenaConstants.C_UNEXPLORED;
-                    else if (arena[row][col].getType() == Types.OBSTACLE)
-                        cellColor = ArenaConstants.C_OBSTACLE;
-                    else
-                        cellColor = ArenaConstants.C_FREE;
-                }
 
-                g.setColor(cellColor);
-                g.fillRect(_gridCells[row][col].cellX + ArenaConstants.MAP_X_OFFSET, _gridCells[row][col].cellY, _gridCells[row][col].cellSize, _gridCells[row][col].cellSize);
-
-            }
-        }
-
-        // Paint the robot on-screen.
-        g.setColor(ArenaConstants.C_ROBOT);
-        int r = ArenaConstants.ARENA_ROWS - bot.cur.y;
-        int c = bot.cur.x;
-
-        g.fillOval((c-1) * ArenaConstants.CELL_SIZE + ArenaConstants.ROBOT_X_OFFSET + ArenaConstants.MAP_X_OFFSET, ArenaConstants.MAP_H - (r * ArenaConstants.CELL_SIZE + ArenaConstants.ROBOT_Y_OFFSET), ArenaConstants.ROBOT_W, ArenaConstants.ROBOT_H);
-
-        // Paint the robot's direction indicator on-screen.
-        g.setColor(ArenaConstants.C_ROBOT_DIR);
-        Orientation o = bot.or;
-        switch (o) {
-            case North:
-                g.fillOval(c * ArenaConstants.CELL_SIZE + 10 + ArenaConstants.MAP_X_OFFSET, ArenaConstants.MAP_H - r * ArenaConstants.CELL_SIZE - 15, ArenaConstants.ROBOT_DIR_W, ArenaConstants.ROBOT_DIR_H);
-                break;
-            case East:
-                g.fillOval(c * ArenaConstants.CELL_SIZE + 35 + ArenaConstants.MAP_X_OFFSET, ArenaConstants.MAP_H - r * ArenaConstants.CELL_SIZE + 10, ArenaConstants.ROBOT_DIR_W, ArenaConstants.ROBOT_DIR_H);
-                break;
-            case South:
-                g.fillOval(c * ArenaConstants.CELL_SIZE + 10 + ArenaConstants.MAP_X_OFFSET, ArenaConstants.MAP_H - r * ArenaConstants.CELL_SIZE + 35, ArenaConstants.ROBOT_DIR_W, ArenaConstants.ROBOT_DIR_H);
-                break;
-            case West:
-                g.fillOval(c * ArenaConstants.CELL_SIZE - 15 + ArenaConstants.MAP_X_OFFSET, ArenaConstants.MAP_H - r * ArenaConstants.CELL_SIZE + 10, ArenaConstants.ROBOT_DIR_W, ArenaConstants.ROBOT_DIR_H);
-                break;
-        }
-    }
-
-    private class _DisplayGrid {
-        public final int cellX;
-        public final int cellY;
-        public final int cellSize;
-
-        public _DisplayGrid(int borderX, int borderY, int borderSize) {
-            this.cellX = borderX + ArenaConstants.CELL_LINE_WEIGHT;
-            this.cellY = ArenaConstants.MAP_H - (borderY - ArenaConstants.CELL_LINE_WEIGHT);
-            this.cellSize = borderSize - (ArenaConstants.CELL_LINE_WEIGHT * 2);
-        }
-    }
 }

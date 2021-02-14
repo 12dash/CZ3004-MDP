@@ -2,6 +2,7 @@ package simulator;
 
 import arena.Arena;
 import arena.ArenaConstants;
+import arena.Temp;
 import robot.Robot;
 import utility.File_Utility;
 import utility.Map_Descriptor;
@@ -21,8 +22,8 @@ public class Simulator {
 
     private static Robot bot;
 
-    private static Arena realArena = null;            // real arena
-    private static Arena exploredArena =null;         // exploration map
+    private static Temp realArena = null;            // real arena
+    private static Temp exploredArena =null;         // exploration map
 
     //-- private static int timeLimit = 3600;            // time limit
     //-- private static int coverageLimit = 300;         // coverage limit
@@ -38,16 +39,16 @@ public class Simulator {
 
         bot = new Robot(Orientation.East);
         if (!realRun) {
-            realArena = new Arena(ArenaConstants.ARENA_ROWS, ArenaConstants.ARENA_COLS, bot);
-            realArena.make_arena();
+            realArena = new Temp(new Arena(ArenaConstants.ARENA_ROWS, ArenaConstants.ARENA_COLS), bot);
+            realArena.arena.make_arena();
             realArena.setAllUnexplored();
         }
 
-        exploredArena = new Arena(ArenaConstants.ARENA_ROWS, ArenaConstants.ARENA_COLS, bot);
-        exploredArena.make_arena();
+        exploredArena = new Temp(new Arena(ArenaConstants.ARENA_ROWS, ArenaConstants.ARENA_COLS), bot);
+        exploredArena.arena.make_arena();
         exploredArena.setAllUnexplored();
 
-        bot.setCur(realArena.arena[18][1]);
+        bot.setCur(realArena.arena.arena[18][1]);
 
         //-- if (realRun) comm.openConnection();
         displayAll();
@@ -148,8 +149,8 @@ public class Simulator {
                             String[] p_string = File_Utility.read_file(loadTF.getText());
                             int[][] obs = Map_Descriptor.get_map(p_string[0], p_string[1]);
                             realArena.setAllExplored();
-                            realArena.update_arena(obs);
-                            realArena.get_view();
+                            realArena.arena.update_arena(obs);
+                            realArena.arena.get_view();
 
                             CardLayout cl = ((CardLayout) _mapCards.getLayout());
                             cl.show(_mapCards, "REAL_MAP");

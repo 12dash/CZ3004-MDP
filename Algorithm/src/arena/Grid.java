@@ -7,9 +7,12 @@ public class Grid {
 
     private Types type;
     private Acc acc;
+
     public int x;
     public int y;
+
     private boolean isExplored;
+
     private int pos[] = new int[2];
 
 

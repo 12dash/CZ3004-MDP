@@ -14,8 +14,10 @@ public class AStar {
 
     ArrayList<Grid> candidate_grid = new ArrayList<Grid>();
     ArrayList<Grid> visited_grid = new ArrayList<Grid>();
+
     Grid end;
     Robot robot;
+    Arena arena;
 
     private int heuristic_cost(Grid cur, String move) {
         int cost = (-1 * (Math.abs((cur.x - this.end.x)) + Math.abs((cur.y - this.end.y))));
@@ -41,7 +43,7 @@ public class AStar {
         Node r;
         Node l;
 
-        ArrayList<int[]> next_positions = this.robot.get_next_positions(arena, cur.cur_grid);
+        ArrayList<int[]> next_positions = this.robot.get_next_positions(cur.cur_grid);
 
         int[] pos_S = next_positions.get(0);
         int[] pos_R = next_positions.get(1);
@@ -93,25 +95,42 @@ public class AStar {
         return pos;
     }
 
-    private void get_path(){
+    private void get_path() {
         ArrayList<Grid> path = new ArrayList<>();
         ArrayList<Orientation> orientation = new ArrayList<Orientation>();
-        Node temp = this.visited.get(this.visited.size()-1);
+        Node temp = this.visited.get(this.visited.size() - 1);
         path.add(temp.cur_grid);
-        while(true){
+        while (true) {
             temp = temp.parent_grid;
-            if (temp == null){
+            if (temp == null) {
                 break;
             }
-            path.add(0,temp.cur_grid);
-            orientation.add(0,temp.or);
+            path.add(0, temp.cur_grid);
+            orientation.add(0, temp.or);
 
         }
-        this.robot.path = path;
-        this.robot.orientations = orientation;
+        System.out.println(this.robot.path.size());
+
+        if (this.robot.path.size() == 0) {
+            this.robot.path = path;
+            this.robot.orientations = orientation;
+            this.arena.display_solution(path);
+            System.out.println("123");
+        } else {
+            for (int i = 0; i < path.size()-1; i++) {
+
+                this.robot.path.add(path.get(i));
+                this.robot.orientations.add(orientation.get(i));
+
+            }
+        }
+
     }
 
-    public void start_search(Arena arena, Grid start, Grid end, Robot robot, boolean Goal_State) {
+    public void start_search(Arena arena, Grid end, Robot robot, boolean Goal_State) {
+
+        Grid start = robot.cur;
+        this.arena = arena;
 
         this.robot = robot;
         this.end = end;
@@ -125,31 +144,29 @@ public class AStar {
         while (!candidate.isEmpty()) {
             int min_pos = min_cost();
             Node can = candidate.get(min_pos);
-            robot.update_position(can.cur_grid,can.or);
+            robot.update_position(can.cur_grid, can.or);
             this.candidate.remove(min_pos);
             this.visited.add(can);
             this.visited_grid.add(can.cur_grid);
             if (Goal_State) {
                 int x = can.cur_grid.x;
                 int y = can.cur_grid.y;
-                if ((x >= 12) && (y <= 2)) {
+                if ((x >= 12) && (y <= 2) && Goal_State) {
                     System.out.println("Reached the Goal State");
                     get_path();
                     return;
                 }
             }
-            if (can.cur_grid.equals(this.end)) {
+            if (!Goal_State && can.cur_grid.equals(this.end)) {
                 System.out.println("Reached End Stop");
                 get_path();
                 arena.display_solution(this.robot.path);
                 return;
             } else {
                 get_neighbours(can, arena);
-
             }
         }
     }
-
 
 
 }
