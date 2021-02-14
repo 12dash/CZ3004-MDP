@@ -3,14 +3,16 @@ import serial
 """
 Connection between RPI and Arduino via USB
 """
+"""
+Configuration for Arduino
+"""
+#serial port name can be changed
+SERIAL_PORT = '/dev/ttyACM0'
+#Baud Rate 57600/ 115200 for no future problems
+BAUD = 9600
+FORMAT = 'UTF-8'
 
 class Arduino:
-    #serial port name can be changed
-    SERIAL_PORT = '/dev/ttyACM0'
-    #Baud Rate 57600/ 115200 for no future problems
-    BAUD = 9600
-    FORMAT = 'UTF-8'
-
     def __init__(self, serial_port = SERIAL_PORT, baud_rate = BAUD):
         self.serial_port = serial_port
         self.baud_rate = baud_rate
@@ -35,7 +37,11 @@ class Arduino:
             print(f"[ARDUINO] {msg}")
 
         except Exception as error:
-            print("[ERROR] Message from Arduino fail to print")
+            print("[ERROR] Message from Arduino fail to print: " + str(error))
+            raise error
+            #reconnect
+            #self.stop_connection()
+            #self.start_connection()
 
     def write_to_arduino(self, msg):
          try:
@@ -44,9 +50,11 @@ class Arduino:
              self.ser.write(msg).encode(FORMAT)
 
          except Exception as error:
-            print("[ERROR] Message can't be send to Arduino")
-            print("Error message (Arduino): " + str(error))
+            print("[ERROR] Message can't be send to Arduino: " + str(error))
             raise error
+            #reconnect
+            #self.stop_connection()
+            #self.start_connection()
 """
 This is testing connection between arduino and rpi to check the coding works.
 Remember to comment block the code once testing is successful 
