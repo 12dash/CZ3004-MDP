@@ -8,13 +8,18 @@ package arena;
 
 import values.*;
 
+import javax.swing.*;
+import java.awt.*;
 import java.util.ArrayList;
 
-public class Arena {
+public class Arena extends JPanel {
 
     public int m; //number of rows
     public int n; //number of columns
+
     public Grid[][] arena;
+
+    public Robot bot;
 
     public Arena(int m, int n) {
         this.m = m;
@@ -22,15 +27,21 @@ public class Arena {
         this.arena = new Grid[this.m][this.n];
     }
 
-    public void make_arena(int[][] temp) {
+    public void make_arena() {
+        for (int i = 0; i < arena.length; i++) {
+            for (int j = 0; j < arena[0].length; j++) {
+                this.arena[i][j] = new Grid(Types.FREE, j, i);
+            }
+        }
+    }
+
+    public void update_arena(int[][] temp) {
         for (int i = 0; i < temp.length; i++) {
             for (int j = 0; j < temp[0].length; j++) {
-                int y = i;
-                int x = j;
                 if (temp[i][j] == 1) {
-                    this.arena[i][j] = new Grid(Types.OBSTACLE, x, y);
+                    this.arena[i][j].setType(Types.OBSTACLE);
                 } else {
-                    this.arena[i][j] = new Grid(Types.FREE, x, y);
+                    this.arena[i][j].setType(Types.FREE);
                 }
             }
         }
@@ -124,6 +135,10 @@ public class Arena {
         }
     }
 
+    /**
+     * Sets all cells in the grid to an explored state.
+     */
+
     public void display_solution(ArrayList<Grid> path) {
 
         String[][] solution = new String[this.m][this.n];
@@ -159,4 +174,9 @@ public class Arena {
             System.out.println(" " + i);
         }
     }
+
+
+
+
+
 }

@@ -1,17 +1,14 @@
 package com.company;
 
-import algo.AStar;
-import algo.Greedy;
-import algo.DepthFirstSearch;
-import arena.Arena;
-import arena.Grid;
+import algo.*;
+import arena.*;
 import robot.Robot;
-import robot.Utility;
-import utility.Map_Descriptor;
-import utility.File_Utility;
+
 import values.Orientation;
 
-import java.util.ArrayList;
+import utility.Map_Descriptor;
+import utility.File_Utility;
+import values.Types;
 
 public class Main {
 
@@ -22,13 +19,15 @@ public class Main {
         int[][] obs = Map_Descriptor.get_map(p_string[0], p_string[1]);
 
         Arena arena = new Arena(20, 15);
-        arena.make_arena(obs);
+        arena.make_arena();
+        arena.update_arena(obs);
         arena.add_padding();
 
-        Robot robot = new Robot(arena.arena[18][1], Orientation.East);
+        Robot robot = new Robot(Orientation.East);
+        robot.setCur(arena.arena[18][1]);
 
-        AStar search = new AStar();
-        search.start_search(arena, arena.arena[18][1], arena.arena[1][13], robot, true);
-        arena.display_solution(robot.path);
+        FastestPath.findPath(arena,new int[] {13,16},robot);
+
+
     }
 }

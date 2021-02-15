@@ -1,23 +1,24 @@
 package robot;
 
-import values.Acc;
 import values.Orientation;
 import algo.Mapping;
 import arena.*;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class Robot {
 
-    public Grid cur = null;
-    public Orientation or = null;
-    public ArrayList<Grid> path = new ArrayList<Grid>();
-    public ArrayList<Orientation> orientations = new ArrayList<Orientation>();
+    public Grid cur;
+    public Orientation or;
+    public ArrayList<Grid> path = new ArrayList<>();
+    public ArrayList<Orientation> orientations = new ArrayList<>();
 
-    public Robot(Grid cur, Orientation or) {
-        this.cur = cur;
+    public Robot(Orientation or) {
         this.or = or;
+    }
+
+    public void setCur(Grid cur){
+        this.cur = cur;
     }
 
     public void add_node() {
@@ -25,17 +26,12 @@ public class Robot {
         this.orientations.add(this.or);
     }
 
-    public void remove_node() {
-        this.path.remove(this.path.size() - 1);
-        this.orientations.remove(this.orientations.size() - 1);
-    }
-
     public void update_position(Grid new_grid, Orientation new_or) {
         this.cur = new_grid;
         this.or = new_or;
     }
 
-    public ArrayList<int[]> get_next_positions(Arena a, Grid b) {
+    public ArrayList<int[]> get_next_positions(Grid b) {
 
         Orientation or = this.or;
 
@@ -72,7 +68,7 @@ public class Robot {
                 break;
             }
         }
-        ArrayList<int[]> return_variable = new ArrayList<int[]>();
+        ArrayList<int[]> return_variable = new ArrayList<>();
         return_variable.add(pos_S);
         return_variable.add(pos_R);
         return_variable.add(pos_L);
