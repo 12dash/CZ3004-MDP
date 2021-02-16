@@ -26,22 +26,18 @@ class PcConnectionServer:
         self.connected = True
 
     def read_from_client(self):
-        while self.connected:
-            msg = self.client_conn.recv(PC_BUFFER_SIZE).decode(FORMAT)
-            print(f"[ALGORITHM] {msg}")
+        print("Reading message from PC: ")
+        msg = self.client_conn.recv(PC_BUFFER_SIZE).decode(FORMAT)
+        print(f"[PC] {msg}")
+        return msg
             
+    def send_to_client(self, msg):
+        try:
+            msg = msg.encode(FORMAT)
+            self.client_conn.send(msg)
+
             if msg == DISCONNECT_MESSAGE:
                 self.stop_connection()
-            
-    def send_to_client(self):
-        try:
-            while self.connected:
-                msg = input("Send message:")
-                msg = msg.encode(FORMAT)
-                self.client_conn.send(msg)
-
-                if msg == DISCONNECT_MESSAGE:
-                    self.stop_connection()
         except Exception as error:
             print("[ERROR] Message can't be send to Algorithm")
             print("Error message (Algorithm): " + str(error))

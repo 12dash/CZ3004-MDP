@@ -34,7 +34,7 @@ class AndroidBluetoothServer:
             print("[ERROR] Connection to Andorid failed: " + str(error))
             raise error
 
-    def close_connection(self):
+    def stop_connection(self):
         if self.client_sock:
             self.client_sock.close()
             print("[CONNECTION CLOSE] Bluetooth on Tablet close")
@@ -50,10 +50,10 @@ class AndroidBluetoothServer:
 
     def read_from_client(self):
         try:
-            while self.connected:
-                print("Reading message from android: ")
-                msg = self.client_sock.recv(ANDROID_BUFFER_SIZE).decode(FORMAT)
-                print(f"[ANDROID] {msg}")
+            print("Reading message from android: ")
+            msg = self.client_sock.recv(ANDROID_BUFFER_SIZE).decode(FORMAT)
+            print(f"[ANDROID] {msg}")
+            return msg
         except Exception as error:
              print("[ERROR] Message from Andorid fail to print: " + str(error))
              raise error
@@ -61,12 +61,12 @@ class AndroidBluetoothServer:
              #self.close_connection()
              #self.start_connection()
 
-    def send_to_client(self):
+    def send_to_client(self, msg):
         try:
-            while self.connected:
-                print("To Android: ")
-                msg = input()
-                self.client_sock.send(msg)
+            self.client_sock.send(msg)
+
+            if msg == DISCONNECT_MESSAGE:
+                self.stop_connection()
 
         except Exception as error:
             print("[ERROR] Message from RPI to Android fail to send: " + str(error))
