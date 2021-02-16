@@ -56,4 +56,8 @@ public class Grid {
     public boolean isExplored(){
         return this.isExplored;
     }
+
+    public void displayCurrentGrid(){
+        System.out.println(String.format("(%d, %d)",x, y));
+    }
 }

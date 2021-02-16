@@ -19,8 +19,6 @@ public class Arena extends JPanel {
 
     public Grid[][] arena;
 
-    public Robot bot;
-
     public Arena(int m, int n) {
         this.m = m;
         this.n = n;
@@ -174,9 +172,5 @@ public class Arena extends JPanel {
             System.out.println(" " + i);
         }
     }
-
-
-
-
 
 }
