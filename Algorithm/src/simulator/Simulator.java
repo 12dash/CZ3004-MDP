@@ -37,7 +37,7 @@ public class Simulator {
      */
     public static void main(String[] args){
 
-        bot = new Robot(Orientation.East);
+        bot = new Robot(Orientation.East,null);
         if (!realRun) {
             realArena = new Temp(new Arena(ArenaConstants.ARENA_ROWS, ArenaConstants.ARENA_COLS), bot);
             realArena.arena.make_arena();
@@ -47,7 +47,6 @@ public class Simulator {
         exploredArena = new Temp(new Arena(ArenaConstants.ARENA_ROWS, ArenaConstants.ARENA_COLS), bot);
         exploredArena.arena.make_arena();
         exploredArena.setAllUnexplored();
-
         bot.setCur(realArena.arena.arena[18][1]);
 
         //-- if (realRun) comm.openConnection();

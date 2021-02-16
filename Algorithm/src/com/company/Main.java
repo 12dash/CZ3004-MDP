@@ -14,7 +14,7 @@ public class Main {
 
     public static void main(String[] args) {
 
-        String path = "example_5.txt";
+        String path = "example_4.txt";
         String[] p_string = File_Utility.read_file(path);
         int[][] obs = Map_Descriptor.get_map(p_string[0], p_string[1]);
 
@@ -23,8 +23,7 @@ public class Main {
         arena.update_arena(obs);
         arena.add_padding();
 
-        Robot robot = new Robot(Orientation.East);
-        robot.setCur(arena.arena[18][1]);
+        Robot robot = new Robot(Orientation.East,arena.arena[18][1] );
 
         FastestPath.findPath(arena,new int[] {13,16},robot);
 
