@@ -2,6 +2,7 @@ package algo;
 
 import arena.*;
 import robot.Robot;
+import robot.Utility;
 
 public class FastestPath {
 
@@ -20,6 +21,8 @@ public class FastestPath {
         search = new AStar();
         search.start_search(arena, arena.arena[1][13], robot, true);
         arena.display_solution(robot.path);
-        
+
+        print(robot);
+
     }
 }

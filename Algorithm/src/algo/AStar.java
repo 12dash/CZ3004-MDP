@@ -146,7 +146,7 @@ public class AStar {
             if (Goal_State) {
                 int x = can.cur_grid.x;
                 int y = can.cur_grid.y;
-                if ((x >= 12) && (y <= 2) && Goal_State) {
+                if ((x > 12) && (y < 2) && Goal_State) {
                     System.out.println("Reached the Goal State");
                     get_path();
                     return;
