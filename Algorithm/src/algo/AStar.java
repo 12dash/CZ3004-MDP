@@ -107,22 +107,17 @@ public class AStar {
             }
             path.add(0, temp.cur_grid);
             orientation.add(0, temp.or);
-
         }
-        System.out.println(this.robot.path.size());
-
         if (this.robot.path.size() == 0) {
             this.robot.path = path;
             this.robot.orientations = orientation;
-            this.arena.display_solution(path);
-            System.out.println("123");
-        } else {
-            for (int i = 0; i < path.size()-1; i++) {
 
+        } else {
+            for (int i = 1; i < path.size()-1; i++) {
                 this.robot.path.add(path.get(i));
                 this.robot.orientations.add(orientation.get(i));
-
             }
+            this.robot.orientations.add(this.robot.or);
         }
 
     }
@@ -160,7 +155,6 @@ public class AStar {
             if (!Goal_State && can.cur_grid.equals(this.end)) {
                 System.out.println("Reached End Stop");
                 get_path();
-                arena.display_solution(this.robot.path);
                 return;
             } else {
                 get_neighbours(can, arena);

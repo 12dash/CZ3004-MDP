@@ -5,6 +5,12 @@ import robot.Robot;
 
 public class FastestPath {
 
+    public static void print(Robot r){
+        for(int i = 0;i<r.path.size();i++){
+            System.out.println(r.path.get(i).x +" "+r.path.get(i).y + " " + r.orientations.get(i));
+        }
+    }
+
     public static void findPath(Arena arena, int[] wayPoint_cord, Robot robot){
 
         AStar search = new AStar();
@@ -14,5 +20,6 @@ public class FastestPath {
         search = new AStar();
         search.start_search(arena, arena.arena[1][13], robot, true);
         arena.display_solution(robot.path);
+        
     }
 }
