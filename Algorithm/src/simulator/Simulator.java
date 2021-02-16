@@ -1,9 +1,12 @@
 package simulator;
 
+import algo.FastestPath;
 import arena.Arena;
 import arena.ArenaConstants;
+import arena.Grid;
 import arena.Temp;
 import robot.Robot;
+import robot.RobotConstants;
 import utility.File_Utility;
 import utility.Map_Descriptor;
 import values.Orientation;
@@ -12,6 +15,9 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.nio.ReadOnlyBufferException;
+import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 
 
 public class Simulator {
@@ -48,7 +54,7 @@ public class Simulator {
         exploredArena.arena.make_arena();
         exploredArena.setAllUnexplored();
 
-        bot.setCur(realArena.arena.arena[18][1]);
+        bot.setCur(realArena.arena.arena[RobotConstants.ROBOT_START_Y][RobotConstants.ROBOT_START_X]);
 
         //-- if (realRun) comm.openConnection();
         displayAll();
@@ -61,13 +67,6 @@ public class Simulator {
         _appFrame.setTitle("Simulator");
 
         _appFrame.setSize(new Dimension(SimulatorConstants.DEFAULT_WIDTH, SimulatorConstants.DEFAULT_HEIGHT));
-        // _appFrame.setResizable(false);
-
-        // Center the main frame in the middle of the screen
-        // Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
-        //_appFrame.setLocation(dim.width / 2 - _appFrame.getSize().width / 2, dim.height / 2 - _appFrame.getSize().height / 2);
-
-        // Create the CardLayout for storing the different maps
         _mapCards = new JPanel(new CardLayout());
 
         // Create the JPanel for the buttons
@@ -90,10 +89,27 @@ public class Simulator {
 
     }
 
-    /**
-     * Initialises the main map view by adding the different maps as cards in the CardLayout. Displays realMap
-     * by default.
-     */
+    public static void simulateRobotMovement(ArrayList<Grid> path, ArrayList<Orientation> orientations) throws InterruptedException {
+        // Emulate real movement by pausing execution.
+        for (int i = 0; i < path.size(); i++) {
+            try {
+                TimeUnit.MILLISECONDS.sleep(RobotConstants.SPEED);
+            } catch (InterruptedException e) {
+                System.out.println("Something went wrong in robot simulation!");
+            }
+            //System.out.println(String.format("Path Length: %d", path.size()));
+            //bot.cur.displayCurrentGrid();
+            bot.update_position(path.get(i), orientations.get(i));
+            realArena.repaint();
+            System.out.println(orientations.get(i));
+            System.out.println(path.get(i));
+            //bot.cur.displayCurrentGrid();
+        }
+    }
+        /**
+         * Initialises the main map view by adding the different maps as cards in the CardLayout. Displays realMap
+         * by default.
+         */
 
 
     public static void initialiseMap(){
@@ -150,7 +166,8 @@ public class Simulator {
                             int[][] obs = Map_Descriptor.get_map(p_string[0], p_string[1]);
                             realArena.setAllExplored();
                             realArena.arena.update_arena(obs);
-                            realArena.arena.get_view();
+                            realArena.arena.add_padding();
+                            //realArena.arena.get_view();
 
                             CardLayout cl = ((CardLayout) _mapCards.getLayout());
                             cl.show(_mapCards, "REAL_MAP");
@@ -166,17 +183,58 @@ public class Simulator {
             });
             _buttons.add(btn_LoadMap);
 
-            // Fastest Path Button
-            JButton btn_FastestPath = new JButton("Fastest Path");
-            formatButton(btn_FastestPath);
-            btn_FastestPath.addMouseListener(new MouseAdapter() {
-                public void mousePressed(MouseEvent e) {
-                    CardLayout cl = ((CardLayout) _mapCards.getLayout());
-                    cl.show(_mapCards, "EXPLORATION");
-                    //new FastestPath().execute();
-                }
-            });
-            _buttons.add(btn_FastestPath);
         }
+
+        // FastestPath Class for Multithreading
+        class FastestPath extends SwingWorker<Integer, String> {
+            protected Integer doInBackground() throws Exception {
+                bot.setCur(realArena.arena.arena[RobotConstants.ROBOT_START_Y][RobotConstants.ROBOT_START_X]);
+                realArena.repaint();
+
+                if (realRun) {
+                    while (true) {
+                        System.out.println("Waiting for FP_START...");
+                       //-- String msg = comm.recvMsg();
+                       //-- if (msg.equals(CommMgr.FP_START)) break;
+                    }
+                }
+                bot.reInitialisePathAndOrientations();
+                algo.FastestPath.findPath(realArena.arena, new int[] {13,16}, bot);
+
+                try {
+                    simulateRobotMovement(realArena.bot.path, realArena.bot.orientations);
+                } catch (InterruptedException ex) {
+                    ex.printStackTrace();
+                }
+               // algo.FastestPath.findPath(exploredArena.arena, new int[] {13,16}, bot);
+
+
+                return 222;
+            }
+        }
+
+        // Fastest Path Button
+        JButton btn_FastestPath = new JButton("Fastest Path");
+        formatButton(btn_FastestPath);
+        btn_FastestPath.addMouseListener(new MouseAdapter() {
+            public void mousePressed(MouseEvent e) {
+                CardLayout cl = ((CardLayout) _mapCards.getLayout());
+                cl.show(_mapCards, "REAL_MAP");
+                bot.setCur(realArena.arena.arena[RobotConstants.ROBOT_START_Y][RobotConstants.ROBOT_START_X]);
+                realArena.repaint();
+
+                if (realRun) {
+                    while (true) {
+                        System.out.println("Waiting for FP_START...");
+                        //-- String msg = comm.recvMsg();
+                        //-- if (msg.equals(CommMgr.FP_START)) break;
+                    }
+                }
+
+
+                new FastestPath().execute();
+            }
+        });
+        _buttons.add(btn_FastestPath);
     }
 }

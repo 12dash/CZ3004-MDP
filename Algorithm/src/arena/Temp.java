@@ -39,6 +39,10 @@ public class Temp extends JPanel {
         return (row >= 0 && row <= 2 && col <= ArenaConstants.GOAL_COL + 1 && col >= ArenaConstants.GOAL_COL - 1);
     }
 
+
+
+
+
     /**
      * Overrides JComponent's paintComponent() method. It creates a two-dimensional array of _DisplayCell objects
      * to store the current map state. Then, it paints square cells for the grid with the appropriate colors as
@@ -46,6 +50,7 @@ public class Temp extends JPanel {
      */
     public void paintComponent(Graphics g) {
         // Create a two-dimensional array of _DisplayCell objects for rendering.
+        super.paintComponent(g);
         Temp._DisplayGrid[][] _gridCells = new Temp._DisplayGrid[ArenaConstants.ARENA_ROWS][ArenaConstants.ARENA_COLS];
         for (int row = 0; row < ArenaConstants.ARENA_ROWS; row++) {
             for (int col = 0; col < ArenaConstants.ARENA_COLS; col++) {
@@ -81,6 +86,7 @@ public class Temp extends JPanel {
         g.setColor(ArenaConstants.C_ROBOT);
         int r = ArenaConstants.ARENA_ROWS - this.bot.cur.y;
         int c = bot.cur.x;
+        System.out.println(String.format("(%d, %d)", r, c));
 
         g.fillOval((c - 1) * ArenaConstants.CELL_SIZE + ArenaConstants.ROBOT_X_OFFSET + ArenaConstants.MAP_X_OFFSET, ArenaConstants.MAP_H - (r * ArenaConstants.CELL_SIZE + ArenaConstants.ROBOT_Y_OFFSET), ArenaConstants.ROBOT_W, ArenaConstants.ROBOT_H);
 

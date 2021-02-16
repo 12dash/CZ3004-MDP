@@ -4,17 +4,23 @@ import values.Orientation;
 import algo.Mapping;
 import arena.*;
 
+import javax.print.attribute.standard.OrientationRequested;
 import java.util.ArrayList;
 
 public class Robot {
 
     public Grid cur;
     public Orientation or;
-    public ArrayList<Grid> path = new ArrayList<>();
+    public ArrayList<Grid> path = new ArrayList<>();      // Stores the path robot moves
     public ArrayList<Orientation> orientations = new ArrayList<>();
 
     public Robot(Orientation or) {
         this.or = or;
+    }
+
+    public Robot(Orientation or, Grid cur){
+        this.or = or;
+        this.cur = cur;
     }
 
     public void setCur(Grid cur){
@@ -26,11 +32,21 @@ public class Robot {
         this.orientations.add(this.or);
     }
 
+    public void reInitialisePathAndOrientations(){
+        this.path = new ArrayList<Grid>();
+        this.orientations = new ArrayList<Orientation>();
+
+    }
+
+
     public void update_position(Grid new_grid, Orientation new_or) {
         this.cur = new_grid;
         this.or = new_or;
     }
 
+    /**
+      Returns the neighbouring cells (Straight, Left, Right)
+     */
     public ArrayList<int[]> get_next_positions(Grid b) {
 
         Orientation or = this.or;
@@ -75,6 +91,10 @@ public class Robot {
         return return_variable;
     }
 
+    /**
+     * Returns the orientation of the robot after next move
+     */
+
     public Orientation new_orientation(String next_move) {
 
         Orientation next_or;
@@ -116,6 +136,10 @@ public class Robot {
         }
         return null;
     }
+
+    /**
+     * Utility for mapping in DFS
+     */
 
     public void fix_path(Grid a, Mapping mapping) {
         Grid parent = mapping.find_parent(a);
