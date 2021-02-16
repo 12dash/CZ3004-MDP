@@ -1,12 +1,11 @@
 import socket
 import threading
-from PcConnectionServer import SERVER_IP, PORT, HEADER, FORMAT, DISCONNECT_MESSAGE
+from config import *
 
 class PcConnectionClient:
   def __init__(self):
     self.client = None
     self.server_ip = SERVER_IP
-    # self.server_ip = "192.168.8.8"
     self.connected = False
     print("Client initialized")
 
@@ -28,7 +27,7 @@ class PcConnectionClient:
 
   def read_from_server(self):
     while self.connected:
-      msg = self.client.recv(HEADER).decode(FORMAT)
+      msg = self.client.recv(PC_BUFFER_SIZE).decode(FORMAT)
       print(f"[SERVER] {msg}")
       if msg == DISCONNECT_MESSAGE:
         self.stop_connection()

@@ -1,14 +1,9 @@
 from bluetooth import *
+from config import * 
+
 """
 Connection between RPI and Android via rfcomm
 """
-
-"""
-Configuration for Andriod
-"""
-#generic uuid
-UUID = "00001101-0000-1000-8000-00805F9B34FB"
-PORT = 6
 
 class AndroidBluetoothServer:
     def __init__(self):
@@ -20,7 +15,7 @@ class AndroidBluetoothServer:
         try:
             self.server_sock = BluetoothSocket(RFCOMM)
             #port must indicate what port RPI is in.
-            self.server_sock.bind(("",PORT))
+            self.server_sock.bind(("",RFCOMM_CHNL))
             self.server_sock.listen(3)
             port = self.server_sock.getsockname()[1]
 
@@ -57,7 +52,7 @@ class AndroidBluetoothServer:
         try:
             while self.connected:
                 print("Reading message from android: ")
-                msg = self.client_sock.recv(2048)
+                msg = self.client_sock.recv(ANDROID_BUFFER_SIZE).decode(FORMAT)
                 print(f"[ANDROID] {msg}")
         except Exception as error:
              print("[ERROR] Message from Andorid fail to print: " + str(error))

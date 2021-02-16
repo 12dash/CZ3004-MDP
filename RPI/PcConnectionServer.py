@@ -1,18 +1,9 @@
 import socket
+from config import *
 
 """
 Connection between RPI and Algorithm via IP Socket. 
 """
-
-"""
-CONFIG FOR IP SOCKET PROGRAMMING
-"""
-SERVER_IP = socket.gethostbyname(socket.gethostname() + ".local") # should give "192.168.8.8" on the rpi
-PORT = 8080
-HEADER = 2048
-FORMAT = 'UTF-8'
-DISCONNECT_MESSAGE = "!DISCONNECT!"
-
 
 class PcConnectionServer:
     def __init__(self, server_ip = SERVER_IP, port = PORT):
@@ -36,7 +27,7 @@ class PcConnectionServer:
 
     def read_from_client(self):
         while self.connected:
-            msg = self.client_conn.recv(HEADER).decode(FORMAT)
+            msg = self.client_conn.recv(PC_BUFFER_SIZE).decode(FORMAT)
             print(f"[ALGORITHM] {msg}")
             
             if msg == DISCONNECT_MESSAGE:
