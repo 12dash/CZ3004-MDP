@@ -7,7 +7,8 @@ Connection between RPI and Android via rfcomm
 Configuration for Andriod
 """
 #generic uuid
-UUID = "94f39d29-7d6d-437d-973b-fba39e49d4ee"
+UUID = "00001101-0000-1000-8000-00805F9B34FB"
+PORT = 6
 
 class Android:
     def __init__(self):
@@ -19,19 +20,18 @@ class Android:
         try:
             self.server_sock = BluetoothSocket(RFCOMM)
             #port must indicate what port RPI is in.
-            self.server_sock.bind(("",PORT_ANY))
+            self.server_sock.bind(("",PORT))
             self.server_sock.listen(3)
-            port = server_sock.getsockname()[1]
+            port = self.server_sock.getsockname()[1]
 
-            advertise_service( self.server_sock, "MDP-Server",
+            advertise_service( self.server_sock, "RPI Bluetooth Server",
              service_id = UUID,
              service_classes = [ UUID, SERIAL_PORT_CLASS ],
              profiles = [ SERIAL_PORT_PROFILE ],
-             # protocols = [ OBEX_UUID ]
-             )
+              )
 
             print("Waiting for connection on RFCOMM channel %d" % port)
-            self.client_sock, client_info = server_sock.accept()
+            self.client_sock, client_info = self.server_sock.accept()
             print("[NEW CONNECTION] Bluetooth connection with Android connected to ", client_info)
             self.bluetooth_is_connected = True
 
