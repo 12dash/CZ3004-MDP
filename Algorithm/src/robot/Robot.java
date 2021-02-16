@@ -14,11 +14,6 @@ public class Robot {
     public ArrayList<Grid> path = new ArrayList<>();      // Stores the path robot moves
     public ArrayList<Orientation> orientations = new ArrayList<>();
 
-    public Robot(Orientation or, Grid cur) {
-        this.or = or;
-        this.cur = cur;
-    }
-
     public Robot(Orientation or, Grid cur){
         this.or = or;
         this.cur = cur;

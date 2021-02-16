@@ -53,12 +53,8 @@ public class Simulator {
         exploredArena = new Temp(new Arena(ArenaConstants.ARENA_ROWS, ArenaConstants.ARENA_COLS), bot);
         exploredArena.arena.make_arena();
         exploredArena.setAllUnexplored();
-<<<<<<< HEAD
 
-        bot.setCur(realArena.arena.arena[RobotConstants.ROBOT_START_Y][RobotConstants.ROBOT_START_X]);
-=======
         bot.setCur(realArena.arena.arena[18][1]);
->>>>>>> 51cdd0667549f4d26500956a55a0f2206145e259
 
         //-- if (realRun) comm.openConnection();
         displayAll();
@@ -101,13 +97,10 @@ public class Simulator {
             } catch (InterruptedException e) {
                 System.out.println("Something went wrong in robot simulation!");
             }
-            //System.out.println(String.format("Path Length: %d", path.size()));
-            //bot.cur.displayCurrentGrid();
             bot.update_position(path.get(i), orientations.get(i));
             realArena.repaint();
             System.out.println(orientations.get(i));
             System.out.println(path.get(i));
-            //bot.cur.displayCurrentGrid();
         }
     }
         /**
@@ -194,7 +187,6 @@ public class Simulator {
             protected Integer doInBackground() throws Exception {
                 bot.setCur(realArena.arena.arena[RobotConstants.ROBOT_START_Y][RobotConstants.ROBOT_START_X]);
                 realArena.repaint();
-
                 if (realRun) {
                     while (true) {
                         System.out.println("Waiting for FP_START...");
@@ -204,15 +196,11 @@ public class Simulator {
                 }
                 bot.reInitialisePathAndOrientations();
                 algo.FastestPath.findPath(realArena.arena, new int[] {13,16}, bot);
-
                 try {
                     simulateRobotMovement(realArena.bot.path, realArena.bot.orientations);
                 } catch (InterruptedException ex) {
                     ex.printStackTrace();
                 }
-               // algo.FastestPath.findPath(exploredArena.arena, new int[] {13,16}, bot);
-
-
                 return 222;
             }
         }
@@ -224,9 +212,6 @@ public class Simulator {
             public void mousePressed(MouseEvent e) {
                 CardLayout cl = ((CardLayout) _mapCards.getLayout());
                 cl.show(_mapCards, "REAL_MAP");
-                bot.setCur(realArena.arena.arena[RobotConstants.ROBOT_START_Y][RobotConstants.ROBOT_START_X]);
-                realArena.repaint();
-
                 if (realRun) {
                     while (true) {
                         System.out.println("Waiting for FP_START...");
@@ -234,8 +219,6 @@ public class Simulator {
                         //-- if (msg.equals(CommMgr.FP_START)) break;
                     }
                 }
-
-
                 new FastestPath().execute();
             }
         });
