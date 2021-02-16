@@ -1,28 +1,31 @@
-package algo;
+package Algo;
 
-import arena.*;
-import robot.Robot;
-import robot.Utility;
+import Environment.*;
+import Utility.PrintConsole;
+
+import java.util.ArrayList;
 
 public class FastestPath {
 
-    public static void print(Robot r){
-        for(int i = 0;i<r.path.size();i++){
-            System.out.println(r.path.get(i).x +" "+r.path.get(i).y + " " + r.orientations.get(i));
-        }
+    private static void combine(ArrayList<Grid> path, ArrayList<Grid> path1, int i){
+        for(;i<path1.size();i++){path.add(path1.get(i));}
     }
 
-    public static void findPath(Arena arena, int[] wayPoint_cord, Robot robot){
-
+    public static ArrayList<Grid> findPath(Arena arena, int[] wayPoint_cord){
         AStar search = new AStar();
-        Grid wayPoint = arena.arena[wayPoint_cord[1]][wayPoint_cord[0]];
-        search.start_search(arena, wayPoint, robot, false);
+        ArrayList<Grid> path = new ArrayList<Grid>();
+
+        Grid wayPoint = arena.grids[wayPoint_cord[1]][wayPoint_cord[0]];
+        search.startSearch(arena, arena.grids[18][1], wayPoint, false);
+        ArrayList<Grid> path1 = new ArrayList<>(search.solution);
+        combine(path,path1,0);
 
         search = new AStar();
-        search.start_search(arena, arena.arena[1][13], robot, true);
-        arena.display_solution(robot.path);
+        wayPoint = arena.grids[wayPoint_cord[1]][wayPoint_cord[0]];
+        search.startSearch(arena, wayPoint, arena.grids[0][14], true);
+        ArrayList<Grid> path2 = new ArrayList<>(search.solution);
+        combine(path,path2,1);
 
-        print(robot);
-
+        return path;
     }
 }

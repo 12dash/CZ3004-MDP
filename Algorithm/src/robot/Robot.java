@@ -1,153 +1,72 @@
-package robot;
+package Robot;
 
-import values.Orientation;
-import algo.Mapping;
-import arena.*;
+import Environment.Grid;
+import Values.Orientation;
 
-import javax.print.attribute.standard.OrientationRequested;
 import java.util.ArrayList;
 
 public class Robot {
 
-    public Grid cur;
-    public Orientation or;
-    public ArrayList<Grid> path = new ArrayList<>();      // Stores the path robot moves
+    public ArrayList<Grid> path = new ArrayList<>();
     public ArrayList<Orientation> orientations = new ArrayList<>();
 
-    public Robot(Orientation or, Grid cur){
-        this.or = or;
+    public Orientation cur_or;
+    public Grid cur;
+
+    public Robot(Grid g) {
+        cur_or = Orientation.North;
+        cur = g;
+    }
+
+    public Robot(Orientation or, ArrayList<Grid> path) {
+        this.cur_or = or;
+        this.path = path;
+        getOrientation();
+    }
+
+    public void setCur(Grid cur) {
         this.cur = cur;
     }
 
-    public void setCur(Grid cur){
-        this.cur = cur;
+    public void updatePosition(Grid next_cur, Orientation next_or) {
+        this.cur = next_cur;
+        this.cur_or = next_or;
     }
 
-    public void add_node() {
-        this.path.add(this.cur);
-        this.orientations.add(this.or);
+    private Orientation nextOrientation(Grid cur, Grid next) {
+        Orientation next_or = Orientation.East;
+
+        int cur_X = cur.getX();
+        int cur_Y = cur.getY();
+
+        int next_X = next.getX();
+        int next_Y = next.getY();
+
+        int dif = Math.abs(cur_X - next_X) + Math.abs(cur_Y - next_Y);
+
+        if (dif == 1) {
+            if (cur_X == next_X) next_or = (cur_Y - next_Y) > 0 ? Orientation.North : Orientation.South;
+            else next_or = (cur_X - next_X) > 0 ? Orientation.West : Orientation.East;
+        } else {
+            int x = cur_X - next_X;
+            int y = cur_Y - next_Y;
+
+            if ((x > 0) && (y > 0)) next_or = Orientation.NorthWest;
+            else if ((x < 0) && (y > 0)) next_or = Orientation.NorthEast;
+            else if ((x > 0) && (y < 0)) next_or = Orientation.SouthWest;
+            else if ((x < 0) && (y < 0)) next_or = Orientation.SouthEast;
+        }
+        return next_or;
     }
 
-    public void reInitialisePathAndOrientations(){
-        this.path = new ArrayList<Grid>();
-        this.orientations = new ArrayList<Orientation>();
-
-    }
-
-
-    public void update_position(Grid new_grid, Orientation new_or) {
-        this.cur = new_grid;
-        this.or = new_or;
-    }
-
-    /**
-      Returns the neighbouring cells (Straight, Left, Right)
-     */
-    public ArrayList<int[]> get_next_positions(Grid b) {
-
-        Orientation or = this.or;
-
-        int x = b.x;
-        int y = b.y;
-
-        int[] pos_S = null;
-        int[] pos_L = null;
-        int[] pos_R = null;
-
-        switch (or) {
-            case North: {
-                pos_S = new int[]{x, y - 1};
-                pos_L = new int[]{x - 1, y};
-                pos_R = new int[]{x + 1, y};
-                break;
-            }
-            case South: {
-                pos_S = new int[]{x, y + 1};
-                pos_L = new int[]{x + 1, y};
-                pos_R = new int[]{x - 1, y};
-                break;
-            }
-            case East: {
-                pos_S = new int[]{x + 1, y};
-                pos_L = new int[]{x, y - 1};
-                pos_R = new int[]{x, y + 1};
-                break;
-            }
-            case West: {
-                pos_S = new int[]{x - 1, y};
-                pos_L = new int[]{x, y + 1};
-                pos_R = new int[]{x, y - 1};
-                break;
+    public void getOrientation() {
+        orientations.add(Orientation.East);
+        for (int i = 0; i < this.path.size() - 1; i++) {
+            try {
+                orientations.add(nextOrientation(path.get(i), path.get(i + 1)));
+            } catch (Exception e) {
+                System.out.println("Getting Orientations");
             }
         }
-        ArrayList<int[]> return_variable = new ArrayList<>();
-        return_variable.add(pos_S);
-        return_variable.add(pos_R);
-        return_variable.add(pos_L);
-        return return_variable;
     }
-
-    /**
-     * Returns the orientation of the robot after next move
-     */
-
-    public Orientation new_orientation(String next_move) {
-
-        Orientation next_or;
-
-        if (next_move.equals("S")) {
-            next_or = this.or;
-            return next_or;
-        }
-
-        switch (this.or) {
-            case North:
-                if (next_move.equals("L")) {
-                    next_or = Orientation.West;
-                } else {
-                    next_or = Orientation.East;
-                }
-                return next_or;
-            case East:
-                if (next_move.equals("L")) {
-                    next_or = Orientation.North;
-                } else {
-                    next_or = Orientation.South;
-                }
-                return next_or;
-            case West:
-                if (next_move.equals("L")) {
-                    next_or = Orientation.South;
-                } else {
-                    next_or = Orientation.North;
-                }
-                return next_or;
-            case South:
-                if (next_move.equals("L")) {
-                    next_or = Orientation.East;
-                } else {
-                    next_or = Orientation.West;
-                }
-                return next_or;
-        }
-        return null;
-    }
-
-    /**
-     * Utility for mapping in DFS
-     */
-
-    public void fix_path(Grid a, Mapping mapping) {
-        Grid parent = mapping.find_parent(a);
-        Grid temp = this.path.get(this.path.size() - 2);
-
-        if (parent.equals(temp)) {
-            return;
-        }
-        while (!temp.equals(parent)) {
-            this.path.remove(this.path.size() - 2);
-            temp = this.path.get(this.path.size() - 2);
-        }
-    }
-
 }

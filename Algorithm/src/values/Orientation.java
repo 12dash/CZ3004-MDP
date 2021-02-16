@@ -1,8 +1,12 @@
-package values;
+package Values;
 
 public enum Orientation {
     North,
     South,
     East,
-    West
-};
+    West,
+    NorthEast,
+    NorthWest,
+    SouthEast,
+    SouthWest
+}

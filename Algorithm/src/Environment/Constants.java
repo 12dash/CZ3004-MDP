@@ -1,7 +1,11 @@
-package arena;
+package Environment;
+
 import java.awt.*;
 
-public class ArenaConstants {
+public class Constants {
+
+    public static final int ROWS = 20;
+    public static final int COLUMNS = 15;
     public static final int ARENA_SIZE = 300;     // total num of cells
     public static final int ARENA_ROWS = 20;      // total num of rows
     public static final int ARENA_COLS = 15;      // total num of cols
@@ -34,4 +38,6 @@ public class ArenaConstants {
 
     public static final int MAP_H = 600;
     public static final int MAP_X_OFFSET = 120;
+
 }
+
