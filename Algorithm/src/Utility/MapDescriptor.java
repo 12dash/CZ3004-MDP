@@ -1,11 +1,11 @@
-package utility;
+package Utility;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
 import java.util.ArrayList;
 
-public class Map_Descriptor {
+public class MapDescriptor {
 
     public static int[] mapping(String str) {
         int[] temp;
@@ -95,7 +95,6 @@ public class Map_Descriptor {
                 pos += 1;
             }
         }
-
 
         ArrayList<int[]> temp = convert_binary_list(p2);
         ArrayList<Integer> binary_list = flatten(temp);

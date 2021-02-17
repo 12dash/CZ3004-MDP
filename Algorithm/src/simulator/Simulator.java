@@ -1,66 +1,43 @@
-package simulator;
+package Simulator;
 
-import algo.FastestPath;
-import arena.Arena;
-import arena.ArenaConstants;
-import arena.Grid;
-import arena.Temp;
-import robot.Robot;
-import robot.RobotConstants;
-import utility.File_Utility;
-import utility.Map_Descriptor;
-import values.Orientation;
+import Environment.*;
+import Robot.*;
+import Robot.Robot;
+
+import Utility.*;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.nio.ReadOnlyBufferException;
+import java.awt.event.*;
+
 import java.util.ArrayList;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
-
 public class Simulator {
+
     private static JFrame _appFrame = null;         // application JFrame
 
     private static JPanel _mapCards = null;         // JPanel for map views
     private static JPanel _buttons = null;          // JPanel for buttons
 
-    private static Robot bot;
-
-    private static Temp realArena = null;            // real arena
-    private static Temp exploredArena =null;         // exploration map
-
-    //-- private static int timeLimit = 3600;            // time limit
-    //-- private static int coverageLimit = 300;         // coverage limit
-
-    //-- private static final CommMgr comm = CommMgr.getCommMgr();
+    private static Map realArena = null;            // real arena
+    private static Map exploredArena = null;         // exploration map
 
     private static final boolean realRun = false;
 
-    /**
-     * Initialisation
-     */
-    public static void main(String[] args){
-
-        bot = new Robot(Orientation.East,null);
+    public static void main(String[] args) {
         if (!realRun) {
-            realArena = new Temp(new Arena(ArenaConstants.ARENA_ROWS, ArenaConstants.ARENA_COLS), bot);
-            realArena.arena.make_arena();
-            realArena.setAllUnexplored();
+            realArena = new Map(new Arena());
+            realArena.setAllExplored();
+            realArena.robot = new Robot(realArena.arena.grids[18][1]);
         }
 
-        exploredArena = new Temp(new Arena(ArenaConstants.ARENA_ROWS, ArenaConstants.ARENA_COLS), bot);
-        exploredArena.arena.make_arena();
-        exploredArena.setAllUnexplored();
-
-        bot.setCur(realArena.arena.arena[18][1]);
-
-        //-- if (realRun) comm.openConnection();
+        exploredArena = new Map(new Arena());
         displayAll();
     }
 
-    public static void displayAll(){
+    public static void displayAll() {
         // Initialise main frame for display
 
         _appFrame = new JFrame();
@@ -86,56 +63,37 @@ public class Simulator {
         // Display the application
         _appFrame.setVisible(true);
         _appFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-
     }
 
-    public static void simulateRobotMovement(ArrayList<Grid> path, ArrayList<Orientation> orientations) throws InterruptedException {
+    public static void simulateRobotMovement() {
+        System.out.println(realArena.robot.path.size());
         // Emulate real movement by pausing execution.
-        for (int i = 0; i < path.size(); i++) {
-            try {
-                TimeUnit.MILLISECONDS.sleep(RobotConstants.SPEED);
-            } catch (InterruptedException e) {
-                System.out.println("Something went wrong in robot simulation!");
-            }
-            bot.update_position(path.get(i), orientations.get(i));
+        for (int i = 0; i < realArena.robot.path.size(); i++) {
+             try {
+             TimeUnit.MILLISECONDS.sleep(RobotConstants.SPEED);
+             } catch (InterruptedException e) {
+             System.out.println("Something went wrong in robot simulation!");
+             }
+            realArena.robot.updatePosition(realArena.robot.path.get(i), realArena.robot.orientations.get(i));
             realArena.repaint();
-            System.out.println(orientations.get(i));
-            System.out.println(path.get(i));
         }
     }
-        /**
-         * Initialises the main map view by adding the different maps as cards in the CardLayout. Displays realMap
-         * by default.
-         */
 
-
-    public static void initialiseMap(){
-
+    public static void initialiseMap() {
         if (!realRun) {
             _mapCards.add(realArena, "REAL_MAP");
         }
-        _mapCards.add(exploredArena, "EXPLORATION");
-
         CardLayout cl = ((CardLayout) _mapCards.getLayout());
         if (!realRun) {
             cl.show(_mapCards, "REAL_MAP");
-        } else {
-            cl.show(_mapCards, "EXPLORATION");
         }
     }
 
-
-    /**
-     * Initialises the JPanel for the buttons.
-     */
     private static void initButtonsLayout() {
         _buttons.setLayout(new FlowLayout());
         addButtons();
     }
 
-    /**
-     * Helper method to format the buttons.
-     */
     private static void formatButton(JButton btn) {
         btn.setFont(new Font("Arial", Font.BOLD, 13));
         btn.setFocusPainted(false);
@@ -149,7 +107,7 @@ public class Simulator {
             btn_LoadMap.addMouseListener(new MouseAdapter() {
                 public void mousePressed(MouseEvent e) {
                     JDialog loadMapDialog = new JDialog(_appFrame, "Load Map", true);
-                    loadMapDialog.setSize(400, 60);
+                    loadMapDialog.setSize(400, 80);
                     loadMapDialog.setLayout(new FlowLayout());
 
                     final JTextField loadTF = new JTextField(15);
@@ -159,16 +117,18 @@ public class Simulator {
                         public void mousePressed(MouseEvent e) {
                             loadMapDialog.setVisible(false);
 
-                            String[] p_string = File_Utility.read_file(loadTF.getText());
-                            int[][] obs = Map_Descriptor.get_map(p_string[0], p_string[1]);
+                            String[] p_string = FileManager.read_file(loadTF.getText());
+                            int[][] obs = MapDescriptor.get_map(p_string[0], p_string[1]);
                             realArena.setAllExplored();
-                            realArena.arena.update_arena(obs);
-                            realArena.arena.add_padding();
-                            //realArena.arena.get_view();
+                            realArena.arena.make_arena(obs);
+                            realArena.robot = new Robot(realArena.arena.grids[18][1]);
 
                             CardLayout cl = ((CardLayout) _mapCards.getLayout());
                             cl.show(_mapCards, "REAL_MAP");
+                            realArena.validate();
                             realArena.repaint();
+
+
                         }
                     });
                     loadMapDialog.add(new JLabel("File Name: "));
@@ -181,30 +141,16 @@ public class Simulator {
             _buttons.add(btn_LoadMap);
 
         }
-
-        // FastestPath Class for Multithreading
         class FastestPath extends SwingWorker<Integer, String> {
             protected Integer doInBackground() throws Exception {
-                bot.setCur(realArena.arena.arena[RobotConstants.ROBOT_START_Y][RobotConstants.ROBOT_START_X]);
-                realArena.repaint();
-                if (realRun) {
-                    while (true) {
-                        System.out.println("Waiting for FP_START...");
-                       //-- String msg = comm.recvMsg();
-                       //-- if (msg.equals(CommMgr.FP_START)) break;
-                    }
-                }
-                bot.reInitialisePathAndOrientations();
-                algo.FastestPath.findPath(realArena.arena, new int[] {13,16}, bot);
-                try {
-                    simulateRobotMovement(realArena.bot.path, realArena.bot.orientations);
-                } catch (InterruptedException ex) {
-                    ex.printStackTrace();
-                }
+                ArrayList<Grid> path = Algo.FastestPath.findPath(realArena.arena, new int[]{8, 16});
+                PrintConsole.displaySolution(path,realArena.arena);
+                realArena.robot.path = path;
+                realArena.robot.getOrientation();
+                Simulator.simulateRobotMovement();
                 return 222;
             }
         }
-
         // Fastest Path Button
         JButton btn_FastestPath = new JButton("Fastest Path");
         formatButton(btn_FastestPath);
@@ -215,8 +161,6 @@ public class Simulator {
                 if (realRun) {
                     while (true) {
                         System.out.println("Waiting for FP_START...");
-                        //-- String msg = comm.recvMsg();
-                        //-- if (msg.equals(CommMgr.FP_START)) break;
                     }
                 }
                 new FastestPath().execute();
