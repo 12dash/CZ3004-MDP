@@ -19,7 +19,8 @@ class Main(threading.Thread):
 
   
   def send_to_pc(self, msg):
-    self.pc_connection.send_to_client(msg)
+    if msg:
+    	self.pc_connection.send_to_client(msg)
 
   def read_from_pc(self):
     while self.pc_connection.connected:
@@ -35,7 +36,8 @@ class Main(threading.Thread):
         print("Invalid recipient from PC")
 
   def send_to_android(self, msg):
-    self.android_connection.send_to_client(msg)
+    if msg:
+      self.android_connection.send_to_client(msg)
 
   def read_from_android(self):
     while self.android_connection.connected:
@@ -62,11 +64,11 @@ class Main(threading.Thread):
   def start_multi_threads(self):
     # PC Write and Read Multi-threading
     pc_read_thread = threading.Thread(target = self.read_from_pc, args = () )
-    pc_write_thread = threading.Thread(target = self.send_to_pc, args = () )
+    pc_write_thread = threading.Thread(target = self.send_to_pc, args = ("",) )
 
      # ANDROID Write and Read Multi-threading
     android_read_thread = threading.Thread(target = self.read_from_android, args = () )
-    android_write_thread = threading.Thread(target = self.send_to_android, args = () )
+    android_write_thread = threading.Thread(target = self.send_to_android, args = ("",) )
 
     # Start threads
     pc_read_thread.start()
