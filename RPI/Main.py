@@ -23,18 +23,16 @@ class Main(threading.Thread):
 
   def read_from_pc(self):
     while self.pc_connection.connected:
-            msg = self.pc_connection.read_from_client()
+      msg = self.pc_connection.read_from_client()
+      msg_lst = msg.split("|")
+      header = msg_lst[0]
 
-            if msg != DISCONNECT_MESSAGE:
-              header, body = msg.split("|")
-              
-              if header == "an":
-                self.send_to_android(body)
-              elif header == "ar":
-                self.send_to_arduino(body)
-
-            else:
-              self.pc_connection.stop_connection()
+      if header == "an":
+        self.send_to_android(msg_lst[1])
+      elif header == "ar":
+        self.send_to_arduino(msg_lst[1])
+      else:
+        print("Invalid recipient from PC")
 
   def send_to_android(self, msg):
     self.android_connection.send_to_client(msg)
@@ -42,18 +40,16 @@ class Main(threading.Thread):
   def read_from_android(self):
     while self.android_connection.connected:
       msg = self.android_connection.read_from_client()
+      msg_lst = msg.split("|")
+      header = msg_lst[0]
 
-      if msg != DISCONNECT_MESSAGE:
-        header, body = msg.split("|")
-
-        if header == "pc":
-          self.send_to_pc(body)
-        elif header == "an":
-          self.send_to_arduino(body)
-      
+      if header == "pc":
+        self.send_to_pc(msg_lst[1])
+      elif header == "an":
+        self.send_to_arduino(msg_lst[1])
       else:
-        self.android_connection.stop_connection()
-        
+        print("Invalid recipient from Android")
+      
   def send_to_arduino(self, msg):
     pass
 
