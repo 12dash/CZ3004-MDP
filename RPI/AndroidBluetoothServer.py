@@ -10,6 +10,7 @@ class AndroidBluetoothServer:
         self.server_sock = None
         self.client_sock = None
         self.connected = False
+        os.system('sudo hciconfig hci0 piscan')
 
     def start_connection(self):
         try:
