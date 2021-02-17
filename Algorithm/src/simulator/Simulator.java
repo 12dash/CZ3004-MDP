@@ -143,7 +143,8 @@ public class Simulator {
         }
         class FastestPath extends SwingWorker<Integer, String> {
             protected Integer doInBackground() throws Exception {
-                ArrayList<Grid> path = Algo.FastestPath.findPath(realArena.arena, new int[]{1, 16});
+                ArrayList<Grid> path = Algo.FastestPath.findPath(realArena.arena, new int[]{8, 16});
+                PrintConsole.displaySolution(path,realArena.arena);
                 realArena.robot.path = path;
                 realArena.robot.getOrientation();
                 Simulator.simulateRobotMovement();
