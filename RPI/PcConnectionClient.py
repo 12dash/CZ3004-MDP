@@ -29,7 +29,8 @@ class PcConnectionClient:
     while self.connected:
       msg = self.client.recv(PC_BUFFER_SIZE).decode(FORMAT)
       print(f"[SERVER] {msg}")
-      if msg == DISCONNECT_MESSAGE:
+      if msg == DISCONNECT_MESSAGE or len(msg) == 0:
+        print(len(msg))
         self.stop_connection()
           
   def stop_connection(self):
