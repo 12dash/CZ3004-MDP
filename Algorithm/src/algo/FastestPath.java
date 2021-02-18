@@ -25,6 +25,7 @@ public class FastestPath {
         search.startSearch(arena, wayPoint, arena.grids[0][14], true);
         ArrayList<Grid> path2 = new ArrayList<>(search.solution);
         combine(path,path2,1);
+        PrintConsole.displaySolution(path,arena);
 
         return path;
     }

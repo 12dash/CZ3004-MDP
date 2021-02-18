@@ -28,6 +28,5 @@ public class Grid {
     public void setAcc(boolean acc){this.acc = acc;}
     public boolean getAcc(){return this.acc;}
     public boolean isExplored(){return this.explored;}
-    public void setExplored(boolean explored){this.explored =explored;}
-
+    public void setExplored(boolean explored){this.explored=explored;}
 }

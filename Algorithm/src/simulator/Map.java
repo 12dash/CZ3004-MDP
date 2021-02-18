@@ -3,6 +3,7 @@ package Simulator;
 import Environment.*;
 import Values.*;
 import Robot.Robot;
+import Robot.*;
 
 import java.awt.*;
 import javax.swing.*;
@@ -10,10 +11,32 @@ import javax.swing.*;
 public class Map extends JPanel {
     public Arena arena;
     public Robot robot;
+    public Grid wayPoint = null;
+    public int step = 0;
+    public boolean fPath = true;
 
     Map(Arena arena) {
         this.arena = arena;
         this.arena.initializeArena();
+        this.robot = new Robot(arena.grids[-1 + Constants.ROWS - RobotConstants.START_ROW][RobotConstants.START_COL]);
+    }
+
+    public void reset() {
+        this.robot = new Robot(arena.grids[-1 + Constants.ROWS - RobotConstants.START_ROW][RobotConstants.START_COL]);
+        this.wayPoint = null;
+        for (int i = 0; i < Constants.ROWS; i++) {
+            for (int j = 0; j < Constants.COLUMNS; j++) {
+                arena.grids[i][j].setExplored(false);
+            }
+        }
+    }
+
+    public void resetRobot() {
+        this.robot = new Robot(arena.grids[-1 + Constants.ROWS - RobotConstants.START_ROW][RobotConstants.START_COL]);
+    }
+
+    public void setWayPoint(Grid wayPoint) {
+        this.wayPoint = wayPoint;
     }
 
     private boolean inStartZone(int row, int col) {
@@ -37,24 +60,33 @@ public class Map extends JPanel {
         // Paint the cells with the appropriate colors.
         for (int row = 0; row < Constants.ARENA_ROWS; row++) {
             for (int col = 0; col < Constants.ARENA_COLS; col++) {
-                Color cellColor;
+                Color cellColor = null;
                 if (inStartZone(row, col))
                     cellColor = Constants.C_START;
                 else if (inGoalZone(row, col))
                     cellColor = Constants.C_GOAL;
-                else {
-                    if (false)
+                else if (!fPath) {
+                    if (arena.grids[row][col].isExplored()) {
+                        if (arena.grids[row][col].getType() == Type.OBSTACLE)
+                            cellColor = Constants.C_OBSTACLE;
+                        else
+                            cellColor = Constants.C_FREE;
+                    } else {
                         cellColor = Constants.C_UNEXPLORED;
-                    else if (arena.grids[row][col].getType() == Type.OBSTACLE)
+                    }
+                } else {
+                    cellColor = Constants.C_FREE;
+                    if (arena.grids[row][col].getType() == Type.OBSTACLE)
                         cellColor = Constants.C_OBSTACLE;
-                    else
-                        cellColor = Constants.C_FREE;
+                    else if (arena.grids[row][col].equals(this.wayPoint)) {
+                        cellColor = Constants.C_WAYPOINT;
+                    }
                 }
-
                 g.setColor(cellColor);
                 g.fillRect(_gridCells[row][col].cellX + Constants.MAP_X_OFFSET, _gridCells[row][col].cellY, _gridCells[row][col].cellSize, _gridCells[row][col].cellSize);
             }
         }
+
 
         // Paint the robot on-screen.
         g.setColor(Constants.C_ROBOT);

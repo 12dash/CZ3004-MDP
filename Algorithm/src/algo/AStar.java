@@ -21,8 +21,8 @@ public class AStar {
     public AStar(){};
 
     private int heuristicCost(Grid cur) {
-        int cost = (Math.abs((cur.getX() - this.end.getX())) + Math.abs((cur.getY() -this.end.getY())));
-        return cost;
+        double cost = (Math.pow((cur.getX() - this.end.getX()),2) + Math.pow((cur.getY() -this.end.getY()),2));
+        return (int)(Math.pow(cost,0.5));
     }
 
     private boolean checkRange(int y,int x){
@@ -52,13 +52,13 @@ public class AStar {
         Node node_min = this.candidate.get(0);
         int pos = 0;
 
-        for (int i = 1; i < this.candidate.size(); i++) {
+        for (int i = 0; i < this.candidate.size(); i++) {
             Node can = candidate.get(i);
             if (can.grid.equals(this.end)) {
                 pos = i;
                 break;
             }
-            if (node_min.total_cost > can.total_cost) {
+            else if (node_min.total_cost >= can.total_cost) {
                 node_min = can;
                 pos = i;
             }
@@ -75,10 +75,10 @@ public class AStar {
         if (checkRange(y+1,x) && checkNeighbor(arena.grids[y+1][x])){addCandidate(cur,y+1,x);}//D
         if (checkRange(y,x-1) && checkNeighbor(arena.grids[y][x-1])){addCandidate(cur,y,x-1);}//L
         if (checkRange(y,x+1) && checkNeighbor(arena.grids[y][x+1])){addCandidate(cur,y,x+1);}//R
-        if (checkRange(y-1,x+1) && checkNeighbor(arena.grids[y-1][x+1])){addCandidate(cur,y-1,x+1);}//UR
-        if (checkRange(y-1,x-1) && checkNeighbor(arena.grids[y-1][x-1])){addCandidate(cur,y-1,x-1);}//UL
-        if (checkRange(y+1,x+1) && checkNeighbor(arena.grids[y+1][x+1])){addCandidate(cur,y+1,x+1);}//DR
-        if (checkRange(y+1,x-1) && checkNeighbor(arena.grids[y+1][x-1])){addCandidate(cur,y+1,x-1);}//Dl
+        //if (checkRange(y-1,x+1) && checkNeighbor(arena.grids[y-1][x+1])){addCandidate(cur,y-1,x+1);}//UR
+        //if (checkRange(y-1,x-1) && checkNeighbor(arena.grids[y-1][x-1])){addCandidate(cur,y-1,x-1);}//UL
+        //if (checkRange(y+1,x+1) && checkNeighbor(arena.grids[y+1][x+1])){addCandidate(cur,y+1,x+1);}//DR
+        //if (checkRange(y+1,x-1) && checkNeighbor(arena.grids[y+1][x-1])){addCandidate(cur,y+1,x-1);}//Dl
     }
 
     private boolean checkGoal(Node node) {
@@ -110,6 +110,7 @@ public class AStar {
             int posNextNode = nextCandidate();
 
             Node candidateNode = candidate.get(posNextNode);
+            //System.out.println("Can : "+candidateNode.grid.getY()+" "+candidateNode.grid.getX()+" "+candidateNode.total_cost);
             this.candidate.remove(posNextNode);
 
             this.visited.add(candidateNode);

@@ -62,7 +62,7 @@ public class Arena {
         for (int i = 0; i < Constants.ROWS; i++) {
             for (int j = 0; j < Constants.COLUMNS; j++) {
                 if (this.grids[i][j].getType() == Type.OBSTACLE) {
-                    checkCellModifyAcc(i, j);
+                    this.grids[i][j].setAcc(false);
                     addNeighbourPadding(i, j);
                 }
             }

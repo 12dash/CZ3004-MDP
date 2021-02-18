@@ -14,7 +14,7 @@ public class Node {
         this.grid = cur_grid;
         this.parent_grid = parent_grid;
         if (parent_grid != null)
-            this.cost_g = parent_grid.cost_g + 1;
+            this.cost_g = parent_grid.cost_g+1;
         else
             this.cost_g = 0;
         this.cost_h = cost_h;

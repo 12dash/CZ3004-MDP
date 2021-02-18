@@ -66,4 +66,25 @@ public class PrintConsole {
             System.out.println(" " + i);
         }
     }
+
+    public static void getExploration(Arena arena){
+        String[][] solution = new String[Constants.ROWS][Constants.COLUMNS];
+
+        for (int i = 0; i < Constants.ROWS; i++) {
+            for (int j = 0; j < Constants.COLUMNS; j++) {
+                if (arena.grids[i][j].isExplored()) solution[i][j] = "1";
+                else solution[i][j] = " ";
+            }
+        }
+
+        for (int i = 0; i < Constants.ROWS; i++) {
+            for (int j = 0; j < Constants.COLUMNS; j++) {
+                System.out.print(solution[i][j]+"|");
+            }
+            System.out.println();
+        }
+
+
+    }
+
 }
