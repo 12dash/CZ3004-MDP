@@ -13,8 +13,9 @@ public class Map extends JPanel {
     public Robot robot;
     public Grid wayPoint = null;
     public int step = 0;
+    public double percent = 100;
     public boolean fPath = true;
-
+    public String maxTime = "6:00";
     Map(Arena arena) {
         this.arena = arena;
         this.arena.initializeArena();

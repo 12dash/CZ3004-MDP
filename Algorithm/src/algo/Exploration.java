@@ -18,6 +18,7 @@ public class Exploration {
     public Orientation nextOr;
 
     public double numberCellExplored = 0;
+    public double percentCurrentExploration = 0;
 
     public ArrayList<Grid> unexplored = new ArrayList<Grid>();
 
@@ -209,6 +210,9 @@ public class Exploration {
             }
         }
         this.numberCellExplored = num;
+       // System.out.println("Num : "+ num);
+        this.percentCurrentExploration = (num / 300.0) * 100;
+       // System.out.println(this.percentCurrentExploration);
         return num;
     }
 
@@ -286,7 +290,7 @@ public class Exploration {
     }
 
     public void goToNextGrid() {
-        System.out.println(robot.path.size());
+       // System.out.println(robot.path.size());
         robot.sense(arena);
         for (int i = 0; i < robot.path.size(); i++) {
             robot.updatePosition(robot.path.get(i), robot.orientations.get(i));
@@ -294,30 +298,61 @@ public class Exploration {
         }
     }
 
-    public void startExploration() {
-        move();
-        while (!robot.cur.equals(arena.grids[RobotConstants.ROBOT_START_Y][RobotConstants.ROBOT_START_X])) {
-            move();
-        }
-        calNumberCellExplored();
-        getUnexplored();
-        PrintConsole.getExploration(arena);
-        System.out.println(unexplored.size());
+    public void startExploration(double percentExploration) {
 
-        while (!(numberCellExplored == 300)) {
-            Grid temp = getNextFree();
-            if (temp == null) {
-                temp = getFreeNeighbour(unexplored.get(0));
+        if (percentExploration == 100) {
+            move();
+            while (!robot.cur.equals(arena.grids[RobotConstants.ROBOT_START_Y][RobotConstants.ROBOT_START_X])) {
+                move();
             }
-            AStar a = new AStar();
-            a.startSearch(arena, robot.cur, temp, false);
-            ArrayList<Grid> path = a.solution;
-            robot.path = path;
-            robot.getOrientation();
-            goToNextGrid();
             calNumberCellExplored();
-            System.out.println("Unexplored size : "+ unexplored.size());
             getUnexplored();
+            PrintConsole.getExploration(arena);
+            System.out.println(unexplored.size());
+            while (!(numberCellExplored == 300)) {
+                Grid temp = getNextFree();
+                if (temp == null) {
+                    temp = getFreeNeighbour(unexplored.get(0));
+                }
+                AStar a = new AStar();
+                a.startSearch(arena, robot.cur, temp, false);
+                ArrayList<Grid> path = a.solution;
+                robot.path = path;
+                robot.getOrientation();
+                goToNextGrid();
+                calNumberCellExplored();
+                System.out.println("Unexplored size : " + unexplored.size());
+                getUnexplored();
+            }
+        } else {
+            boolean out = false;
+            move();
+            calNumberCellExplored();
+            while (!robot.cur.equals(arena.grids[RobotConstants.ROBOT_START_Y][RobotConstants.ROBOT_START_X])) {
+                move();
+                calNumberCellExplored();
+                System.out.println("% explored "+this.percentCurrentExploration);
+                if (this.percentCurrentExploration > percentExploration) {
+                    out = true;
+                    System.out.println("Break");
+                    break;
+                }
+            }
+            while ((this.percentCurrentExploration <= percentExploration) && (!out)) {
+                getUnexplored();
+                Grid temp = getNextFree();
+                if (temp == null) {
+                    temp = getFreeNeighbour(unexplored.get(0));
+                }
+                AStar a = new AStar();
+                a.startSearch(arena, robot.cur, temp, false);
+                ArrayList<Grid> path = a.solution;
+                robot.path = path;
+                robot.getOrientation();
+                goToNextGrid();
+                calNumberCellExplored();
+                System.out.println("Unexplored size : " + unexplored.size());
+            }
         }
 
         PrintConsole.getExploration(arena);
