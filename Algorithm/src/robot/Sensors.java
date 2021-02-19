@@ -21,7 +21,7 @@ public class Sensors {
             this.max_distance = 5;
         } else {
             this.min_distance = 0;
-            this.max_distance = 3;
+            this.max_distance = 4;
         }
     }
 

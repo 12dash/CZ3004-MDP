@@ -195,7 +195,6 @@ public class Exploration {
                     return true;
                 }
                 break;
-
         }
         return false;
     }
@@ -220,9 +219,6 @@ public class Exploration {
 
     public void move() {
         robot.sense(arena);
-        //PrintConsole.getExploration(arena);
-        //System.out.println("Robot : " + this.robot.cur.getX() + " " + this.robot.cur.getY());
-        //System.out.println();
         if (moveRight()) {
             System.out.println("Move Right");
         } else if (moveForward()) {
@@ -232,7 +228,6 @@ public class Exploration {
         } else if (moveBack()) {
             System.out.println("Move Backward");
         }
-        //System.out.println("Next Grid : " +nextGrid.getY()+" "+nextGrid.getX());
         setNext();
     }
 
@@ -292,6 +287,7 @@ public class Exploration {
 
     public void goToNextGrid() {
         System.out.println(robot.path.size());
+        robot.sense(arena);
         for (int i = 0; i < robot.path.size(); i++) {
             robot.updatePosition(robot.path.get(i), robot.orientations.get(i));
             robot.sense(arena);

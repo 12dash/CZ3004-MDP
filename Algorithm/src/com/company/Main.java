@@ -18,9 +18,9 @@ public class Main {
         Arena arena = new Arena();
         arena.make_arena(obs);
 
-        //FastestPath.findPath(arena,new int[]{8,16});
+        FastestPath.findPath(arena,new int[]{1,1});
         Robot r = new Robot(arena.grids[RobotConstants.ROBOT_START_Y][RobotConstants.ROBOT_START_X]);
-        Exploration e = new Exploration(arena, r);
-        e.startExploration();
+        //Exploration e = new Exploration(arena, r);
+        //e.startExploration();
     }
 }
