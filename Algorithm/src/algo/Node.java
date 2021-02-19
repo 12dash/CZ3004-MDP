@@ -5,12 +5,12 @@ import Environment.*;
 public class Node {
     Grid grid;
     Node parent_grid;
-    int cost_g;
-    int cost_h;
-    int total_cost;
+    double cost_g;
+    double cost_h;
+    double total_cost;
 
     public Node(){};
-    public Node(Grid cur_grid, Node  parent_grid, int cost_h){
+    public Node(Grid cur_grid, Node  parent_grid, double cost_h){
         this.grid = cur_grid;
         this.parent_grid = parent_grid;
         if (parent_grid != null)

@@ -18,14 +18,46 @@ public class AStar {
     Grid end;
     Arena arena;
 
-    public AStar(){};
-
-    private int heuristicCost(Grid cur) {
-        double cost = (Math.pow((cur.getX() - this.end.getX()),2) + Math.pow((cur.getY() -this.end.getY()),2));
-        return (int)(Math.pow(cost,0.5));
+    public AStar() {
     }
 
-    private boolean checkRange(int y,int x){
+    ;
+
+    private double turnCost(Grid cur, Node parent) {
+
+        Node granParent;
+        try {
+            granParent = parent.parent_grid;
+            if (granParent == null) {
+                return 0;
+            }
+        } catch (Exception e) {
+            return 0;
+        }
+
+        double turnCost = 0;
+
+        int Px = Math.abs(parent.grid.getX() - granParent.grid.getX());
+        int Py = Math.abs(parent.grid.getY() - granParent.grid.getY());
+
+        int Cx = Math.abs(cur.getX() - parent.grid.getX());
+        int Cy = Math.abs(cur.getY() - parent.grid.getY());
+
+        if ((Px != Cx) || (Py != Cy)) {
+            turnCost = 5;
+            System.out.println("Added Turn Cost");
+        }
+        return turnCost;
+
+    }
+
+    private double heuristicCost(Grid cur, Node Parent) {
+        double cost = (Math.pow((cur.getX() - this.end.getX()), 2) + Math.pow((cur.getY() - this.end.getY()), 2));
+        //cost += turnCost(cur, Parent);
+        return (Math.pow(cost, 0.5));
+    }
+
+    private boolean checkRange(int y, int x) {
         return (x >= 0) && (x < Constants.COLUMNS) && (y >= 0) && (y < Constants.ROWS);
     }
 
@@ -33,15 +65,15 @@ public class AStar {
         int x = grid.getX();
         int y = grid.getY();
 
-        if(!visited_grid.contains(grid) && (!candidate_grid.contains(grid))){
+        if (!visited_grid.contains(grid) && (!candidate_grid.contains(grid))) {
             return arena.grids[y][x].getAcc();
         } else {
             return false;
         }
     }
 
-    public void addCandidate(Node cur, int y, int x){
-        int cost = heuristicCost(arena.grids[y][x]);
+    public void addCandidate(Node cur, int y, int x) {
+        double cost = heuristicCost(arena.grids[y][x], cur);
         Node temp = new Node(arena.grids[y][x], cur, cost);
         candidate.add(temp);
         candidate_grid.add(temp.grid);
@@ -57,8 +89,7 @@ public class AStar {
             if (can.grid.equals(this.end)) {
                 pos = i;
                 break;
-            }
-            else if (node_min.total_cost >= can.total_cost) {
+            } else if (node_min.total_cost >= can.total_cost) {
                 node_min = can;
                 pos = i;
             }
@@ -71,10 +102,18 @@ public class AStar {
         int x = cur.grid.getX();
         int y = cur.grid.getY();
 
-        if (checkRange(y-1,x) && checkNeighbor(arena.grids[y-1][x])){addCandidate(cur,y-1,x);}//U
-        if (checkRange(y+1,x) && checkNeighbor(arena.grids[y+1][x])){addCandidate(cur,y+1,x);}//D
-        if (checkRange(y,x-1) && checkNeighbor(arena.grids[y][x-1])){addCandidate(cur,y,x-1);}//L
-        if (checkRange(y,x+1) && checkNeighbor(arena.grids[y][x+1])){addCandidate(cur,y,x+1);}//R
+        if (checkRange(y - 1, x) && checkNeighbor(arena.grids[y - 1][x])) {
+            addCandidate(cur, y - 1, x);
+        }//U
+        if (checkRange(y + 1, x) && checkNeighbor(arena.grids[y + 1][x])) {
+            addCandidate(cur, y + 1, x);
+        }//D
+        if (checkRange(y, x - 1) && checkNeighbor(arena.grids[y][x - 1])) {
+            addCandidate(cur, y, x - 1);
+        }//L
+        if (checkRange(y, x + 1) && checkNeighbor(arena.grids[y][x + 1])) {
+            addCandidate(cur, y, x + 1);
+        }//R
         //if (checkRange(y-1,x+1) && checkNeighbor(arena.grids[y-1][x+1])){addCandidate(cur,y-1,x+1);}//UR
         //if (checkRange(y-1,x-1) && checkNeighbor(arena.grids[y-1][x-1])){addCandidate(cur,y-1,x-1);}//UL
         //if (checkRange(y+1,x+1) && checkNeighbor(arena.grids[y+1][x+1])){addCandidate(cur,y+1,x+1);}//DR
@@ -87,18 +126,19 @@ public class AStar {
         return (x >= 12) && (y <= 2);
     }
 
-    private void getSolution(){
-        Node temp = this.visited.get(this.visited.size()-1);
-        while(!(temp==null)){
-                this.solution.add(0,temp.grid);
-                temp = temp.parent_grid;
+    private void getSolution() {
+        Node temp = this.visited.get(this.visited.size() - 1);
+        while (!(temp == null)) {
+            this.solution.add(0, temp.grid);
+            temp = temp.parent_grid;
         }
     }
+
     public void startSearch(Arena arena, Grid start, Grid end, boolean GoalState) {
         this.end = end;
         this.arena = arena;
 
-        int s_h_cost = heuristicCost(start);
+        double s_h_cost = heuristicCost(start, null);
         Node start_node = new Node(start, null, s_h_cost);
 
         getNeighbours(start_node);

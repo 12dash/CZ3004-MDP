@@ -434,7 +434,7 @@ public class MazeView extends View {
         row = this.convertRow(row);
         cells[col][row].setType("waypoint");
 
-        bluetoothConnectionService.write(String.format("Waypoint (%d, %d)", waypointCoord[0]-1, waypointCoord[1]-1));
+        bluetoothConnectionService.write(String.format("waypoint (%d,%d)", waypointCoord[0]-1, waypointCoord[1]-1));
         showLog("Exiting setWaypointCoord");
     }
 
@@ -592,7 +592,7 @@ public class MazeView extends View {
                         directionInt = 2;
                     }
 //                  MainActivity.printMessage("starting " + "(" + String.valueOf(row-1) + "," + String.valueOf(column-1) + "," + String.valueOf(directionInt) + ")");
-                    bluetoothConnectionService.write(String.format("Starting (%d, %d, %d)", row-1, column-1, directionInt));
+                    bluetoothConnectionService.write(String.format("starting (%d,%d,%d)", row-1, column-1, directionInt));
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

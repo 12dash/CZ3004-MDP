@@ -117,11 +117,28 @@ public class Simulator {
             DefaultMap.repaint();
         }
     }
+
     public static void simulateExploration() {
         Robot robot = DefaultMap.robot;
         Arena arena = DefaultMap.arena;
         Exploration e = new Exploration(arena, robot);
+
+        long start = System.currentTimeMillis();
+
+        long minutes = Long.parseLong(DefaultMap.maxTime.split(":")[0]);
+        long seconds = Long.parseLong(DefaultMap.maxTime.split(":")[1]);
+
+        long time =(minutes*60)+seconds;
+        System.out.println(time);
+        time = time*1000;
+
+
+        long end = start + time;
+        System.out.println(time);
+
+        boolean out = false;
         e.move();
+        e.calNumberCellExplored();
         while (!robot.cur.equals(arena.grids[RobotConstants.ROBOT_START_Y][RobotConstants.ROBOT_START_X])) {
             try {
                 TimeUnit.MILLISECONDS.sleep(RobotConstants.SPEED);
@@ -129,13 +146,21 @@ public class Simulator {
                 System.out.println("Something went wrong in robot simulation!");
             }
             e.move();
-            DefaultMap.repaint();
             e.calNumberCellExplored();
-            //System.out.println("Robot : " + this.robot.cur.getX() + " " + this.robot.cur.getY());
+            //System.out.println("% explored "+e.percentCurrentExploration);
+            long tempTime = System.currentTimeMillis();
+            if (tempTime > end){
+                return;
+            }
+            if (e.percentCurrentExploration > DefaultMap.percent) {
+                out = true;
+                System.out.println("Break");
+                break;
+            }
+            DefaultMap.repaint();
         }
-        e.getUnexplored();
-        System.out.println("% Explored : "+(e.numberCellExplored/300)*100);
-        while (!(e.numberCellExplored == 300)) {
+        while ((e.percentCurrentExploration <= DefaultMap.percent) && (!out)) {
+            e.getUnexplored();
             Grid temp = e.getNextFree();
             if (temp == null) {
                 temp = e.getFreeNeighbour(e.unexplored.get(0));
@@ -147,14 +172,22 @@ public class Simulator {
             robot.getOrientation();
             goToNextGrid();
             e.calNumberCellExplored();
-            e.getUnexplored();
+            DefaultMap.repaint();
+            long tempTime = System.currentTimeMillis();
+            if (tempTime > end){
+                return;
+            }
         }
-        AStar a = new AStar();
-        a.startSearch(arena, robot.cur, arena.grids[RobotConstants.ROBOT_START_Y][RobotConstants.ROBOT_START_X], false);
-        ArrayList<Grid> path = a.solution;
-        robot.path = path;
-        robot.getOrientation();
-        goToNextGrid();
+        if (DefaultMap.percent == 100) {
+            AStar a = new AStar();
+            a.startSearch(arena, robot.cur, DefaultMap.arena.grids[RobotConstants.ROBOT_START_Y][RobotConstants.ROBOT_START_X], false);
+            ArrayList<Grid> path = a.solution;
+            robot.path = path;
+            robot.getOrientation();
+            goToNextGrid();
+            e.calNumberCellExplored();
+            DefaultMap.repaint();
+        }
     }
 
     public static void simulateRobotMovement() {
@@ -312,7 +345,39 @@ public class Simulator {
                 Simulator.FastP = false;
                 System.out.println("Exploration Map has been clicked");
                 ExplorationMap = DefaultMap;
-                new Exploration().execute();
+                JDialog loadMapDialog = new JDialog(_appFrame, "Get Options", true);
+                loadMapDialog.setSize(200, 220);
+                loadMapDialog.setLayout(new FlowLayout());
+
+                JLabel percent = new JLabel("Percent : ");
+                JTextField percent_f = new JTextField(15);
+
+                JLabel time = new JLabel("Time : ");
+                JTextField time_f = new JTextField(15);
+
+                JButton go = new JButton("Go");
+                go.addMouseListener(new MouseAdapter() {
+                    public void mousePressed(MouseEvent e) {
+                        System.out.println("The button has been pressed");
+                        if (!percent_f.getText().equals("")) {
+                            DefaultMap.percent = Double.parseDouble(percent_f.getText());
+                        } else {
+                            DefaultMap.percent = 100;
+                        }
+                        if (!time_f.getText().equals("")) {
+                            DefaultMap.maxTime = time_f.getText();
+                        }
+
+                        new Exploration().execute();
+                        loadMapDialog.setVisible(false);
+                    }
+                });
+                loadMapDialog.add(percent);
+                loadMapDialog.add(percent_f);
+                loadMapDialog.add(time);
+                loadMapDialog.add(time_f);
+                loadMapDialog.add(go);
+                loadMapDialog.setVisible(true);
                 System.out.println("Reset");
             }
         });
