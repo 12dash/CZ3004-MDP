@@ -7,6 +7,8 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -29,7 +31,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
+import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.math.BigInteger;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -38,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
     TextView currentStatusTextView;
     ToggleButton setWayPointToggleBtn, setStartPointToggleBtn;
     ImageButton obstacleImageBtn, clearImageBtn;
-    Button resetMapBtn, fastestPathBtn, explorationPathBtn;
+    Button resetMapBtn, fastestPathBtn, explorationPathBtn, f1Btn, f2Btn, updateBtn;
     Switch manualAutoToggleBtn, tiltSwitch;
     MazeView mazeView;
     ReconfigureFragment reconfigureFragment = new ReconfigureFragment();
@@ -49,7 +55,9 @@ public class MainActivity extends AppCompatActivity {
     Sensor accelerometerSensor;
     SensorEventListener tiltSensorEventListener;
 
-    private static boolean autoUpdate = false;
+    SharedPreferences sharedPreferences;
+
+    public static boolean manualUpdateRequest = false;
     private boolean tiltIsAllowedFlag = true;
 
     // String Constants
@@ -66,8 +74,28 @@ public class MainActivity extends AppCompatActivity {
         IntentFilter incomingMessageIntentFilter = new IntentFilter("IncomingMessage");
         LocalBroadcastManager.getInstance(this).registerReceiver(incomingMessageReceiver, incomingMessageIntentFilter);
         sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+        sharedPreferences = this.getSharedPreferences("Shared Preferences", Context.MODE_PRIVATE);
 
+        //ReconfigurePreferenceCommand
 
+        f1Btn = findViewById(R.id.btn_F1);
+        f1Btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String F1 = sharedPreferences.getString("F1", "");
+                Log.d(TAG, F1);
+                moveRobotUI(F1);
+            }
+        });
+
+        f2Btn = findViewById(R.id.btn_F2);
+        f2Btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String F2 = sharedPreferences.getString("F2", "");
+                moveRobotUI(F2);
+            }
+        });
 
         // Setup UI and Eventlistener
         currentStatusTextView = findViewById(R.id.currentStatusTextView);
@@ -212,6 +240,24 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        // If performing checklist, comment out (String message = MDF String) and (setReceivedJsonObject) line.
+        // If performing fastest path, comment out "sendArena" line
+        updateBtn = findViewById(R.id.updateButton);
+        updateBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                manualUpdateRequest = true;
+                bluetoothConnectionService.write("sendArena");
+                try {
+//                     String message = "{\"map\":[{\"explored\": \"ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff\",\"length\":300,\"obstacle\":\"00000000000000000706180400080010001e000400000000200044438f840000000000000080\"}]}";
+//                     mazeView.setReceivedJsonObject(new JSONObject(message));
+                    mazeView.updateMapInformation();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
         obstacleImageBtn = findViewById(R.id.obstacleImageBtn);
         obstacleImageBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -239,7 +285,7 @@ public class MainActivity extends AppCompatActivity {
                     mazeView.setUnSetCellStatus(false);
             }
         });
-
+        //ALWAYS SET STARTPOINT/ROBOT FIRST.
         manualAutoToggleBtn = findViewById(R.id.manualAutoToggleBtn);
         manualAutoToggleBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -247,28 +293,30 @@ public class MainActivity extends AppCompatActivity {
                 if (manualAutoToggleBtn.getText().equals("MANUAL")) {
                     try {
                         mazeView.setAutoUpdate(true);
-                        autoUpdate = true;
                         mazeView.toggleCheckedBtn("None");
-//                        updateButton.setClickable(false);
-//                        updateButton.setTextColor(Color.GRAY);
+                        updateBtn.setClickable(false);
+                        updateBtn.setTextColor(Color.GRAY);
+//                        ControlFragment.getCalibrateButton().setClickable(false);
+//                        ControlFragment.getCalibrateButton().setTextColor(Color.GRAY);
                         manualAutoToggleBtn.setText("AUTO");
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-                    updateStatus("AUTO mode");
+                    Toast.makeText(MainActivity.this, "Auto Mode", Toast.LENGTH_SHORT).show();
                 }
                 else if (manualAutoToggleBtn.getText().equals("AUTO")) {
                     try {
                         mazeView.setAutoUpdate(false);
-                        autoUpdate = false;
                         mazeView.toggleCheckedBtn("None");
-//                        updateButton.setClickable(true);
-//                        updateButton.setTextColor(Color.BLACK);
+                        updateBtn.setClickable(true);
+                        updateBtn.setTextColor(Color.BLACK);
+//                        ControlFragment.getCalibrateButton().setClickable(true);
+//                        ControlFragment.getCalibrateButton().setTextColor(Color.BLACK);
                         manualAutoToggleBtn.setText("MANUAL");
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-                    updateStatus("MANUAL mode");
+                    Toast.makeText(MainActivity.this, "Manual Mode", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -307,13 +355,75 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             String messageValue = intent.getStringExtra("Message Value");
-            // TODO : Standardise Status messages. Are they JSON or just string etc.
+            try {
+                // Converts AMD "grid" json to Rpi's "map" json by setting setReceivedJsonObject(messageValue) -> updateMapInformation()
+                // Note MDF String might be reversed format from pdf
+                if (messageValue.length() > 7 && messageValue.substring(2,6).equals("grid")) {
+                    String resultString = "";
+                    String amdString = messageValue.substring(11,messageValue.length()-2);
+                    Log.d(TAG,"amdString: " + amdString);
+                    BigInteger hexBigIntegerExplored = new BigInteger(amdString, 16);
+                    String exploredString = hexBigIntegerExplored.toString(2);
 
-            if(messageValue.startsWith("{\"status\""))
-                currentStatusTextView.setText(messageValue);
-            else if (messageValue.startsWith("{\"image\""))
-                // TODO : Update Map with correct image and coorindates
-                Log.d(TAG, "onReceive: " + messageValue);
+                    while (exploredString.length() < 300)
+                        exploredString = "0" + exploredString;
+
+                    for (int i=0; i<exploredString.length(); i=i+15) {
+                        int j=0;
+                        String subString = "";
+                        while (j<15) {
+                            subString = subString + exploredString.charAt(j+i);
+                            j++;
+                        }
+                        resultString = subString + resultString;
+                    }
+                    hexBigIntegerExplored = new BigInteger(resultString, 2);
+                    resultString = hexBigIntegerExplored.toString(16);
+
+                    JSONObject amdObject = new JSONObject();
+                    amdObject.put("explored", "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff");
+                    amdObject.put("length", amdString.length()*4);
+                    amdObject.put("obstacle", resultString);
+                    JSONArray amdArray = new JSONArray();
+                    amdArray.put(amdObject);
+                    JSONObject amdMessage = new JSONObject();
+                    amdMessage.put("map", amdArray);
+                    messageValue = String.valueOf(amdMessage);
+                    Log.d(TAG,"Executed for AMD message, message: " + messageValue);
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            try {
+                  // This branch is only for demo-ing. Allows Status to be updated even when in Manual Mode.
+                  if (messageValue.length() > 8 && messageValue.substring(2,8).equals("status") && !mazeView.getAutoUpdate()){
+                    JSONObject statusJsonObject = new JSONObject(messageValue);
+                    currentStatusTextView.setText(statusJsonObject.getString("status"));
+                }
+//                else if (messageValue.startsWith("{\"image\"")) {
+                  else if (messageValue.length() > 8 && messageValue.substring(2,7).equals("image")){
+                    JSONObject jsonObject = new JSONObject(messageValue);
+                    JSONArray jsonArray = jsonObject.getJSONArray("image");
+                    mazeView.drawImageNumberCell(jsonArray.getInt(0),jsonArray.getInt(1),jsonArray.getInt(2));
+                    Log.d(TAG,jsonArray.getInt(0)+ "," + jsonArray.getInt(1));
+                }
+            }
+            catch (JSONException e){
+                Log.d(TAG,"Adding Image Failed");
+            }
+
+            if (mazeView.getAutoUpdate() || MainActivity.manualUpdateRequest) {
+                try {
+                    mazeView.setReceivedJsonObject(new JSONObject(messageValue));
+                    mazeView.updateMapInformation();
+                    MainActivity.manualUpdateRequest = false;
+                    Log.d(TAG, "Decode successfully");
+                }
+                catch (JSONException e){
+                    Log.d(TAG, "Decode unsuccessfully");
+                }
+            }
         }
     };
 
@@ -327,16 +437,16 @@ public class MainActivity extends AppCompatActivity {
             switch(direction) {
                 case "left":
                     updateStatus("turning " + direction);
-                    bluetoothDirectionMsg = "A";
+                    bluetoothDirectionMsg = "A|";
                     break;
                 case "right":
                     updateStatus("turning " + direction);
-                    bluetoothDirectionMsg = "D";
+                    bluetoothDirectionMsg = "D|";
                     break;
                 case "forward":
                     if (mazeView.getValidPosition()) {
                         updateStatus("moving forward");
-                        bluetoothDirectionMsg = "W";
+                        bluetoothDirectionMsg = "W|";
                     }
                     else
                         updateStatus("Unable to move forward");
