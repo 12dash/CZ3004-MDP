@@ -23,13 +23,7 @@ public class Simulator {
     private static JPanel _buttons = null;          // JPanel for buttons
 
     private static Map FastestPath_Map = null;        // real arena
-    private static Map ExplorationMap = null;         // exploration map
     private static Map DefaultMap = null;
-
-    private static JPanel _optionsFastestPath = null;
-
-    private static boolean FastP = false;
-
     public static void main(String[] args) {
         DefaultMap = new Map(new Arena());
         DefaultMap.robot = new Robot(DefaultMap.arena.grids[18][1]);
@@ -47,13 +41,11 @@ public class Simulator {
 
         // Create the JPanel for the buttons
         _buttons = new JPanel();
-        _optionsFastestPath = new JPanel();
 
 
         // Add _mapCards & _buttons to the main frame's content pane
         Container contentPane = _appFrame.getContentPane();
         contentPane.add(_mapCards, BorderLayout.CENTER);
-        contentPane.add(_optionsFastestPath, BorderLayout.LINE_START);
         contentPane.add(_buttons, BorderLayout.PAGE_END);
 
         // Initialize the main map view
@@ -62,47 +54,11 @@ public class Simulator {
         // Initialize the buttons
         initButtonsLayout();
 
-        optionsFPath();
-
         // Display the application
         _appFrame.setVisible(true);
         _appFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
     }
 
-    public static void optionsFPath() {
-        _optionsFastestPath.setLayout(new BoxLayout(_optionsFastestPath, BoxLayout.Y_AXIS));
-
-        JPanel Step = new JPanel();
-        JLabel l1 = new JLabel("Step : ");
-        JTextField step = new JTextField(7);
-        Step.add(l1);
-        Step.add(step);
-        //  _optionsFastestPath.add(Step);
-
-        JPanel WaypointX = new JPanel();
-        JLabel Waypoint_X = new JLabel("WayPoint X : ");
-        JTextField Waypoint_x = new JTextField(7);
-        WaypointX.add(Waypoint_X);
-        WaypointX.add(Waypoint_x);
-        //     _optionsFastestPath.add(WaypointX);
-
-        JPanel WaypointY = new JPanel();
-        JLabel Waypoint_Y = new JLabel("WayPoint Y : ");
-        JTextField Waypoint_y = new JTextField(7);
-        WaypointY.add(Waypoint_Y);
-        WaypointY.add(Waypoint_y);
-        //  _optionsFastestPath.add(WaypointY);
-
-        Box iconPanel = new Box(BoxLayout.Y_AXIS);
-        iconPanel.add(Step);
-        iconPanel.add(WaypointX);
-        iconPanel.add(WaypointY);
-        iconPanel.setBackground(Color.gray);
-        iconPanel.setVisible(true);
-
-        _optionsFastestPath.add(iconPanel, BorderLayout.CENTER);
-        _optionsFastestPath.setVisible(false);
-    }
 
     public static void goToNextGrid() {
         System.out.println(DefaultMap.robot.path.size());
@@ -129,9 +85,7 @@ public class Simulator {
         long seconds = Long.parseLong(DefaultMap.maxTime.split(":")[1]);
 
         long time =(minutes*60)+seconds;
-        System.out.println(time);
         time = time*1000;
-
 
         long end = start + time;
         System.out.println(time);
@@ -147,7 +101,6 @@ public class Simulator {
             }
             e.move();
             e.calNumberCellExplored();
-            //System.out.println("% explored "+e.percentCurrentExploration);
             long tempTime = System.currentTimeMillis();
             if (tempTime > end){
                 return;
@@ -159,7 +112,7 @@ public class Simulator {
             }
             DefaultMap.repaint();
         }
-        while ((e.percentCurrentExploration <= DefaultMap.percent) && (!out)) {
+        while ((e.percentCurrentExploration < DefaultMap.percent) && (!out)) {
             e.getUnexplored();
             Grid temp = e.getNextFree();
             if (temp == null) {
@@ -178,6 +131,7 @@ public class Simulator {
                 return;
             }
         }
+        System.out.println(DefaultMap.percent);
         if (DefaultMap.percent == 100) {
             AStar a = new AStar();
             a.startSearch(arena, robot.cur, DefaultMap.arena.grids[RobotConstants.ROBOT_START_Y][RobotConstants.ROBOT_START_X], false);
@@ -203,6 +157,7 @@ public class Simulator {
             } catch (InterruptedException e) {
                 System.out.println("Something went wrong in robot simulation!");
             }
+            FastestPath_Map.path.add(FastestPath_Map.robot.path.get(i));
             FastestPath_Map.robot.updatePosition(FastestPath_Map.robot.path.get(i), FastestPath_Map.robot.orientations.get(i));
             FastestPath_Map.repaint();
             i += step;
@@ -214,7 +169,6 @@ public class Simulator {
     }
 
     public static void initialiseMap() {
-        //_mapCards.add(FastestPath_Map, "FAST_MAP");
         _mapCards.add(DefaultMap, "DEFAULT_MAP");
         CardLayout cl = ((CardLayout) _mapCards.getLayout());
         cl.show(_mapCards, "DEFAULT_MAP");
@@ -282,7 +236,6 @@ public class Simulator {
 
         class Exploration extends SwingWorker<Integer, String> {
             protected Integer doInBackground() throws Exception {
-                System.out.println("Hello");
                 simulateExploration();
                 return 222;
             }
@@ -292,7 +245,6 @@ public class Simulator {
         formatButton(btn_FastestPath);
         btn_FastestPath.addMouseListener(new MouseAdapter() {
             public void mousePressed(MouseEvent e) {
-                Simulator.FastP = true;
                 JDialog loadMapDialog = new JDialog(_appFrame, "Get Options", true);
                 loadMapDialog.setSize(200, 220);
                 loadMapDialog.setLayout(new FlowLayout());
@@ -310,8 +262,6 @@ public class Simulator {
 
                 go.addMouseListener(new MouseAdapter() {
                     public void mousePressed(MouseEvent e) {
-                        System.out.println("The button has been pressed");
-
                         int step_pass = Integer.parseInt(Step.getText());
                         int x = Integer.parseInt(WaypointX_field.getText());
                         int y = Integer.parseInt(WaypointY_field.getText());
@@ -342,9 +292,7 @@ public class Simulator {
             public void mousePressed(MouseEvent e) {
                 DefaultMap.fPath = false;
                 DefaultMap.reset();
-                Simulator.FastP = false;
                 System.out.println("Exploration Map has been clicked");
-                ExplorationMap = DefaultMap;
                 JDialog loadMapDialog = new JDialog(_appFrame, "Get Options", true);
                 loadMapDialog.setSize(200, 220);
                 loadMapDialog.setLayout(new FlowLayout());

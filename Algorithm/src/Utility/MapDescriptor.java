@@ -1,5 +1,9 @@
 package Utility;
 
+import Environment.Arena;
+import Environment.Constants;
+import Values.Type;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
@@ -103,7 +107,7 @@ public class MapDescriptor {
         int[][] obstacles = new int[20][15];
         for (int i = 19; i >= 0; i--) {
             for (int j = 0; j < 15; j++) {
-                if(p1_array[i][j] == 1) {
+                if (p1_array[i][j] == 1) {
                     obstacles[i][j] = binary_list.get(pos);
                     pos += 1;
                 }
@@ -112,4 +116,76 @@ public class MapDescriptor {
         return obstacles;
     }
 
+    private static String mappingBooleanToHexadecimal(int a, int b, int c, int d) {
+        if ((a == 0) && (b == 0) && (c == 0) && (d == 0)) return "0";
+        else if ((a == 0) && (b == 0) && (c == 0) && (d == 1)) return "1";
+        else if ((a == 0) && (b == 0) && (c == 1) && (d == 0)) return "2";
+        else if ((a == 0) && (b == 0) && (c == 1) && (d == 1)) return "3";
+        else if ((a == 0) && (b == 1) && (c == 0) && (d == 0)) return "4";
+        else if ((a == 0) && (b == 1) && (c == 0) && (d == 1)) return "5";
+        else if ((a == 0) && (b == 1) && (c == 1) && (d == 0)) return "6";
+        else if ((a == 0) && (b == 1) && (c == 1) && (d == 1)) return "7";
+        else if ((a == 1) && (b == 0) && (c == 0) && (d == 0)) return "8";
+        else if ((a == 1) && (b == 0) && (c == 0) && (d == 1)) return "9";
+        else if ((a == 1) && (b == 0) && (c == 1) && (d == 0)) return "A";
+        else if ((a == 1) && (b == 0) && (c == 1) && (d == 1)) return "B";
+        else if ((a == 1) && (b == 1) && (c == 0) && (d == 0)) return "C";
+        else if ((a == 1) && (b == 1) && (c == 0) && (d == 1)) return "D";
+        else if ((a == 1) && (b == 1) && (c == 1) && (d == 0)) return "E";
+        else if ((a == 1) && (b == 1) && (c == 1) && (d == 1)) return "F";
+
+        return null;
+    }
+
+
+    public static void generateMapDescriptor(Arena arena) {
+
+        ArrayList<Integer> p1_list = new ArrayList<Integer>();
+        ArrayList<Integer> p2_list = new ArrayList<Integer>();
+
+        p1_list.add(1);
+        p1_list.add(1);
+
+        for (int i = Constants.ARENA_ROWS - 1; i >= 0; i--) {
+            for (int j = 0; j < Constants.ARENA_COLS; j++) {
+                if (arena.grids[i][j].isExplored()) {
+                    p1_list.add(1);
+                    if (arena.grids[i][j].getType() == Type.OBSTACLE) {
+                        p2_list.add(1);
+                    } else {
+                        p2_list.add(0);
+                    }
+                } else {
+                    p1_list.add(0);
+                }
+            }
+        }
+        p1_list.add(1);
+        p1_list.add(1);
+
+        String p1_string = "";
+
+        for (int i = 0; i < p1_list.size() / 4; i++) {
+            int a = p1_list.get(i * 4);
+            int b = p1_list.get(i * 4 + 1);
+            int c = p1_list.get(i * 4 + 2);
+            int d = p1_list.get(i * 4 + 3);
+            p1_string = p1_string + mappingBooleanToHexadecimal(a, b, c, d);
+        }
+        System.out.println(p1_string);
+
+        while(p2_list.size()%16 !=0){
+            p2_list.add(0);
+        }
+        String p2_string = "";
+
+        for (int i = 0; i < p2_list.size() / 4; i++) {
+            int a = p2_list.get(i * 4);
+            int b = p2_list.get(i * 4 + 1);
+            int c = p2_list.get(i * 4 + 2);
+            int d = p2_list.get(i * 4 + 3);
+            p2_string = p2_string + mappingBooleanToHexadecimal(a, b, c, d);
+        }
+        System.out.println(p2_string);
+    }
 }

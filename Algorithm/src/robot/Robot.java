@@ -13,6 +13,7 @@ public class Robot {
 
     public Orientation cur_or;
     public Grid cur;
+
     public Sensors sensorF;
     public Sensors sensorB;
     public Sensors sensorL;
@@ -41,10 +42,51 @@ public class Robot {
     public void updatePosition(Grid next_cur, Orientation next_or) {
         this.cur = next_cur;
         this.cur_or = next_or;
-        sensorF.updatePosition(cur.getX(),cur.getY());
-        sensorB.updatePosition(cur.getX(),cur.getY());
-        sensorL.updatePosition(cur.getX(),cur.getY());
-        sensorR.updatePosition(cur.getX(),cur.getY());
+        sensorF.updatePosition(cur.getX(), cur.getY());
+        sensorB.updatePosition(cur.getX(), cur.getY());
+        sensorL.updatePosition(cur.getX(), cur.getY());
+        sensorR.updatePosition(cur.getX(), cur.getY());
+        updateSensorOrientation();
+    }
+
+    public void updateSensorOrientation() {
+        this.sensorF.updateOr(cur_or);
+        switch (cur_or) {
+            case North:
+                this.sensorB.updateOr(Orientation.South);
+                this.sensorL.updateOr(Orientation.West);
+                this.sensorR.updateOr(Orientation.East);
+                break;
+            case South:
+                this.sensorB.updateOr(Orientation.North);
+                this.sensorL.updateOr(Orientation.East);
+                this.sensorR.updateOr(Orientation.South);
+                break;
+            case East:
+                this.sensorB.updateOr(Orientation.West);
+                this.sensorL.updateOr(Orientation.North);
+                this.sensorR.updateOr(Orientation.South);
+                break;
+            case West:
+                this.sensorB.updateOr(Orientation.East);
+                this.sensorL.updateOr(Orientation.South);
+                this.sensorR.updateOr(Orientation.North);
+                break;
+        }
+    }
+
+    public void sense(Arena ar) {
+        this.sensorF.sense(ar);
+        this.sensorB.sense(ar);
+        this.sensorR.sense(ar);
+        this.sensorL.sense(ar);
+    }
+
+    public void setSensor() {
+        this.sensorF = new Sensors(this.cur.getX(), this.cur.getY(), "Short");
+        this.sensorB = new Sensors(this.cur.getX(), this.cur.getY(), "Short");
+        this.sensorR = new Sensors(this.cur.getX(), this.cur.getY(), "Short");
+        this.sensorL = new Sensors(this.cur.getX(), this.cur.getY(), "Short");
         updateSensorOrientation();
     }
 
@@ -76,54 +118,13 @@ public class Robot {
 
     public void getOrientation() {
         orientations.removeAll(orientations);
-        for (int i = 0; i < this.path.size()-1; i++) {
+        for (int i = 0; i < this.path.size() - 1; i++) {
             try {
                 orientations.add(nextOrientation(path.get(i), path.get(i + 1)));
             } catch (Exception e) {
-                System.out.println("Getting Orientations");
+                System.out.println("Error in Getting Orientations");
             }
         }
         orientations.add(cur_or);
-    }
-
-    public void updateSensorOrientation(){
-        this.sensorF.updateOr(cur_or);
-        switch (cur_or){
-            case North:
-                this.sensorB.updateOr(Orientation.South);
-                this.sensorL.updateOr(Orientation.West);
-                this.sensorR.updateOr(Orientation.East);
-                break;
-            case South:
-                this.sensorB.updateOr(Orientation.North);
-                this.sensorL.updateOr(Orientation.East);
-                this.sensorR.updateOr(Orientation.South);
-                break;
-            case East:
-                this.sensorB.updateOr(Orientation.West);
-                this.sensorL.updateOr(Orientation.North);
-                this.sensorR.updateOr(Orientation.South);
-                break;
-            case West:
-                this.sensorB.updateOr(Orientation.East);
-                this.sensorL.updateOr(Orientation.South);
-                this.sensorR.updateOr(Orientation.North);
-                break;
-        }
-    }
-
-    public void sense(Arena ar){
-        this.sensorF.sense(ar);
-        this.sensorB.sense(ar);
-        this.sensorR.sense(ar);
-        this.sensorL.sense(ar);
-    }
-
-    public void setSensor(){
-        this.sensorF = new Sensors(this.cur.getX(),this.cur.getY(),"Short");
-        this.sensorB = new Sensors(this.cur.getX(),this.cur.getY(),"Short");
-        this.sensorR = new Sensors(this.cur.getX(),this.cur.getY(),"Short");
-        this.sensorL = new Sensors(this.cur.getX(),this.cur.getY(),"Short");
-        updateSensorOrientation();
     }
 }

@@ -4,7 +4,6 @@ import Environment.*;
 import Robot.*;
 import Utility.PrintConsole;
 import Values.Orientation;
-import Values.Type;
 
 import java.util.ArrayList;
 
@@ -200,7 +199,7 @@ public class Exploration {
         return false;
     }
 
-    public int calNumberCellExplored() {
+    public void calNumberCellExplored() {
         int num = 0;
         for (int row = 0; row < Constants.ROWS; row++) {
             for (int col = 0; col < Constants.COLUMNS; col++) {
@@ -210,10 +209,7 @@ public class Exploration {
             }
         }
         this.numberCellExplored = num;
-       // System.out.println("Num : "+ num);
         this.percentCurrentExploration = (num / 300.0) * 100;
-       // System.out.println(this.percentCurrentExploration);
-        return num;
     }
 
     private void setNext() {
@@ -243,13 +239,13 @@ public class Exploration {
                 if (arena.grids[y][i + x].getAcc()) {
                     return arena.grids[y][i + x];
                 }
-            } catch (Exception e) {
+            } catch (Exception ignored) {
             }
             try {
                 if (arena.grids[y][x - i].getAcc()) {
                     return arena.grids[y][x - i];
                 }
-            } catch (Exception e) {
+            } catch (Exception ignored) {
             }
         }
         for (int i = 1; i < 4; i++) {
@@ -257,13 +253,13 @@ public class Exploration {
                 if (arena.grids[y + i][x].getAcc()) {
                     return arena.grids[y + i][x];
                 }
-            } catch (Exception e) {
+            } catch (Exception ignored) {
             }
             try {
                 if (arena.grids[y - i][x - i].getAcc()) {
                     return arena.grids[y - i][x];
                 }
-            } catch (Exception e) {
+            } catch (Exception ignored) {
             }
         }
         return null;
@@ -281,16 +277,15 @@ public class Exploration {
     }
 
     public Grid getNextFree() {
-        for (int i = 0; i < unexplored.size(); i++) {
-            if (unexplored.get(i).getAcc()) {
-                return unexplored.get(i);
+        for (Grid grid : unexplored) {
+            if (grid.getAcc()) {
+                return grid;
             }
         }
         return null;
     }
 
     public void goToNextGrid() {
-       // System.out.println(robot.path.size());
         robot.sense(arena);
         for (int i = 0; i < robot.path.size(); i++) {
             robot.updatePosition(robot.path.get(i), robot.orientations.get(i));
@@ -316,8 +311,7 @@ public class Exploration {
                 }
                 AStar a = new AStar();
                 a.startSearch(arena, robot.cur, temp, false);
-                ArrayList<Grid> path = a.solution;
-                robot.path = path;
+                robot.path = a.solution;
                 robot.getOrientation();
                 goToNextGrid();
                 calNumberCellExplored();
@@ -346,8 +340,7 @@ public class Exploration {
                 }
                 AStar a = new AStar();
                 a.startSearch(arena, robot.cur, temp, false);
-                ArrayList<Grid> path = a.solution;
-                robot.path = path;
+                robot.path = a.solution;
                 robot.getOrientation();
                 goToNextGrid();
                 calNumberCellExplored();
