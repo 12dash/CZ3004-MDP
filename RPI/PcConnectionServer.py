@@ -6,8 +6,8 @@ Connection between RPI and Algorithm via IP Socket.
 """
 
 class PcConnectionServer:
-    def __init__(self, server_ip = SERVER_IP, port = PORT):
-        self.server_ip = server_ip
+    def __init__(self,  port = PORT):
+        self.server_ip = SERVER_IP
         self.port = port
         self.server = None
         self.client_conn = None
