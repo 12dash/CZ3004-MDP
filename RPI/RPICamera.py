@@ -1,14 +1,16 @@
 from picamera import PiCamera
 from picamera.array import PiRGBArray
-import cv2
+import cv2 as cv
 import numpy as np
+from datetime import datetime
 
 
 class RPICamera:
   def __init__(self):
     self.cam = PiCamera()
-    self.resolution = (640, 480)
+    self.resolution = (256, 256)
     self.output = PiRGBArray(self.cam)
+    self.image_path = "/home/pi/workspace/CZ3004-MDP/RPI/images/"
 
   
   def capture_image(self):
@@ -21,6 +23,10 @@ class RPICamera:
     else: 
       print("Image captured")
       print(array)
+      
+      #Save image
+      cv.imwrite(f"{self.image_path}{str(datetime.now().strftime('%Y-%m-%d~%H:%M:%S'))}.jpg", array)
+      print(f"Image saved to {self.image_path}")
     
     return array
   
