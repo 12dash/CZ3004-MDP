@@ -6,20 +6,29 @@ import Robot.Robot;
 import Robot.*;
 
 import java.awt.*;
+import java.util.ArrayList;
 import javax.swing.*;
 
 public class Map extends JPanel {
     public Arena arena;
     public Robot robot;
+
+    //Variables used for the Fastest Path.
     public Grid wayPoint = null;
     public int step = 0;
-    public double percent = 100;
     public boolean fPath = true;
+    public ArrayList<Grid> path= new ArrayList<>();
+
+    //Variable for the Exploration.
+    public double percent = 100;
     public String maxTime = "6:00";
+
     Map(Arena arena) {
         this.arena = arena;
-        this.arena.initializeArena();
-        this.robot = new Robot(arena.grids[-1 + Constants.ROWS - RobotConstants.START_ROW][RobotConstants.START_COL]);
+        int y = -1 + Constants.ROWS - RobotConstants.START_ROW;
+        int x = RobotConstants.START_COL;
+        this.robot = new Robot(arena.grids[y][x]);
+        setAllUnexplored();
     }
 
     public void reset() {
@@ -33,7 +42,9 @@ public class Map extends JPanel {
     }
 
     public void resetRobot() {
-        this.robot = new Robot(arena.grids[-1 + Constants.ROWS - RobotConstants.START_ROW][RobotConstants.START_COL]);
+        int y = -1 + Constants.ROWS - RobotConstants.START_ROW;
+        int x = RobotConstants.START_COL;
+        this.robot = new Robot(arena.grids[y][x]);
     }
 
     public void setWayPoint(Grid wayPoint) {
@@ -46,6 +57,14 @@ public class Map extends JPanel {
 
     private boolean inGoalZone(int row, int col) {
         return (row >= 0 && row <= 2 && col <= Constants.GOAL_COL + 1 && col >= Constants.GOAL_COL - 1);
+    }
+    private boolean checkIfPresent(Grid a){
+        for(Grid x: this.path){
+            if (x.equals(a)){
+                return true;
+            }
+        }
+        return false;
     }
 
     public void paintComponent(Graphics g) {
@@ -82,12 +101,14 @@ public class Map extends JPanel {
                     else if (arena.grids[row][col].equals(this.wayPoint)) {
                         cellColor = Constants.C_WAYPOINT;
                     }
+                    else if(checkIfPresent(arena.grids[row][col])){
+                        cellColor = Constants.C_PATH;
+                    }
                 }
                 g.setColor(cellColor);
                 g.fillRect(_gridCells[row][col].cellX + Constants.MAP_X_OFFSET, _gridCells[row][col].cellY, _gridCells[row][col].cellSize, _gridCells[row][col].cellSize);
             }
         }
-
 
         // Paint the robot on-screen.
         g.setColor(Constants.C_ROBOT);
@@ -152,5 +173,4 @@ public class Map extends JPanel {
             }
         }
     }
-
 }

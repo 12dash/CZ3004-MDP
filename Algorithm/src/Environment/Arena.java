@@ -8,18 +8,32 @@ public class Arena {
     public Grid[][] grids;
 
     public Arena() {
+        /*
+        Constructor for making an Arena and initializing it
+         */
         grids = new Grid[Constants.ROWS][Constants.COLUMNS];
+        initializeArena();
     }
 
     public void initializeArena() {
+        /*
+        Initialize the arena setting the grids as :
+            1. Type = Free
+            2. Accessible = True
+            3. Explored = False
+         */
         for (int i = 0; i < Constants.ROWS; i++) {
             for (int j = 0; j < Constants.COLUMNS; j++) {
-                this.grids[i][j] = new Grid(Type.FREE, true, j, i); //Grids(Type type, boolean acc, int x , int y)
+                //Grids(Type type, boolean acc, int x , int y)
+                this.grids[i][j] = new Grid(Type.FREE, true, j, i);
             }
         }
     }
 
     public void checkCellModifyAcc(int i, int j) {
+        /*
+        Method to check if the position is a valid position in the arena and then change the acc to false
+         */
         if (((i >= 0) && (i < Constants.COLUMNS)) && ((j >= 0) && (j < Constants.ROWS))) {
             if (this.grids[j][i].getAcc()) this.grids[j][i].setAcc(false);
         }
@@ -67,11 +81,11 @@ public class Arena {
                 }
             }
         }
+        //Build the padding around the edges of the arena
         getBorderPadding();
     }
 
     public void make_arena(int[][] temp) {
-        initializeArena();
         for (int i = 0; i < Constants.ROWS; i++) {
             for (int j = 0; j < Constants.COLUMNS; j++) {
                 if (temp[i][j] == 1) {
