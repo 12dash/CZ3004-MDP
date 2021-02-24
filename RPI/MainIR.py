@@ -165,6 +165,5 @@ class Main(threading.Thread):
 if __name__ == "__main__":
   print("Start main program")
   main = Main()
-  main.start_multi_threads()
-  
 
+  main.start_multi_threads()
