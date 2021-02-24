@@ -8,7 +8,7 @@ from datetime import datetime
 class RPICamera:
   def __init__(self):
     self.cam = PiCamera()
-    self.resolution = (256, 256)
+    self.cam.resolution = (256, 256)
     self.output = PiRGBArray(self.cam)
     self.image_path = "/home/pi/workspace/CZ3004-MDP/RPI/images/"
 
