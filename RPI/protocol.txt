@@ -2,17 +2,17 @@ Android -> Algo: pc|{"start": "FS"} -- Fastest Path
 Android -> Algo: pc|{"start": "ES"} -- Start Exploration
 Android -> Algo: pc|{"sendArena": "true"} -- Call for MDF String 
 Algo -> Android: an|{"p1": "<str>" , "p2":"<str>" }
-Algo -> Arduino: ar| {"stop" : "true"} -- STOP 
+Algo -> Arduino: ar|{"stop" : "true"} -- STOP When goal has been reached
 
 // For Fastest Path
 Android -> Algo: pc|{"waypoint": [x,y]}  -- Value is the coords of waypoint
 Algo -> Arduino: ar|{"fastestPath": ["0","L","R","5"] } -- Refer to Arduino commmands list for more
-RPI -> Arduino: "0" -- Single command at a time
-Arduino -> RPI: pc|Done -- TBC
+RPI -> Arduino: "0" -- Single command at a time -- TBC
+Arduino -> RPI: pc|Done -- To indicate that a single movement is done -- TBC
 
 // For Image Recognition
 Algo -> RPI: ir|{"coords": [x,y] } -- Message refers to coord
-RPI -> PC: {"imageArr": <3d pixel array>, "coords": "3,3"}
+RPI -> PC: {"imageArr": <3d pixel array>, "coords": [x,y] }
 PC -> Android: an|{"image":[x,y,id]}
 
 // For Exploration
@@ -24,6 +24,9 @@ Algo -> Arduino: SENSE -- TBC
 Arduino -> Algo: Send algo nearby obstacles -- TBC
 
 
+TBC:
+- For IR, when RPI is capturing image, when does Algo knows to resume movement?
+- For FP, Arduino to receive all commands at once vs one by one
 
 
 
