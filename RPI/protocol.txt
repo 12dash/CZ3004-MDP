@@ -1,18 +1,27 @@
-Android -> Algo: pc|FS -- Fastest Path
-Android -> Algo: pc|ES -- Start Exploration
-Android -> Algo: pc|SendArena -- Call for MDF String 
+Android -> Algo: pc|{"start": "FS"} -- Fastest Path
+Android -> Algo: pc|{"start": "ES"} -- Start Exploration
+Android -> Algo: pc|{"sendArena": "true"} -- Call for MDF String 
+Algo -> Android: an|{"p1": "<str>" , "p2":"<str>" }
+Algo -> Arduino: ar| {"stop" : "true"} -- STOP 
 
 // For Fastest Path
 Android -> Algo: pc|{"waypoint": [x,y]}  -- Value is the coords of waypoint
-Algo -> Arduino: ar|{"fastestPath": [0,"L","R",5] } -- Refer to Arduino commmands list for more
+Algo -> Arduino: ar|{"fastestPath": ["0","L","R","5"] } -- Refer to Arduino commmands list for more
 RPI -> Arduino: "0" -- Single command at a time
 Arduino -> RPI: pc|Done -- TBC
 
 // For Image Recognition
-Algo -> RPI: ir|3,3 -- Message refers to coord
+Algo -> RPI: ir|{"coords": [x,y] } -- Message refers to coord
 RPI -> PC: {"imageArr": <3d pixel array>, "coords": "3,3"}
-PC -> Android: an|{"image":[x,y,id]} -- TBC
+PC -> Android: an|{"image":[x,y,id]}
 
+// For Exploration
+Algo -> Arduino: ar|{"explore": "L" }
+Algo -> Android: ar|{"explore": "L" }
+
+// For Image Recognition and Exploration:
+Algo -> Arduino: SENSE -- TBC
+Arduino -> Algo: Send algo nearby obstacles -- TBC
 
 
 
