@@ -1,5 +1,6 @@
 import socket
 import threading
+import json
 from config import *
 
 class PcConnectionClient:
@@ -34,16 +35,23 @@ class PcConnectionClient:
       msg = self.client.recv(PC_BUFFER_SIZE).decode(FORMAT)
       print(f"[SERVER] {msg}")
 
-      arr, coords = msg.split("%") # Delimited by %: <arr>%<coords>
+      json_incoming = json.loads(msg)
+
+      arr = json_incoming["imageArr"]
+      coords = json_incoming["coords"]
 
       print("Input Arr: " + arr)
       print("Coords: " + coords)
 
-      # Sabrina: Do IR processing here
+      # Sabrina: Predict Image ID here
       print("Predicted Image IDs Here")
+      predicted_img = "Some Image ID to be predicted here"
+
+      #TODO: Save the raw image captured with bounding box here -- need to display as output as end of run
 
       #Then send to android
-      self.send_to_server_ir_data(f"an|image_ids%{coords}")
+      json_outgoing = json.dumps({"image": [coords[0], coords[1], predicted_img]})
+      self.send_to_server_ir_data(f"an|{json_outgoing}")
       
       if msg == DISCONNECT_MESSAGE or len(msg) == 0:
         print(len(msg))

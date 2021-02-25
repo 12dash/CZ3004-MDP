@@ -1,5 +1,6 @@
 import threading
 import queue
+import json
 from config import *
 from PcConnectionServer import PcConnectionServer
 from AndroidBluetoothServer import AndroidBluetoothServer
@@ -58,15 +59,16 @@ class Main(threading.Thread):
       elif header == "ar":
         arduino_queue.put_nowait(msg_lst[1])
       elif header == "ir":
-        coords = msg_lst[1]
+        coords = json.loads(msg_lst[1])["coords"]
 
         # RPI to take picture on command from ALGO PC
-        pic_arr = self.rpi_camera.capture_image()
+        image_arr = self.rpi_camera.capture_image()
 
-        print("Sending image to IR PC")
+        print("Sending image and coords to IR PC")
         # after picture is taken, send to IR PC -> Image Array and Coords
-        self.ir_pc_queue.put_nowait(str(pic_arr) + "%" + coords) # convert arr to str: <array>%<coords>
-        print("Sent image to IR PC")
+        json_msg = {"imageArr" : image_arr, "coords": coords }
+        self.ir_pc_queue.put_nowait(json.dumps(json_msg)) 
+        print("Sent image and coords to IR PC")
       else:
         print("Invalid recipient from PC")
 
