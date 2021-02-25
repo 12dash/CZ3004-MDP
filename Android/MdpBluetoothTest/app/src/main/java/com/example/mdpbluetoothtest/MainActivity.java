@@ -35,7 +35,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.reflect.Array;
 import java.math.BigInteger;
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -48,6 +50,8 @@ public class MainActivity extends AppCompatActivity {
     Switch manualAutoToggleBtn, tiltSwitch;
     MazeView mazeView;
     ReconfigureFragment reconfigureFragment = new ReconfigureFragment();
+    StringFragment stringFragment = new StringFragment();
+
 
     // Non UI Components - Sensors, Services
     BluetoothConnectionService bluetoothConnectionService;
@@ -56,9 +60,15 @@ public class MainActivity extends AppCompatActivity {
     SensorEventListener tiltSensorEventListener;
 
     SharedPreferences sharedPreferences;
+    SharedPreferences.Editor editor;
 
     public static boolean manualUpdateRequest = false;
     private boolean tiltIsAllowedFlag = true;
+
+    public static ArrayList<ArrayList<Integer>> imagecoordList = new ArrayList<ArrayList<Integer>>();
+    public ArrayList<ArrayList<Integer>> returnArrayList(){
+        return imagecoordList;
+    }
 
     // String Constants
     private static final String TAG = "MainActivity";
@@ -161,6 +171,8 @@ public class MainActivity extends AppCompatActivity {
                 return;
             }
         };
+
+
 
         accelerometerSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         tiltSwitch = findViewById(R.id.phoneTiltSwitch);
@@ -341,7 +353,7 @@ public class MainActivity extends AppCompatActivity {
             case R.id.action_map:
 //                intent = new Intent(this, BluetoothActivity.class);
 //                return true;
-                Toast.makeText(this, "Go to Map though", Toast.LENGTH_SHORT).show();
+                stringFragment.show(getFragmentManager(), "String Fragment");
                 return true;
             case R.id.action_reconfigure:
                 reconfigureFragment.show(getFragmentManager(), "Reconfigure Fragment");
@@ -406,6 +418,19 @@ public class MainActivity extends AppCompatActivity {
                     JSONObject jsonObject = new JSONObject(messageValue);
                     JSONArray jsonArray = jsonObject.getJSONArray("image");
                     mazeView.drawImageNumberCell(jsonArray.getInt(0),jsonArray.getInt(1),jsonArray.getInt(2));
+                    editor = sharedPreferences.edit();
+
+
+
+                    ArrayList<Integer> imgcoord = new ArrayList<Integer>();
+                    imgcoord.add(jsonArray.getInt(0));
+                    imgcoord.add(jsonArray.getInt(1));
+                    imgcoord.add(jsonArray.getInt(2));
+                    imagecoordList.add(imgcoord);
+
+                    editor.putString("IMAGE", imagecoordList.toString());
+                    editor.commit();
+                    Log.d("IMAGE", imagecoordList.toString());
                     Log.d(TAG,jsonArray.getInt(0)+ "," + jsonArray.getInt(1));
                 }
             }

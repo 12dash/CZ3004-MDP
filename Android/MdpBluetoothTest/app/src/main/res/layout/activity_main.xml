@@ -252,30 +252,6 @@
                 android:tint="@color/black"
                 app:srcCompat="@drawable/ic_clear" />
 
-            <ImageButton
-                android:id="@+id/exploredImageBtn"
-                android:layout_width="45dp"
-                android:layout_height="45dp"
-                android:layout_marginStart="16dp"
-                android:layout_marginLeft="16dp"
-                android:layout_marginTop="16dp"
-                android:scaleType="centerCrop"
-                android:layout_row="1"
-                android:layout_column="0"
-                android:tint="@color/black"
-                app:srcCompat="@drawable/ic_exploredimg" />
-
-            <ImageButton
-                android:id="@+id/directionChangeImageBtn"
-                android:layout_width="45dp"
-                android:layout_height="45dp"
-                android:layout_marginStart="16dp"
-                android:layout_marginLeft="16dp"
-                android:layout_marginTop="16dp"
-                android:scaleType="centerCrop"
-                android:tint="@color/black"
-                app:srcCompat="@drawable/ic_direction" />
-
                 <Button
                     android:id="@+id/btn_F1"
                     android:layout_width="50dp"

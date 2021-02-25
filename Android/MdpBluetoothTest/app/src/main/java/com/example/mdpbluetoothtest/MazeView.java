@@ -27,6 +27,7 @@ import org.json.JSONObject;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class MazeView extends View {
@@ -37,6 +38,7 @@ public class MazeView extends View {
     }
 
     SharedPreferences sharedPreferences;
+    SharedPreferences.Editor editor;
     private BluetoothConnectionService bluetoothConnectionService;
 
     private Paint blackPaint = new Paint();
@@ -75,6 +77,7 @@ public class MazeView extends View {
     private static final int ROW = 20;
     private static float cellSize;
     private static Cell[][] cells;
+
 
     private boolean mapDrawn = false;
     public static String publicMDFExploration;
@@ -434,7 +437,7 @@ public class MazeView extends View {
         row = this.convertRow(row);
         cells[col][row].setType("waypoint");
 
-        bluetoothConnectionService.write(String.format("waypoint (%d,%d)", waypointCoord[0]-1, waypointCoord[1]-1));
+        bluetoothConnectionService.write(String.format("pc|{\"waypoint\":[%d,%d]}", waypointCoord[0]-1, waypointCoord[1]-1));
         showLog("Exiting setWaypointCoord");
     }
 
@@ -645,7 +648,6 @@ public class MazeView extends View {
         ToggleButton setStartPointToggleBtn = ((Activity)this.getContext()).findViewById(R.id.setStartPointToggleBtn);
         ToggleButton setWaypointToggleBtn = ((Activity)this.getContext()).findViewById(R.id.setWayPointToggleBtn);
         ImageButton obstacleImageBtn = ((Activity)this.getContext()).findViewById(R.id.obstacleImageBtn);
-        ImageButton exploredImageBtn = ((Activity)this.getContext()).findViewById(R.id.exploredImageBtn);
         ImageButton clearImageBtn = ((Activity)this.getContext()).findViewById(R.id.clearImageBtn);
 
         if (!buttonName.equals("setStartPointToggleBtn"))
@@ -658,9 +660,6 @@ public class MazeView extends View {
                 this.setWaypointStatus(false);
                 setWaypointToggleBtn.toggle();
             }
-        if (!buttonName.equals("exploredImageBtn"))
-            if (exploredImageBtn.isEnabled())
-                this.setExploredStatus(false);
         if (!buttonName.equals("obstacleImageBtn"))
             if (obstacleImageBtn.isEnabled())
                 this.setSetObstacleStatus(false);
@@ -720,6 +719,7 @@ public class MazeView extends View {
         BigInteger hexBigIntegerExplored, hexBigIntegerObstacle;
         String message;
 
+
         if (mapInformation == null)
             return;
 
@@ -731,6 +731,10 @@ public class MazeView extends View {
                     infoJsonObject = infoJsonArray.getJSONObject(0);
 
                     hexStringExplored = infoJsonObject.getString("explored");
+
+
+                    editor = sharedPreferences.edit();
+                    editor.putString("P1", hexStringExplored);
                     hexBigIntegerExplored = new BigInteger(hexStringExplored, 16);
                     exploredString = hexBigIntegerExplored.toString(2);
                     showLog("updateMapInformation.exploredString: " + exploredString);
@@ -748,6 +752,8 @@ public class MazeView extends View {
                     int length = infoJsonObject.getInt("length");
 
                     hexStringObstacle = infoJsonObject.getString("obstacle");
+                    editor.putString("P2", hexStringObstacle);
+                    editor.commit();
                     showLog("updateMapInformation hexStringObstacle: " + hexStringObstacle);
                     hexBigIntegerObstacle = new BigInteger(hexStringObstacle, 16);
                     showLog("updateMapInformation hexBigIntegerObstacle: " + hexBigIntegerObstacle);
@@ -771,6 +777,7 @@ public class MazeView extends View {
                     int[] waypointCoord = this.getWaypointCoord();
                     if (waypointCoord[0] >= 1 && waypointCoord[1] >= 1)
                         cells[waypointCoord[0]][20 - waypointCoord[1]].setType("waypoint");
+
                     break;
                 case "robotPosition":
                     if (canDrawRobot)
@@ -846,6 +853,22 @@ public class MazeView extends View {
         }
         showLog("Exiting updateMapInformation");
         this.invalidate();
+        updateImage();
+
+    }
+
+    public void updateImage(){
+        MainActivity main = new MainActivity();
+        Log.d("TEST",main.returnArrayList().toString());
+        for(int z = 0; z < main.returnArrayList().size(); z++)
+        {
+            Log.d("TESTTEST", main.returnArrayList().get(z).get(0).toString());
+            int x = main.returnArrayList().get(z).get(0);
+            int y = main.returnArrayList().get(z).get(1);
+            int id = main.returnArrayList().get(z).get(2);
+            drawImageNumberCell(x,y,id);
+        }
+
     }
 
     public void moveRobot(String direction) {
