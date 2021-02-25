@@ -1,6 +1,10 @@
 package Simulator;
 
+import Algo.AStar;
+import Algo.InnerExploration;
 import Algo.RightWallHugging;
+import Environment.ArenaConstants;
+import Utility.MapDescriptor;
 import Utility.PrintConsole;
 
 import Robot.*;
@@ -12,22 +16,24 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
 public class ExplorationSimulations extends JPanel {
     Map map;
-    int step_exploration = 100;
-    int minute = 5;
-    int seconds = 59;
+    int percentExploration = 100;
+    long minute = 5;
+    long seconds = 59;
+    long time;
 
     public void simulateRobotMovement() {
-        System.out.println("Calling movement");
+        time = ((minute * 60) + (seconds)) * 1000;
+        long start = System.currentTimeMillis();
+        long end = start + time;
+
         Algo.RightWallHugging obj = new RightWallHugging(map.arena, map.robotSimulator);
-        System.out.println("Calling movement 1");
         obj.move();
-        System.out.println("Calling movement 2");
-        while (!map.robotSimulator.getCur().equals(map.arena.grids[RobotConstants.ROBOT_START_Y][RobotConstants.ROBOT_START_X])) {
-            System.out.println("1234");
+        while (!map.robotSimulator.getCur().equals(map.arena.grids[RobotConstants.ROBOT_START_Y][RobotConstants.ROBOT_START_X]) && (obj.percentExplored < percentExploration) && (System.currentTimeMillis() < end)) {
             try {
                 TimeUnit.MILLISECONDS.sleep(RobotConstants.SPEED);
             } catch (InterruptedException e) {
@@ -36,6 +42,40 @@ public class ExplorationSimulations extends JPanel {
             obj.move();
             map.repaint();
         }
+
+        Algo.InnerExploration innerExploration = new InnerExploration(map.arena, map.robotSimulator);
+        while ((innerExploration.percentExplored < percentExploration) && (System.currentTimeMillis() < end)) {
+            try {
+                TimeUnit.MILLISECONDS.sleep(RobotConstants.SPEED);
+            } catch (InterruptedException e) {
+                System.out.println("Something went wrong in robot simulation!");
+            }
+            innerExploration.move();
+            map.repaint();
+        }
+        /*
+        To return back to the base.....
+         */
+
+        AStar astar = new AStar();
+        astar.startSearch(this.map.arena, this.map.robotSimulator.getCur(), this.map.arena.grids[ArenaConstants.START_ROW][ArenaConstants.START_COL], false);
+
+        System.out.println(astar.solution.size());
+
+        this.map.robotSimulator.setPath(astar.solution);
+        this.map.robotSimulator.getPathOrientation();
+
+        while ((this.map.robotSimulator.getPath().size() != 0)) {
+            try {
+                TimeUnit.MILLISECONDS.sleep(RobotConstants.SPEED);
+            } catch (InterruptedException e) {
+                System.out.println("Something went wrong in robot simulation!");
+            }
+            this.map.robotSimulator.updatePosition(this.map.robotSimulator.getPath().remove(0), this.map.robotSimulator.getOrientations().remove(0));
+            this.map.repaint();
+        }
+
+        MapDescriptor.generateMapDescriptor(this.map.arena);
     }
 
     class ExploreMap extends SwingWorker<Integer, String> {
@@ -67,7 +107,7 @@ public class ExplorationSimulations extends JPanel {
             @Override
             public void itemStateChanged(ItemEvent e) {
                 if (e.getStateChange() == ItemEvent.SELECTED) {
-                    step_exploration = (Integer) comboCount.getSelectedItem();
+                    percentExploration = (int) comboCount.getSelectedItem();
                 }
             }
         });
@@ -117,7 +157,5 @@ public class ExplorationSimulations extends JPanel {
             }
         });
         this.setVisible(true);
-
-
     }
 }

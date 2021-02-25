@@ -98,6 +98,7 @@ public class RobotSimulator extends Robot {
     }
 
     public void sense(Arena ar) {
+
         this.sensorF.sense(ar);
         this.sensorB.sense(ar);
         this.sensorR.sense(ar);

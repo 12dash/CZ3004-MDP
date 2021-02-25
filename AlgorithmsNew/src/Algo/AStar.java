@@ -32,8 +32,10 @@ public class AStar {
             Heuristic cost to calculate the cost involved in expanding the cur candidate Node.
             Takes the straight line cost from cur to end goal.
          */
-        double cost = (Math.pow((cur.getX() - this.end.getX()), 2) + Math.pow((cur.getY() - this.end.getY()), 2));
-        return (Math.pow(cost, 0.5));
+        //double cost = (Math.pow((cur.getX() - this.end.getX()), 2) + Math.pow((cur.getY() - this.end.getY()), 2));
+        //return (Math.pow(cost, 0.5));
+        double cost = Math.abs(cur.getX() - this.end.getX()) + Math.abs((cur.getY() - this.end.getY()));
+        return cost;
     }
 
     private boolean checkRange(int y, int x) {

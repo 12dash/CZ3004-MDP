@@ -2,6 +2,8 @@ package com.company;
 
 import Algo.*;
 import Environment.*;
+import Robot.RobotConstants;
+import Robot.RobotSimulator;
 import Utility.*;
 
 public class Main {
@@ -17,9 +19,13 @@ public class Main {
 
         Arena arena = new Arena();
         arena.make_arena(obs);
-        arena.setExplored();
 
-        FastestPath.findPath(arena,new int[]{1,1});
+        RobotSimulator robot = new RobotSimulator(arena.grids[RobotConstants.START_ROW][RobotConstants.START_COL]);
+
+        arena.setUnexplored();
+        Exploration.start(arena, robot);
+
+        //FastestPath.findPath(arena,new int[]{1,1});
 
     }
 }

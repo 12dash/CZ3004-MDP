@@ -347,7 +347,6 @@ public class Exploration {
                 System.out.println("Unexplored size : " + unexplored.size());
             }
         }
-
         PrintConsole.getExploration(arena);
         System.out.println(unexplored.size());
     }

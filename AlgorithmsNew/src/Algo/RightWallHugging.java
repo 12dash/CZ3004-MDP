@@ -13,9 +13,12 @@ public class RightWallHugging{
     public Grid nextGrid;
     public Orientation nextOr;
 
+    public double percentExplored;
+
     public RightWallHugging(Arena arena, RobotSimulator robot){
         this.arena = arena;
         this.robot = robot;
+        this.percentExplored = ExplorationUtility.percentExplore(arena);
     }
 
     public boolean detectPossible(Grid temp) {
@@ -33,7 +36,6 @@ public class RightWallHugging{
     }
 
     public boolean moveForward() {
-        System.out.println("forward");
         Grid temp;
         switch (robot.getOrientation()) {
             case North:
@@ -153,7 +155,6 @@ public class RightWallHugging{
     }
 
     public boolean moveRight() {
-        System.out.println("Right");
         Grid temp;
         switch (robot.getOrientation()) {
             case North:
@@ -209,6 +210,6 @@ public class RightWallHugging{
            // System.out.println("Move Backward");
         }
         setNext();
+        this.percentExplored = ExplorationUtility.percentExplore(arena);
     }
-
 }
