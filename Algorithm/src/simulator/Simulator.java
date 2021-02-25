@@ -48,6 +48,7 @@ public class Simulator {
         contentPane.add(_mapCards, BorderLayout.CENTER);
         contentPane.add(_buttons, BorderLayout.PAGE_END);
 
+
         // Initialize the main map view
         initialiseMap();
 
