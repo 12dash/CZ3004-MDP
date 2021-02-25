@@ -1,0 +1,45 @@
+Android -> Algo: pc|FS -- Fastest Path
+Android -> Algo: pc|ES -- Start Exploration
+Android -> Algo: pc|SendArena -- Call for MDF String 
+
+// For Fastest Path
+Android -> Algo: pc|{"waypoint": [x,y]}  -- Value is the coords of waypoint
+Algo -> Arduino: ar|{"fastestPath": [0,"L","R",5] } -- Refer to Arduino commmands list for more
+RPI -> Arduino: "0" -- Single command at a time
+Arduino -> RPI: pc|Done -- TBC
+
+// For Image Recognition
+Algo -> RPI: ir|3,3 -- Message refers to coord
+RPI -> PC: {"imageArr": <3d pixel array>, "coords": "3,3"}
+PC -> Android: an|{"image":[x,y,id]} -- TBC
+
+
+
+
+
+
+/**
+ARDUINO COMMANDS
+**/
+
+Dictionary
+0-9, Number of blocks forward
+'E', Print IR
+'F', Move forward, caliFront, printIR
+'H', califront
+'L', Turn Left, printIR
+'R', Turn Right, printIR
+'X', Turn Degree Left,  moveL45F, printIR
+'Y', Turn Degree Right, moveR45F, printIR
+'A', Right hug calibrate: move Left, caliFront,printIR, moveL
+'B', Left hug calibrate: move Right, caliFront,printIR, moveL
+'T', caliFront or caliRight
+'C': end exploration calibration
+'D': 
+'Z':
+
+Fastest Path
+U: Turn Right, fastest Path
+
+For arduino team,
+'S': moveSlow, but straight
