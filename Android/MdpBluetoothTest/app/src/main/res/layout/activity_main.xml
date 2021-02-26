@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity"
+    android:background="#99D9EA"
     android:paddingHorizontal="10dp"
     android:orientation="vertical">
 
@@ -35,7 +36,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Current Status"
-                android:background="@color/design_default_color_primary"
+                android:background="@color/purple_500"
                 android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                 android:textColor="@color/design_default_color_on_primary"
                 android:textAlignment="center"/>
@@ -92,7 +93,7 @@
                 android:layout_height="wrap_content"
                 android:text="Waypoint"
                 android:layout_marginTop="10dp"
-                android:background="@color/design_default_color_primary"
+                android:background="@color/purple_500"
                 android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                 android:textColor="@color/design_default_color_on_primary"
                 android:textAlignment="center"/>
@@ -123,23 +124,23 @@
 
             <ImageView
                 android:id="@+id/arrowLeftBtn"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
                 android:src="@drawable/ic_arrow_left"
                 android:layout_marginTop="50dp"
                 />
 
             <ImageView
                 android:id="@+id/arrowUpBtn"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
                 android:src="@drawable/ic_arrow_up"
                 android:layout_toRightOf="@id/arrowLeftBtn"/>
 
             <ImageView
                 android:id="@+id/arrowRightBtn"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
                 android:src="@drawable/ic_arrow_right"
                 android:layout_marginTop="50dp"
                 android:layout_toRightOf="@id/arrowUpBtn"/>

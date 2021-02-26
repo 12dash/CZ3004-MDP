@@ -100,7 +100,7 @@ public class MazeView extends View {
         blackPaint.setStyle(Paint.Style.FILL_AND_STROKE);
         obstacleColor.setColor(Color.BLACK);
         robotColor.setColor(Color.GREEN);
-        endColor.setColor(Color.RED);
+        endColor.setColor(Color.GREEN);
         startColor.setColor(Color.CYAN);
         waypointColor.setColor(Color.YELLOW);
         unexploredColor.setColor(Color.LTGRAY);
