@@ -25,6 +25,7 @@ public class ExplorationSimulations extends JPanel {
     long minute = 5;
     long seconds = 59;
     long time;
+    public int step = 1;
 
     public void simulateRobotMovement() {
         time = ((minute * 60) + (seconds)) * 1000;
@@ -32,6 +33,7 @@ public class ExplorationSimulations extends JPanel {
         long end = start + time;
 
         Algo.RightWallHugging obj = new RightWallHugging(map.arena, map.robotSimulator);
+        int count = 1;
         obj.move();
         while (!map.robotSimulator.getCur().equals(map.arena.grids[RobotConstants.ROBOT_START_Y][RobotConstants.ROBOT_START_X]) && (obj.percentExplored < percentExploration) && (System.currentTimeMillis() < end)) {
             try {
@@ -40,7 +42,10 @@ public class ExplorationSimulations extends JPanel {
                 System.out.println("Something went wrong in robot simulation!");
             }
             obj.move();
-            map.repaint();
+            if ((count % step) == 0) {
+                map.repaint();
+            }
+            count += 1;
         }
 
         Algo.InnerExploration innerExploration = new InnerExploration(map.arena, map.robotSimulator);
@@ -51,7 +56,10 @@ public class ExplorationSimulations extends JPanel {
                 System.out.println("Something went wrong in robot simulation!");
             }
             innerExploration.move();
-            map.repaint();
+            if ((count % step) == 0) {
+                map.repaint();
+            }
+            count += 1;
         }
         /*
         To return back to the base.....
@@ -96,12 +104,12 @@ public class ExplorationSimulations extends JPanel {
         this.setBorder(new EmptyBorder(10, 10, 10, 10));
 
         this.add(new JLabel("Percent Explorations : "));
-        Integer[] steps = new Integer[101]; // auto-upcast
-        setLimit(steps, 100);
+        Integer[] percentOption = new Integer[101]; // auto-upcast
+        setLimit(percentOption, 100);
 
-        final JComboBox<Integer> comboCount = new JComboBox<Integer>(steps);
+        final JComboBox<Integer> comboCount = new JComboBox<Integer>(percentOption);
         comboCount.setPreferredSize(new Dimension(60, 20));
-        comboCount.setSelectedIndex(steps.length - 1);
+        comboCount.setSelectedIndex(percentOption.length - 1);
         this.add(comboCount);
         comboCount.addItemListener(new ItemListener() {
             @Override
@@ -142,6 +150,22 @@ public class ExplorationSimulations extends JPanel {
             public void itemStateChanged(ItemEvent e) {
                 if (e.getStateChange() == ItemEvent.SELECTED) {
                     seconds = (Integer) comboSec.getSelectedItem();
+                }
+            }
+        });
+
+        this.add(new JLabel("Step"));
+        final Integer[] steps = {1, 2, 3, 4, 5};  // auto-upcast
+        final JComboBox<Integer> comboCountStep = new JComboBox<Integer>(steps);
+
+        comboCountStep.setPreferredSize(new Dimension(60, 20));
+        this.add(comboCountStep);
+
+        comboCountStep.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                if (e.getStateChange() == ItemEvent.SELECTED) {
+                    step = (Integer) comboCountStep.getSelectedItem();
                 }
             }
         });
