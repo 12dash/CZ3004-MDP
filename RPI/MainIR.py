@@ -1,6 +1,7 @@
 import threading
 import queue
 import json
+import numpy as np
 from config import *
 from PcConnectionServer import PcConnectionServer
 from AndroidBluetoothServer import AndroidBluetoothServer
@@ -59,16 +60,19 @@ class Main(threading.Thread):
       elif header == "ar":
         arduino_queue.put_nowait(msg_lst[1])
       elif header == "ir":
-        coords = json.loads(msg_lst[1])["coords"]
+        json_incoming = json.loads(msg_lst[1])
 
-        # RPI to take picture on command from ALGO PC
-        image_arr = self.rpi_camera.capture_image()
+        if "coords" in json_incoming:
+          coords = json_incoming["coords"]
 
-        print("Sending image and coords to IR PC")
-        # after picture is taken, send to IR PC -> Image Array and Coords
-        json_msg = {"imageArr" : image_arr, "coords": coords }
-        self.ir_pc_queue.put_nowait(json.dumps(json_msg)) 
-        print("Sent image and coords to IR PC")
+          # RPI to take picture on command from ALGO PC
+          image_arr = self.rpi_camera.capture_image()
+
+          print("Sending image and coords to IR PC")
+          # after picture is taken, send to IR PC -> Image Array and Coords
+          json_msg = {"imageArr" : image_arr, "coords": coords }
+          self.ir_pc_queue.put_nowait(json.dumps(json_msg, cls=NumpyEncoder)) 
+          print("Sent image and coords to IR PC")
       else:
         print("Invalid recipient from PC")
 
@@ -162,6 +166,12 @@ class Main(threading.Thread):
     ir_pc_read_thread.start()
     ir_pc_write_thread.start()
 
+# For passing numpy arrays into json
+class NumpyEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, np.ndarray):
+            return obj.tolist()
+        return json.JSONEncoder.default(self, obj)
 
 
 if __name__ == "__main__":
