@@ -2,6 +2,7 @@ import socket
 import threading
 import json
 import queue
+import numpy as np
 from config import *
 
 class PcConnectionClient:
@@ -27,7 +28,7 @@ class PcConnectionClient:
       if not processing_queue.empty():
         obj = processing_queue.get_nowait()
 
-        arr = obj["imageArr"]
+        arr = np.asarray(obj["imageArr"]) #convert to numpy arr
         coords = obj["coords"]
         print("Input Arr: " + arr)
         print("Coords: " + coords)
