@@ -50,7 +50,8 @@ public class Node {
 
         if ((Px != Cx) || (Py != Cy)) {
             //TurnCost is 20.
-            turnCost = 10;
+            turnCost = Math.pow(this.cost_h,0.5);
+
         }
         return turnCost;
 

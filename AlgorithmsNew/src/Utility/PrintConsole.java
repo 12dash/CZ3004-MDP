@@ -52,4 +52,22 @@ public class PrintConsole {
             System.out.println();
         }
     }
+
+    public static void getExploration(Arena arena){
+        String[][] solution = new String[ArenaConstants.ARENA_ROWS][ArenaConstants.ARENA_COLS];
+
+        for (int i = 0; i < ArenaConstants.ARENA_ROWS; i++) {
+            for (int j = 0; j < ArenaConstants.ARENA_COLS; j++) {
+                if (arena.grids[i][j].isExplored()) solution[i][j] = "1";
+                else solution[i][j] = " ";
+            }
+        }
+
+        for (int i = 0; i < ArenaConstants.ARENA_ROWS; i++) {
+            for (int j = 0; j < ArenaConstants.ARENA_COLS; j++) {
+                System.out.print(solution[i][j]+"|");
+            }
+            System.out.println();
+        }
+    }
 }

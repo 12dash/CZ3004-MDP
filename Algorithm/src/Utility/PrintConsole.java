@@ -83,8 +83,6 @@ public class PrintConsole {
             }
             System.out.println();
         }
-
-
     }
 
 }
