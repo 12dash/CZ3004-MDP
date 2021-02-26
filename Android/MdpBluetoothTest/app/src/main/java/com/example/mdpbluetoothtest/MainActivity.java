@@ -86,7 +86,10 @@ public class MainActivity extends AppCompatActivity {
         sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         sharedPreferences = this.getSharedPreferences("Shared Preferences", Context.MODE_PRIVATE);
 
-        //ReconfigurePreferenceCommand
+        editor = sharedPreferences.edit();
+        editor.putString("IMAGE","");
+        editor.commit();
+        imagecoordList.clear();
 
         f1Btn = findViewById(R.id.btn_F1);
         f1Btn.setOnClickListener(new View.OnClickListener() {
@@ -197,7 +200,7 @@ public class MainActivity extends AppCompatActivity {
         fastestPathBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                bluetoothConnectionService.write("Fastest Path");
+                bluetoothConnectionService.write("pc|{\"start\" : \"FS\"}");
                 updateStatus("Fastest Path Started");
             }
         });
@@ -206,7 +209,7 @@ public class MainActivity extends AppCompatActivity {
         explorationPathBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                bluetoothConnectionService.write("Exploration Path");
+                bluetoothConnectionService.write("pc|{\"start\" : \"ES\"}");
                 updateStatus("Exploration Path Started");
             }
         });
@@ -259,7 +262,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 manualUpdateRequest = true;
-                bluetoothConnectionService.write("sendArena");
+                bluetoothConnectionService.write("pc|{\"sendArena\" : \"true\"}");
                 try {
 //                     String message = "{\"map\":[{\"explored\": \"ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff\",\"length\":300,\"obstacle\":\"00000000000000000706180400080010001e000400000000200044438f840000000000000080\"}]}";
 //                     mazeView.setReceivedJsonObject(new JSONObject(message));
@@ -393,14 +396,10 @@ public class MainActivity extends AppCompatActivity {
                     resultString = hexBigIntegerExplored.toString(16);
 
                     JSONObject amdObject = new JSONObject();
-                    amdObject.put("explored", "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff");
-                    amdObject.put("length", amdString.length()*4);
-                    amdObject.put("obstacle", resultString);
-                    JSONArray amdArray = new JSONArray();
-                    amdArray.put(amdObject);
+                    amdObject.put("p1", "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff");
+                    amdObject.put("p2", resultString);
                     JSONObject amdMessage = new JSONObject();
-                    amdMessage.put("map", amdArray);
-                    messageValue = String.valueOf(amdMessage);
+                    messageValue = String.valueOf(amdObject);
                     Log.d(TAG,"Executed for AMD message, message: " + messageValue);
                 }
             } catch (JSONException e) {
@@ -419,8 +418,6 @@ public class MainActivity extends AppCompatActivity {
                     JSONArray jsonArray = jsonObject.getJSONArray("image");
                     mazeView.drawImageNumberCell(jsonArray.getInt(0),jsonArray.getInt(1),jsonArray.getInt(2));
                     editor = sharedPreferences.edit();
-
-
 
                     ArrayList<Integer> imgcoord = new ArrayList<Integer>();
                     imgcoord.add(jsonArray.getInt(0));
