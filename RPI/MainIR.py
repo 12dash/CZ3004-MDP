@@ -59,16 +59,19 @@ class Main(threading.Thread):
       elif header == "ar":
         arduino_queue.put_nowait(msg_lst[1])
       elif header == "ir":
-        coords = json.loads(msg_lst[1])["coords"]
+        json_incoming = json.loads(msg_lst[1])
 
-        # RPI to take picture on command from ALGO PC
-        image_arr = self.rpi_camera.capture_image()
+        if "coords" in json_incoming:
+          coords = json_incoming["coords"]
 
-        print("Sending image and coords to IR PC")
-        # after picture is taken, send to IR PC -> Image Array and Coords
-        json_msg = {"imageArr" : image_arr, "coords": coords }
-        self.ir_pc_queue.put_nowait(json.dumps(json_msg)) 
-        print("Sent image and coords to IR PC")
+          # RPI to take picture on command from ALGO PC
+          image_arr = self.rpi_camera.capture_image()
+
+          print("Sending image and coords to IR PC")
+          # after picture is taken, send to IR PC -> Image Array and Coords
+          json_msg = {"imageArr" : image_arr, "coords": coords }
+          self.ir_pc_queue.put_nowait(json.dumps(json_msg)) 
+          print("Sent image and coords to IR PC")
       else:
         print("Invalid recipient from PC")
 
