@@ -70,7 +70,17 @@ public class MazeView extends View {
     private static boolean unSetCellStatus = false;
     private static boolean setExploredStatus = false;
     private static boolean validPosition = false;
+
     private Bitmap arrowBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ic_arrow_error);
+    private Bitmap unexploredBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.unexplored_bitmap);
+    private Bitmap exploredBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.explored_bitmap);
+    private Bitmap obstacleBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.obstacle_bitmap);
+    private Bitmap waypointBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.waypoint_bitmap);
+    private Bitmap faceFrontBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.face_front_bitmap);
+    private Bitmap faceBackBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.face_back_bitmap);
+    private Bitmap faceRightBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.face_right_bitmap);
+    private Bitmap faceLeftBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.face_left_bitmap);
+
 
     private static final String TAG = "GridMap";
     private static final int COL = 15;
@@ -142,18 +152,35 @@ public class MazeView extends View {
         showLog("Entering drawIndividualCell");
         for (int x = 1; x <= COL; x++)
             for (int y = 0; y < ROW; y++)
-                for (int i = 0; i < this.getArrowCoord().size(); i++)
-                    if (!cells[x][y].type.equals("image") && cells[x][y].getId() == -1) {
-                        canvas.drawRect(cells[x][y].startX, cells[x][y].startY, cells[x][y].endX, cells[x][y].endY, cells[x][y].paint);
-                    } else {
-                        Paint textPaint = new Paint();
-                        textPaint.setTextSize(20);
-                        textPaint.setColor(Color.WHITE);
-                        textPaint.setTextAlign(Paint.Align.CENTER);
-                        canvas.drawRect(cells[x][y].startX, cells[x][y].startY, cells[x][y].endX, cells[x][y].endY, cells[x][y].paint);
-                        canvas.drawText(String.valueOf(cells[x][y].getId()),(cells[x][y].startX+cells[x][y].endX)/2, cells[x][y].endY + (cells[x][y].startY-cells[x][y].endY)/4, textPaint);
-                    }
+                for (int i = 0; i < this.getArrowCoord().size(); i++) {
+                    RectF rectF = new RectF(cells[x][y].startX, cells[x][y].startY, cells[x][y].endX, cells[x][y].endY);
 
+                    switch(cells[x][y].type) {
+                        case "image":
+                            Paint textPaint = new Paint();
+                            textPaint.setTextSize(20);
+                            textPaint.setColor(Color.WHITE);
+                            textPaint.setTextAlign(Paint.Align.CENTER);
+                            canvas.drawRect(rectF, cells[x][y].paint);
+                            canvas.drawText(String.valueOf(cells[x][y].getId()), (cells[x][y].startX + cells[x][y].endX) / 2, cells[x][y].endY + (cells[x][y].startY - cells[x][y].endY) / 4, textPaint);
+                            break;
+                        case "obstacle" :
+                            canvas.drawBitmap(obstacleBitmap, null, rectF, null);
+                            break;
+                        case "waypoint" :
+                            canvas.drawBitmap(waypointBitmap, null, rectF, null);
+                            break;
+                        case "explored" :
+                            canvas.drawBitmap(exploredBitmap, null, rectF, null);
+                            break;
+                        case "unexplored" :
+                            canvas.drawBitmap(unexploredBitmap, null, rectF, null);
+                            break;
+                        default :
+                            canvas.drawRect(cells[x][y].startX, cells[x][y].startY, cells[x][y].endX, cells[x][y].endY, cells[x][y].paint);
+                            break;
+                    }
+                }
         showLog("Exiting drawIndividualCell");
     }
 
@@ -198,22 +225,25 @@ public class MazeView extends View {
         for (int x = curCoord[0] - 1; x < curCoord[0] + 1; x++)
             canvas.drawLine(cells[x][androidRowCoord - 1].startX - (cellSize / 30) + cellSize, cells[x][androidRowCoord - 1].startY, cells[x][androidRowCoord + 1].startX - (cellSize / 30) + cellSize, cells[x][androidRowCoord + 1].endY, robotColor);
 
+        // androidRowCoord converts the curCoord[1] so we are not concerned about reversal.
+        Float startX = cells[curCoord[0] - 1][curCoord[1]].startX;
+        Float startY = cells[curCoord[0]][androidRowCoord - 1].startY;
+        Float endX = cells[curCoord[0] + 1][curCoord[1]].endX;
+        Float endY = cells[curCoord[0]][androidRowCoord + 1].endY;
+        RectF rectF = new RectF(startX, startY, endX, endY);
+
         switch (this.getRobotDirection()) {
             case "up":
-                canvas.drawLine(cells[curCoord[0] - 1][androidRowCoord + 1].startX, cells[curCoord[0] - 1][androidRowCoord + 1].endY, (cells[curCoord[0]][androidRowCoord - 1].startX + cells[curCoord[0]][androidRowCoord - 1].endX) / 2, cells[curCoord[0]][androidRowCoord - 1].startY, blackPaint);
-                canvas.drawLine((cells[curCoord[0]][androidRowCoord - 1].startX + cells[curCoord[0]][androidRowCoord - 1].endX) / 2, cells[curCoord[0]][androidRowCoord - 1].startY, cells[curCoord[0] + 1][androidRowCoord + 1].endX, cells[curCoord[0] + 1][androidRowCoord + 1].endY, blackPaint);
+                canvas.drawBitmap(faceFrontBitmap, null, rectF, null);
                 break;
             case "down":
-                canvas.drawLine(cells[curCoord[0] - 1][androidRowCoord - 1].startX, cells[curCoord[0] - 1][androidRowCoord - 1].startY, (cells[curCoord[0]][androidRowCoord + 1].startX + cells[curCoord[0]][androidRowCoord + 1].endX) / 2, cells[curCoord[0]][androidRowCoord + 1].endY, blackPaint);
-                canvas.drawLine((cells[curCoord[0]][androidRowCoord + 1].startX + cells[curCoord[0]][androidRowCoord + 1].endX) / 2, cells[curCoord[0]][androidRowCoord + 1].endY, cells[curCoord[0] + 1][androidRowCoord - 1].endX, cells[curCoord[0] + 1][androidRowCoord - 1].startY, blackPaint);
+                canvas.drawBitmap(faceBackBitmap, null, rectF, null);
                 break;
             case "right":
-                canvas.drawLine(cells[curCoord[0] - 1][androidRowCoord - 1].startX, cells[curCoord[0] - 1][androidRowCoord - 1].startY, cells[curCoord[0] + 1][androidRowCoord].endX, cells[curCoord[0] + 1][androidRowCoord - 1].endY + (cells[curCoord[0] + 1][androidRowCoord].endY - cells[curCoord[0] + 1][androidRowCoord - 1].endY) / 2, blackPaint);
-                canvas.drawLine(cells[curCoord[0] + 1][androidRowCoord].endX, cells[curCoord[0] + 1][androidRowCoord - 1].endY + (cells[curCoord[0] + 1][androidRowCoord].endY - cells[curCoord[0] + 1][androidRowCoord - 1].endY) / 2, cells[curCoord[0] - 1][androidRowCoord + 1].startX, cells[curCoord[0] - 1][androidRowCoord + 1].endY, blackPaint);
+                canvas.drawBitmap(faceRightBitmap, null, rectF, null);
                 break;
             case "left":
-                canvas.drawLine(cells[curCoord[0] + 1][androidRowCoord - 1].endX, cells[curCoord[0] + 1][androidRowCoord - 1].startY, cells[curCoord[0] - 1][androidRowCoord].startX, cells[curCoord[0] - 1][androidRowCoord - 1].endY + (cells[curCoord[0] - 1][androidRowCoord].endY - cells[curCoord[0] - 1][androidRowCoord - 1].endY) / 2, blackPaint);
-                canvas.drawLine(cells[curCoord[0] - 1][androidRowCoord].startX, cells[curCoord[0] - 1][androidRowCoord - 1].endY + (cells[curCoord[0] - 1][androidRowCoord].endY - cells[curCoord[0] - 1][androidRowCoord - 1].endY) / 2, cells[curCoord[0] + 1][androidRowCoord + 1].endX, cells[curCoord[0] + 1][androidRowCoord + 1].endY, blackPaint);
+                canvas.drawBitmap(faceLeftBitmap, null, rectF, null);
                 break;
             default:
                 Toast.makeText(this.getContext(), "Error with drawing robot (unknown direction)", Toast.LENGTH_LONG).show();
@@ -438,6 +468,8 @@ public class MazeView extends View {
         cells[col][row].setType("waypoint");
 
         bluetoothConnectionService.write(String.format("pc|{\"waypoint\":[%d,%d]}", waypointCoord[0]-1, waypointCoord[1]-1));
+        TextView waypointTextView = ((Activity)this.getContext()).findViewById(R.id.waypointTextView);
+        waypointTextView.setText(String.format("(%d, %d)", waypointCoord[0] - 1, waypointCoord[1] - 1)); // Yeap weird reversal for the column
         showLog("Exiting setWaypointCoord");
     }
 
@@ -678,6 +710,7 @@ public class MazeView extends View {
         robotStatusTextView.setText("Not Available");
         SharedPreferences.Editor editor = sharedPreferences.edit();
 
+        TextView waypointTextView = ((Activity)this.getContext()).findViewById(R.id.waypointTextView);
 
         if (manualAutoToggleBtn.isChecked()) {
             manualAutoToggleBtn.toggle();
@@ -700,6 +733,8 @@ public class MazeView extends View {
         arrowCoord = new ArrayList<>();
         obstacleCoord = new ArrayList<>();
         waypointCoord = new int[]{-1, -1};
+        waypointTextView.setText("Unset"); // Yeap weird reversal for the column
+
         mapDrawn = false;
         canDrawRobot = false;
         validPosition = false;
@@ -726,32 +761,32 @@ public class MazeView extends View {
         for(int i=0; i<mapInformation.names().length(); i++) {
             message = "updateMapInformation Default message";
             switch (mapInformation.names().getString(i)) {
-                case "map":
-                    infoJsonArray = mapInformation.getJSONArray("map");
-                    infoJsonObject = infoJsonArray.getJSONObject(0);
-
-                    hexStringExplored = infoJsonObject.getString("explored");
-
-
+                case "p2":
+                    ; // Filler, Dont want to go to default branch
+                case "p1":
+                    hexStringExplored = mapInformation.getString("p1");
                     editor = sharedPreferences.edit();
                     editor.putString("P1", hexStringExplored);
                     hexBigIntegerExplored = new BigInteger(hexStringExplored, 16);
                     exploredString = hexBigIntegerExplored.toString(2);
                     showLog("updateMapInformation.exploredString: " + exploredString);
 
-                    int x, y;
+                    int x, y, onesCount = 0;
                     for (int j = 0; j < exploredString.length() - 4; j++) {
                         y = 19 - (j / 15);
                         x = 1 + j - ((19 - y) * 15);
-                        if ((String.valueOf(exploredString.charAt(j + 2))).equals("1") && !cells[x][y].type.equals("robot"))
+                        if ((String.valueOf(exploredString.charAt(j + 2))).equals("1") && !cells[x][y].type.equals("robot")) {
                             cells[x][y].setType("explored");
+                            onesCount += 1;
+                        }
                         else if ((String.valueOf(exploredString.charAt(j + 2))).equals("0") && !cells[x][y].type.equals("robot"))
                             cells[x][y].setType("unexplored");
                     }
 
-                    int length = infoJsonObject.getInt("length");
+                    int length = onesCount;
+                    //int length = infoJsonObject.getInt("length");
 
-                    hexStringObstacle = infoJsonObject.getString("obstacle");
+                    hexStringObstacle = mapInformation.getString("p2");
                     editor.putString("P2", hexStringObstacle);
                     editor.commit();
                     showLog("updateMapInformation hexStringObstacle: " + hexStringObstacle);
@@ -777,7 +812,6 @@ public class MazeView extends View {
                     int[] waypointCoord = this.getWaypointCoord();
                     if (waypointCoord[0] >= 1 && waypointCoord[1] >= 1)
                         cells[waypointCoord[0]][20 - waypointCoord[1]].setType("waypoint");
-
                     break;
                 case "robotPosition":
                     if (canDrawRobot)
@@ -849,7 +883,7 @@ public class MazeView extends View {
             }
             if (!message.equals("updateMapInformation Default message"))
 //                MainActivity.receiveMessage(message);
-                    ;
+                ;
         }
         showLog("Exiting updateMapInformation");
         this.invalidate();
