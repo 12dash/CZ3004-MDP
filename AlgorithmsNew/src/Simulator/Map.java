@@ -16,6 +16,7 @@ public class Map extends JPanel {
     public Arena arena;
     public Robot robot;
     public RobotSimulator robotSimulator;
+    public RobotReal robotReal;
 
     public Map(Arena arena, boolean simulate) {
         this.arena = arena;
@@ -25,8 +26,9 @@ public class Map extends JPanel {
             robotSimulator.setOrientation(RobotConstants.START_DIR);
             this.robot = robotSimulator;
         }else{
-            this.robot = new Robot(arena.grids[RobotConstants.START_ROW][RobotConstants.START_COL]);
-            robot.setOrientation(RobotConstants.START_DIR);
+            this.robotReal = new RobotReal(arena.grids[RobotConstants.START_ROW][RobotConstants.START_COL]);
+            robotReal.setOrientation(RobotConstants.START_DIR);
+            this.robot = robotReal;
         }
     }
 
@@ -37,8 +39,9 @@ public class Map extends JPanel {
             robotSimulator.setOrientation(RobotConstants.START_DIR);
             this.robot = robotSimulator;
         }else{
-            this.robot = new Robot(arena.grids[RobotConstants.START_ROW][RobotConstants.START_COL]);
-            robot.setOrientation(RobotConstants.START_DIR);
+            this.robotReal = new RobotReal(arena.grids[RobotConstants.START_ROW][RobotConstants.START_COL]);
+            robotReal.setOrientation(RobotConstants.START_DIR);
+            this.robot = robotReal;
         }
     }
 

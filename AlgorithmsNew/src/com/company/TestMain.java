@@ -6,7 +6,7 @@ import Robot.RobotConstants;
 import Robot.RobotSimulator;
 import Utility.*;
 
-public class Main {
+public class TestMain {
 
     public static void main(String[] args) {
         /*

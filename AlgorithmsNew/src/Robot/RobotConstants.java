@@ -10,4 +10,13 @@ public class RobotConstants {
     public static final int ROBOT_START_X = 1;
     public static final int ROBOT_START_Y = 18;
 
+    public static final char LEFT = 'L';
+    public static final char RIGHT = 'R';
+    public static final char STRAIGHT = 'S';
+    public static final char BACK = 'I';
+    public static final char MOVEMENT_ERROR = 'X';
+
+
+
+
 }
