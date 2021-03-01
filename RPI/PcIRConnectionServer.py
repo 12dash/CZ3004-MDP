@@ -39,6 +39,7 @@ class PcIRConnectionServer:
             # msg = msg.encode(FORMAT)
             # self.client_conn.send(msg)
 
+            image_data = image_data.encode(FORMAT)
             # use struct to make sure we have a consistent endianness on the length
             print(f"Length of img data: {len(image_data)}")
             length = pack('>Q', len(image_data))
