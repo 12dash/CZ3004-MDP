@@ -6,6 +6,7 @@ from config import *
 from PcConnectionServer import PcConnectionServer
 from AndroidBluetoothServer import AndroidBluetoothServer
 from ArduinoConnectionServer import ArduinoConnectionServer
+from PcIRConnectionServer import PcIRConnectionServer
 from RPICamera import RPICamera
 
 """
@@ -30,7 +31,7 @@ class Main(threading.Thread):
     self.arduino_connection.start_connection()
 
     #IR PC ( Create another instance of socket connection w PC for image recognition processing )
-    self.ir_pc_connection = PcConnectionServer(8081) # use another port for IR
+    self.ir_pc_connection = PcIRConnectionServer(8081) # use another port for IR
     self.ir_pc_connection.start_connection()
     
     #RPI Camera

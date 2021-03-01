@@ -4,6 +4,7 @@ import json
 import queue
 import numpy as np
 from config import *
+from struct import unpack
 
 class PcConnectionClient:
   def __init__(self):
@@ -44,13 +45,26 @@ class PcConnectionClient:
         json_outgoing = json.dumps({"image": [coords[0], coords[1], predicted_img]})
         self.send_to_server_ir_data(f"an|{json_outgoing}")
 
+  # Modified version of reading -- reading image from RPI
   def read_from_server(self):
     while self.connected:
       print("Listening for images captured: ")
-      msg = self.client.recv(PC_BUFFER_SIZE).decode(FORMAT)
-      print(f"[IMAGE] {msg}")
+      # msg = self.client.recv(PC_BUFFER_SIZE).decode(FORMAT)
 
-      json_incoming = json.loads(msg)
+      bs = self.client.recv(15)
+      (length,) = unpack('>Q', bs)
+      msg = b''
+
+      while len(msg) < length:
+          # doing it in batches
+          to_read = length - len(msg)
+          msg += self.client.recv(PC_BUFFER_SIZE if to_read > PC_BUFFER_SIZE else to_read)
+
+      if msg:
+        print(f"[IMAGE] {msg}")
+        print(f"Image Received -- Length of image received: {len(msg)}")
+
+        json_incoming = json.loads(msg)
 
       #Add these to processing queue so that it can continuously receive new images
       self.processing_queue.put_nowait(json_incoming)
