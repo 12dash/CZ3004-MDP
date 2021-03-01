@@ -14,8 +14,8 @@ class RPICamera:
 
   
   def capture_image(self):
-    #Capture image in BGR format
-    self.cam.capture(self.output, "bgr")
+    #Capture image in RGB format
+    self.cam.capture(self.output, "rgb")
     array = self.output.array
 
     if array is None:
@@ -27,6 +27,8 @@ class RPICamera:
       #Save image
       cv.imwrite(f"{self.image_path}{str(datetime.now().strftime('%Y-%m-%d~%H:%M:%S'))}.jpg", array)
       print(f"Image saved to {self.image_path}")
+
+    self.output.truncate(0) #clear buffer
     
     return array
   

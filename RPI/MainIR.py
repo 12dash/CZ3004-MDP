@@ -69,11 +69,14 @@ class Main(threading.Thread):
           # RPI to take picture on command from ALGO PC
           image_arr = self.rpi_camera.capture_image()
 
-          print("Sending image and coords to IR PC")
           # after picture is taken, send to IR PC -> Image Array and Coords
           json_msg = {"imageArr" : image_arr, "coords": coords }
           self.ir_pc_queue.put_nowait(json.dumps(json_msg, cls=NumpyEncoder)) 
           print("Sent image and coords to IR PC")
+
+          # after picture is taken, tell Algo to resume movement
+          resume_msg = {"imageCaptured" : "true" }
+          self.pc_queue.put_nowait(json.dumps(resume_msg))
       else:
         print("Invalid recipient from PC")
 

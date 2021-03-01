@@ -5,6 +5,7 @@ import queue
 import numpy as np
 from config import *
 from struct import unpack
+from predict import makePrediction
 
 class PcConnectionClient:
   def __init__(self):
@@ -31,13 +32,13 @@ class PcConnectionClient:
 
         arr = np.asarray(obj["imageArr"]) #convert to numpy arr
         coords = obj["coords"]
-        print("Input Arr: " + arr)
-        print("Coords: " + coords)
+
+        print(arr.shape)
         
         # Do processing here
         # Sabrina: Predict Image ID here
         print("Predicted Image IDs Here")
-        predicted_img = "Some Image ID to be predicted here"
+        predicted_img = makePrediction(arr)
 
         #TODO: Save the raw image captured with bounding box here -- need to display as output as end of run
 
@@ -47,34 +48,37 @@ class PcConnectionClient:
 
   # Modified version of reading -- reading image from RPI
   def read_from_server(self):
-    while self.connected:
-      print("Listening for images captured: ")
-      # msg = self.client.recv(PC_BUFFER_SIZE).decode(FORMAT)
+    try:
+      while self.connected:
+        print("Listening for images captured: ")
 
-      bs = self.client.recv(15)
-      (length,) = unpack('>Q', bs)
-      msg = b''
+        bs = self.client.recv(15)
+        (length,) = unpack('>Q', bs)
+        msg = b''
 
-      while len(msg) < length:
+        while len(msg) < length:
           # doing it in batches
           to_read = length - len(msg)
           msg += self.client.recv(PC_BUFFER_SIZE if to_read > PC_BUFFER_SIZE else to_read)
 
-      if msg:
-        print(f"[IMAGE] {msg}")
-        print(f"Image Received -- Length of image received: {len(msg)}")
-
-        json_incoming = json.loads(msg)
-
-      #Add these to processing queue so that it can continuously receive new images
-      self.processing_queue.put_nowait(json_incoming)
-      
-      if msg == DISCONNECT_MESSAGE or len(msg) == 0:
-        print(len(msg))
-        self.stop_connection()
+        if msg:
+          # print(f"[IMAGE] {msg}")
+          print(f"Image Received -- Length of image received: {len(msg)}")
+          json_incoming = json.loads(msg)
+        
+        # Disconnect message
+        if msg == DISCONNECT_MESSAGE or len(msg) == 0:
+          self.stop_connection()
+        
+        #Add these to processing queue so that it can continuously receive new images
+        self.processing_queue.put_nowait(json_incoming)
+        
+    except Exception:
+      self.stop_connection()
+      print(f"[CONNECTION CLOSE] IR at {self.server_ip}")
           
   def stop_connection(self):
-    print(f"[CONNECTION CLOSE] Algorithm at {self.server_ip}")
+    print(f"[CONNECTION CLOSE] IR at {self.server_ip}")
     self.client.close()
     self.connected = False
     self.client = None

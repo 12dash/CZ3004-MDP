@@ -23,7 +23,7 @@ class PcIRConnectionServer:
         print(f"[Listening] Server is listening on {self.server}")
 
         self.client_conn, self.client_addr = self.server.accept()
-        print(f"[NEW CONNECTION] Algorithm at {self.client_addr} connected.")
+        print(f"[NEW CONNECTION] IR at {self.client_addr} connected.")
         self.connected = True
 
     def read_from_client(self):
@@ -39,6 +39,7 @@ class PcIRConnectionServer:
             # msg = msg.encode(FORMAT)
             # self.client_conn.send(msg)
 
+            image_data = image_data.encode(FORMAT)
             # use struct to make sure we have a consistent endianness on the length
             print(f"Length of img data: {len(image_data)}")
             length = pack('>Q', len(image_data))
@@ -49,20 +50,20 @@ class PcIRConnectionServer:
             if image_data == DISCONNECT_MESSAGE:
                 self.stop_connection()
         except Exception as error:
-            print("[ERROR] Message can't be send to Algorithm")
-            print("Error message (Algorithm): " + str(error))
+            print("[ERROR] Message can't be send to IR")
+            print("Error message (IR): " + str(error))
             raise error
         
 
     def stop_connection(self):
         try:
-            print(f"[CONNECTION CLOSE] Algorithm at {self.client_addr}")
+            print(f"[CONNECTION CLOSE] IR at {self.client_addr}")
             self.client_conn.close()
             self.connected = False
             self.client_conn = None
         except Exception as error:
-            print("[Error] Algorithm disconect failed:" + str(error))
+            print("[Error] IR disconect failed:" + str(error))
 
 if __name__ == '__main__':
-    server = PcConnectionServer()
+    server = PcIRConnectionServer()
     server.start_connection()
