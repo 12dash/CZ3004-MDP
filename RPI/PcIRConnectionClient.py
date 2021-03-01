@@ -5,6 +5,7 @@ import queue
 import numpy as np
 from config import *
 from struct import unpack
+from predict import makePrediction
 
 class PcConnectionClient:
   def __init__(self):
@@ -32,13 +33,12 @@ class PcConnectionClient:
         arr = np.asarray(obj["imageArr"]) #convert to numpy arr
         coords = obj["coords"]
 
-        print(arr)
-        print(coords)
+        print(arr.shape)
         
         # Do processing here
         # Sabrina: Predict Image ID here
         print("Predicted Image IDs Here")
-        predicted_img = "Some Image ID to be predicted here"
+        predicted_img = makePrediction(arr)
 
         #TODO: Save the raw image captured with bounding box here -- need to display as output as end of run
 
