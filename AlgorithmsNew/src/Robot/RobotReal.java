@@ -9,7 +9,7 @@ import java.util.HashMap;
 public class RobotReal extends Robot{
 
     protected ArrayList<Grid> path = new ArrayList<>();  //Stores the fastest path solution
-    private Orientation cur_or;
+    private Orientation cur_or;     // For calculating the commands in Fastest Path
 
     public RobotReal(Grid g) {
         super(g);
@@ -112,8 +112,10 @@ public class RobotReal extends Robot{
 
         StringBuilder cmds = new StringBuilder();
         String temp = commands.toString();
+        System.out.format("Commands: %s", temp);
+
         char[] commandsArray = temp.toCharArray();
-        System.out.println(commandsArray);
+        System.out.println();
         int i = 0;
         while(i < commandsArray.length){
             if (commandsArray[i] != 'S'){
@@ -127,7 +129,7 @@ public class RobotReal extends Robot{
                     i++;
                 }
 
-                if (countS >= 10){
+                if (countS >= 10){      // For number of forward steps greater than 10
                     cmds.append(RobotConstants.NUMBER_MAPPINGS.get(countS));
                 }
                 else {
@@ -158,9 +160,6 @@ public class RobotReal extends Robot{
 
     }
 
-    public void setRobotOrientaion(Orientation orientaion){
-        this.orientation = orientaion;
-    }
 }
 
 

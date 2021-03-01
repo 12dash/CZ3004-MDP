@@ -7,12 +7,12 @@ public class SimulatorConstants {
 
     public static final int CELL_LINE_WEIGHT = 1;
 
-    public static final Color C_START = Color.ORANGE;
+    public static final Color C_START = Color.RED;
     public static final Color C_GOAL = Color.GREEN;
     public static final Color C_UNEXPLORED = Color.LIGHT_GRAY;
     public static final Color C_FREE = Color.WHITE;
     public static final Color C_OBSTACLE = Color.BLACK;
-    public static final Color C_PATH = Color.DARK_GRAY;
+    public static final Color C_PATH = Color.ORANGE;
     public static final Color C_WAYPOINT = Color.CYAN;
 
     public static final Color C_ROBOT = Color.BLUE;

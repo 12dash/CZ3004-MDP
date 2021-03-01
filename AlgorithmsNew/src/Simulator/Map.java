@@ -17,9 +17,13 @@ public class Map extends JPanel {
     public Robot robot;
     public RobotSimulator robotSimulator;
     public RobotReal robotReal;
+    public int waypoint_x;
+    public int waypoint_y;
+    public boolean simulate;
 
     public Map(Arena arena, boolean simulate) {
         this.arena = arena;
+        this.simulate = simulate;
 
         if (simulate) {
             this.robotSimulator = new RobotSimulator(arena.grids[RobotConstants.START_ROW][RobotConstants.START_COL]);
@@ -98,6 +102,18 @@ public class Map extends JPanel {
             }
         }
 
+        // Paint Fastest Path
+        for (Grid gr: robotReal.getPath()){
+            g.setColor(SimulatorConstants.C_PATH);
+            g.fillRect(_gridCells[gr.getY()][gr.getX()].cellX + SimulatorConstants.MAP_X_OFFSET, _gridCells[gr.getY()][gr.getX()].cellY, _gridCells[gr.getY()][gr.getX()].cellSize, _gridCells[gr.getY()][gr.getX()].cellSize);
+        }
+
+        // Paint WayPoint
+        if(!this.simulate){
+            g.setColor(SimulatorConstants.C_WAYPOINT);
+            g.fillRect(_gridCells[waypoint_y][waypoint_x].cellX + SimulatorConstants.MAP_X_OFFSET, _gridCells[waypoint_y][waypoint_x].cellY, _gridCells[waypoint_y][waypoint_x].cellSize, _gridCells[waypoint_y][waypoint_x].cellSize);
+        }
+
         // Paint the robot on-screen.
         g.setColor(SimulatorConstants.C_ROBOT);
         int r = ArenaConstants.ARENA_ROWS - this.robot.getCur().getY();
@@ -128,6 +144,12 @@ public class Map extends JPanel {
                 g.fillOval(c * SimulatorConstants.CELL_SIZE - 10 + SimulatorConstants.MAP_X_OFFSET, SimulatorConstants.MAP_H - r * SimulatorConstants.CELL_SIZE - 1, SimulatorConstants.ROBOT_DIR_W, SimulatorConstants.ROBOT_DIR_H);
                 break;
         }
+
+    }
+
+    public void setWaypoint(int x, int y){
+        waypoint_x = x;
+        waypoint_y = y;
     }
 
 }

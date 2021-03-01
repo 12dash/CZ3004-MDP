@@ -1,3 +1,5 @@
+package Actual_Run;
+
 import Communication.Communication;
 import Communication.CommunicationConstants;
 import Environment.Arena;
@@ -70,6 +72,7 @@ public class Main {
 //            }
 //        }
 
+//        map.arena.setExplored();
         int[] pos = new int[]{wayP_x, wayP_y}; //x,y
         map.robotReal.setPath(Algo.FastestPath.findPath(map.arena, pos));
         String commandString = map.robotReal.generateMovementCommands(START_ORIENTATION);
