@@ -31,8 +31,9 @@ class PcConnectionClient:
 
         arr = np.asarray(obj["imageArr"]) #convert to numpy arr
         coords = obj["coords"]
-        print("Input Arr: " + arr)
-        print("Coords: " + coords)
+
+        print(arr)
+        print(coords)
         
         # Do processing here
         # Sabrina: Predict Image ID here
@@ -61,7 +62,7 @@ class PcConnectionClient:
           msg += self.client.recv(PC_BUFFER_SIZE if to_read > PC_BUFFER_SIZE else to_read)
 
       if msg:
-        print(f"[IMAGE] {msg}")
+        # print(f"[IMAGE] {msg}")
         print(f"Image Received -- Length of image received: {len(msg)}")
 
         json_incoming = json.loads(msg)
