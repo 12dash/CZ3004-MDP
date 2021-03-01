@@ -1,12 +1,12 @@
-Android -> Algo: pc|{"start": "FS"} -- Start Fastest Path
-Android -> Algo: pc|{"start": "IR"} -- Start Image Recognition
-Android -> Algo: pc|{"start": "ES"} -- Start Exploration
-Android -> Algo: pc|{"sendArena": "true"} -- Call for MDF String 
+Android -> Algo: pc|"start:FS" -- Start Fastest Path
+Android -> Algo: pc|"start:IR" -- Start Image Recognition
+Android -> Algo: pc|"start:ES" -- Start Exploration
+Android -> Algo: pc|"sendArena:true" -- Call for MDF String 
 Algo -> Android: an|{"p1": "<str>" , "p2":"<str>" }
 Android -> Arduino: ar|T -- To calibrate
 
 // For Fastest Path
-Android -> Algo: pc|{"waypoint": [x,y]}  -- Value is the coords of waypoint
+Android -> Algo: pc|"waypoint:x:y"  -- Value is the coords of waypoint
 Algo -> Arduino: ar|"0,L,R,5" -- Refer to Arduino commmands list for more.
 RPI -> Arduino: "0" -- Single command at a time -- TBC
 Arduino -> RPI: pc|Done -- To indicate that a single movement is done -- TBC
