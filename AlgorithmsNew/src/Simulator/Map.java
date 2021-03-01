@@ -110,10 +110,9 @@ public class Map extends JPanel {
             }
 
             // Paint WayPoint
-            if (!this.simulate) {
-                g.setColor(SimulatorConstants.C_WAYPOINT);
-                g.fillRect(_gridCells[waypoint_y][waypoint_x].cellX + SimulatorConstants.MAP_X_OFFSET, _gridCells[waypoint_y][waypoint_x].cellY, _gridCells[waypoint_y][waypoint_x].cellSize, _gridCells[waypoint_y][waypoint_x].cellSize);
-            }
+            g.setColor(SimulatorConstants.C_WAYPOINT);
+            g.fillRect(_gridCells[waypoint_y][waypoint_x].cellX + SimulatorConstants.MAP_X_OFFSET, _gridCells[waypoint_y][waypoint_x].cellY, _gridCells[waypoint_y][waypoint_x].cellSize, _gridCells[waypoint_y][waypoint_x].cellSize);
+
         }
 
         // Paint the robot on-screen.
