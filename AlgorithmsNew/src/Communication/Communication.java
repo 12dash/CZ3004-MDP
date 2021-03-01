@@ -58,17 +58,18 @@ public class Communication extends Thread{
 
         try {
             System.out.println("Inside try block 0");
-            StringBuilder sb = new StringBuilder();
+//            StringBuilder sb = new StringBuilder();
             String input = reader.readLine();
+            System.out.println(input);
             System.out.println("Inside try block 1");
+            return input;
 
-            if (input != null && input.length() > 0) {
-                sb.append(input);
-                System.out.println(sb.toString());
-                message =  sb.toString();
-                message = message.split("\\|")[1];
-                return message;
-            }
+//            if (input != null && input.length() > 0) {
+//                sb.append(input);
+//                System.out.println(sb.toString());
+//                message =  sb.toString();
+//                return message;
+//            }
         } catch (IOException e) {
             System.out.println("recvMsg() --> IOException");
         } catch (Exception e) {
