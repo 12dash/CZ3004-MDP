@@ -17,9 +17,9 @@ RPI -> Algo: {"imageCaptured" : "true"} -- After image has been taken, RPI tells
 RPI -> PC: {"imageArr": <3d pixel array>, "coords": [x,y] }
 PC -> Android: an|{"image":[x,y,id]}
 
-// For Exploration
+// For Exploration 
 Algo -> Arduino: ar|"L"
-Algo -> Android: ar|{"move":"0"}
+Algo -> Android: ar|{"move":"0"}  -- same for fastest path
 
 
 // For Image Recognition and Exploration:
