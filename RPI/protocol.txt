@@ -19,7 +19,7 @@ PC -> Android: an|{"image":[x,y,id]}
 
 // For Exploration
 Algo -> Arduino: ar|"L"
-Algo -> Android: ar|{"direction": "L" }
+Algo -> Android: ar|{"move":[{"direction":"0"}]}
 
 // For Image Recognition and Exploration:
 Algo -> Arduino: SENSE -- TBC
