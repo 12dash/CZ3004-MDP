@@ -78,7 +78,7 @@ class PcConnectionClient:
       print(f"[CONNECTION CLOSE] IR at {self.server_ip}")
           
   def stop_connection(self):
-    print(f"[CONNECTION CLOSE] Algorithm at {self.server_ip}")
+    print(f"[CONNECTION CLOSE] IR at {self.server_ip}")
     self.client.close()
     self.connected = False
     self.client = None
