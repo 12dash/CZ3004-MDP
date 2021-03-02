@@ -29,7 +29,7 @@ public class Node {
          */
         Node granParent;
         try {
-            granParent = this.parent_node;
+            granParent = this.parent_node.parent_node;
             if (granParent == null) {
                 return 0;
             }
@@ -40,8 +40,8 @@ public class Node {
         double turnCost = 0;
 
         //Change Vector (Px,Py) representing the direction of movement from Grandparent to Parent.
-        int Px = Math.abs(this.grid.getX() - granParent.grid.getX());
-        int Py = Math.abs(this.grid.getY() - granParent.grid.getY());
+        int Px = Math.abs(parent_node.grid.getX() - granParent.grid.getX());
+        int Py = Math.abs(parent_node.grid.getY() - granParent.grid.getY());
 
 
         //Change Vector (Px,Py) representing the direction of movement from Parent to Child.

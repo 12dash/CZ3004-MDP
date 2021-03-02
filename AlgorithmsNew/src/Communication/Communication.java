@@ -53,6 +53,7 @@ public class Communication extends Thread{
 
     public String recvMsg() {
 
+        System.out.println();
         System.out.println("Receiving a message...");
 
         try {
