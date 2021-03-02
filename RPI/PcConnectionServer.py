@@ -33,6 +33,7 @@ class PcConnectionServer:
             
     def send_to_client(self, msg):
         try:
+            msg += "\n" # Add newline for Algo PC to readline
             msg = msg.encode(FORMAT)
             self.client_conn.send(msg)
 
