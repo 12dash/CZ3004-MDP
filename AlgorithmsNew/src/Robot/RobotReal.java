@@ -15,6 +15,11 @@ public class RobotReal extends Robot{
         super(g);
     }
 
+    public void intiliase_path(){
+        this.path = new ArrayList<>();
+    }
+
+
     private String nextMove(Grid cur, Grid next) {
         Orientation move_dir;
 

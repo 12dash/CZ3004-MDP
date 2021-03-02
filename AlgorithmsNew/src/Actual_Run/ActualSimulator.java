@@ -20,6 +20,7 @@ public class ActualSimulator {
 
     public static Map map;   // real arena
     private static final Communication comm = Communication.getCommunication();
+    private static String commandString = ""; // To store the command string
 
     //#############################################
     //          SET THESE VALUES
@@ -27,9 +28,12 @@ public class ActualSimulator {
 
     private static String INPUT_MAP_FILE = "example_1.txt";
     private static Orientation START_ORIENTATION = Orientation.East;
+    private static int wayP_x = 12;
+    private static int wayP_y = 12;
+
 
     //#############################################
-    //          SET THESE VALUES
+    //
     //#############################################
 
     public static void main(String[] args) {
@@ -73,9 +77,6 @@ public class ActualSimulator {
 
     public static void fastestPath(){
 
-        int wayP_x = 12;
-        int wayP_y = 12;
-
 
         while (true) {
 
@@ -85,37 +86,44 @@ public class ActualSimulator {
             if (msgArr[0].equals(CommunicationConstants.START)) {
 
                 // ##########################################
-                //              FASTEST PATH
+                //              SEND FASTEST PATH STRING
                 // ###########################################
 
                 if (msgArr[1].equals(CommunicationConstants.FP)) {
                     System.out.println("Starting fastest path!");
-
-                    int[] pos = new int[]{wayP_x, wayP_y}; //x,y
-                    map.robotReal.setOrientation(START_ORIENTATION);
-                    map.robotReal.setPath(Algo.FastestPath.findPath(map.arena, pos));
-                    String commandString = map.robotReal.generateMovementCommands(START_ORIENTATION);
                     comm.sendMsg(CommunicationConstants.ANRDUINO, commandString);
                     System.out.println("Sending Command String to Arduino: " + commandString);
                     map.repaint();
                 }
             }
-                // ##############################################
-                //          SETTING WAY POINT
-                // #############################################
+                // #########################################################
+                //          SET WAY POINT,  GET THE FASTEST PATH & INITIAL ORIENTATION
+                // #########################################################
 
             else if (msgArr[0].equals(CommunicationConstants.WAYPOINT)) {
                 wayP_x = Integer.parseInt(msgArr[1]);
                 wayP_y = Integer.parseInt(msgArr[2]);
                 System.out.println("Waypoint Set: (" + wayP_x + "," + wayP_y + ")");
-                wayP_y = ArenaConstants.ARENA_ROWS - wayP_y;
+
+                wayP_y = ArenaConstants.ARENA_ROWS - wayP_y + 1;  // The algo grid counts y in reverse
                 map.setWaypoint(wayP_x, wayP_y);
+                int[] pos = new int[]{wayP_x, wayP_y}; //x,y
+                map.robotReal.intiliase_path();
+                map.robotReal.setPath(Algo.FastestPath.findPath(map.arena, pos));
+
+                if(map.robotReal.getPath().get(1).getX() == 2){
+                    System.out.println("Set the robot facing EAST");
+                    map.robotReal.setOrientation(Orientation.East);
+                }
+                else{
+                    System.out.println("Set the robot facing NORTH");
+                    map.robotReal.setOrientation(Orientation.North);
+                }
+
+                commandString = map.robotReal.generateMovementCommands(map.robotReal.getOrientation());
                 map.repaint();
             }
-
         }
-
-
     }
 
 

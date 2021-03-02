@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class RobotConstants {
-    public static final int SPEED = 20;                             // delay between movements (ms)
+    public static final int SPEED = 500;                             // delay between movements (ms)
     public static final Orientation START_DIR = Orientation.East;  // start direction
     public static final int START_ROW = 18;                          // row no. of start cell
     public static final int START_COL = 1;                          // col no. of start cell
