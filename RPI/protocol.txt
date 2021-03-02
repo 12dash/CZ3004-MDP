@@ -41,6 +41,7 @@ Dictionary
 'H', califront
 'L', Turn Left, printIR
 'R', Turn Right, printIR
+'I', Turn 180 degrees
 'X', Turn Degree Left,  moveL45F, printIR
 'Y', Turn Degree Right, moveR45F, printIR
 'A', Right hug calibrate: move Left, caliFront,printIR, moveL
@@ -49,6 +50,18 @@ Dictionary
 'C': end exploration calibration
 'D': 
 'Z':
+
+For number of steps > 10
+11: '!'
+12: '@'
+13: '#'
+14: '$'
+15: '%'
+16: '^'
+17: '&'
+18: '*'
+19: '('
+
 
 Fastest Path
 U: Turn Right, fastest Path
