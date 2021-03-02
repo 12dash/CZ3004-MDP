@@ -77,11 +77,9 @@ public class ActualSimulator {
 
     public static void fastestPath(){
 
-
         while (true) {
 
             String msg = comm.recvMsg();
-
             String[] msgArr = msg.split(":");
             if (msgArr[0].equals(CommunicationConstants.START)) {
 
@@ -90,15 +88,14 @@ public class ActualSimulator {
                 // ###########################################
 
                 if (msgArr[1].equals(CommunicationConstants.FP)) {
-                    System.out.println("Starting fastest path!");
                     comm.sendMsg(CommunicationConstants.ANRDUINO, commandString);
-                    System.out.println("Sending Command String to Arduino: " + commandString);
+                    System.out.println("Starting fastest path!");
                     map.repaint();
                 }
             }
-                // #########################################################
-                //          SET WAY POINT,  GET THE FASTEST PATH & INITIAL ORIENTATION
-                // #########################################################
+                // #############################################################
+                //   SET WAY POINT,  GET THE FASTEST PATH & INITIAL ORIENTATION
+                // #############################################################
 
             else if (msgArr[0].equals(CommunicationConstants.WAYPOINT)) {
                 wayP_x = Integer.parseInt(msgArr[1]);
@@ -108,7 +105,7 @@ public class ActualSimulator {
                 wayP_y = ArenaConstants.ARENA_ROWS - wayP_y + 1;  // The algo grid counts y in reverse
                 map.setWaypoint(wayP_x, wayP_y);
                 int[] pos = new int[]{wayP_x, wayP_y}; //x,y
-                map.robotReal.intiliase_path();
+
                 map.robotReal.setPath(Algo.FastestPath.findPath(map.arena, pos));
 
                 if(map.robotReal.getPath().get(1).getX() == 2){

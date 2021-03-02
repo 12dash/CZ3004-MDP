@@ -1,10 +1,8 @@
 package Robot;
-
 import Environment.Grid;
 import Values.Orientation;
-
 import java.util.ArrayList;
-import java.util.HashMap;
+
 
 public class RobotReal extends Robot{
 
@@ -14,11 +12,6 @@ public class RobotReal extends Robot{
     public RobotReal(Grid g) {
         super(g);
     }
-
-    public void intiliase_path(){
-        this.path = new ArrayList<>();
-    }
-
 
     private String nextMove(Grid cur, Grid next) {
         Orientation move_dir;
