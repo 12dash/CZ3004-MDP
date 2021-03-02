@@ -130,7 +130,7 @@ public class RobotReal extends Robot{
                 }
 
                 if (countS >= 10){      // For number of forward steps greater than 10
-                    cmds.append(RobotConstants.NUMBER_MAPPINGS.get(countS));
+                    cmds.append(RobotConstants.NUMBER_MAPPINGS.get(countS+1));
                 }
                 else {
                     cmds.append(countS);
@@ -142,8 +142,10 @@ public class RobotReal extends Robot{
 
     public String generateMovementCommands(Orientation initial_or) {
         this.cur_or = initial_or;
+
         StringBuilder commands = new StringBuilder(); // Stores the commands to send to Arduino
         commands = new StringBuilder();
+
         for (int i = 0; i < this.path.size()-1; i++) {
                 commands.append(nextMove(path.get(i), path.get(i + 1)));
         }
