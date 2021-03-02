@@ -132,7 +132,7 @@ if __name__ == "__main__":
       print("Please reconnect PC")
       main.pc_connection = PcConnectionServer()
       main.pc_connection.start_connection()
-      main.pc_queue = queue.Queue()
+      main.pc_queue.queue.clear()
 
       main.start_pc_threads()
       print(f"Running threads: {threading.active_count()}")
@@ -142,7 +142,7 @@ if __name__ == "__main__":
       print("Please reconnect Android")
       main.android_connection = AndroidBluetoothServer()
       main.android_connection.start_connection()
-      main.android_queue = queue.Queue()
+      main.android_queue.queue.clear()
 
       main.start_android_threads()
       print(f"Running threads: {threading.active_count()}")
@@ -152,7 +152,7 @@ if __name__ == "__main__":
       print("Please reconnect Arduino")
       main.arduino_connection = ArduinoConnectionServer()
       main.arduino_connection.start_connection()
-      main.arduino_queue = queue.Queue()
+      main.arduino_queue.queue.clear()
 
       main.start_arduino_threads()
       print(f"Running threads: {threading.active_count()}")
