@@ -236,7 +236,7 @@ if __name__ == "__main__":
       main.ir_pc_connection.start_connection()
       main.ir_pc_queue.queue.clear()
 
-      main.start_pc_threads()
+      main.start_ir_pc_threads()
       print(f"Running threads: {threading.active_count()}")
 
 
