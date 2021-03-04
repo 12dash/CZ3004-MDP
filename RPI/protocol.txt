@@ -68,3 +68,19 @@ U: Turn Right, fastest Path
 
 For arduino team,
 'S': moveSlow, but straight
+
+EXPLORATION
+Order of the sensors' readings:
+
+FL;FC;FR;LC;LL;RR
+
+Legend:
+FL: Front Left
+FC: Front Center
+FR: Front Right
+LC: Left Center
+LL: Left Left
+RR: Right Right
+
+
+
