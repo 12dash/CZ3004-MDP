@@ -10,7 +10,7 @@ public class Grid {
     private final int y;
     private boolean explored;
 
-    public Grid(Type type, boolean acc, int x, int y) {
+    public Grid(Type type, boolean acc, int x, int y, boolean explored) {
 
         /*
          Position in the array of Grids of the class Arena.
@@ -24,8 +24,9 @@ public class Grid {
 
         this.acc = true;//If the grid can be accessed by the robot. (OBSTACLE or FREE or PADDED)
 
-        this.explored = true;//If the grid has been explored by the robot in the exploration stage.
+        this.explored = explored;//If the grid has been explored by the robot in the exploration stage.
     }
+
 
     public Type getType() {
         return this.type;
@@ -58,4 +59,9 @@ public class Grid {
     public void setExplored(boolean explored) {
         this.explored = explored;
     }
+
+    public boolean isObstacle(){
+        return this.type.equals(Type.OBSTACLE);
+    }
+
 }

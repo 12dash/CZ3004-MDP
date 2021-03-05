@@ -20,6 +20,7 @@ public class Map extends JPanel {
     public int waypoint_x;
     public int waypoint_y;
     public boolean simulate;
+    boolean isExploration = false;
 
     public Map(Arena arena, boolean simulate) {
         this.arena = arena;
@@ -36,8 +37,25 @@ public class Map extends JPanel {
         }
     }
 
+    // Override for exploration
+    public Map(Arena arena, boolean simulate, boolean exploration) {
+        this.arena = arena;
+        this.simulate = simulate;
+        this.isExploration = exploration;
+
+        if (simulate) {
+            this.robotSimulator = new RobotSimulator(arena.grids[RobotConstants.START_ROW][RobotConstants.START_COL]);
+            robotSimulator.setOrientation(RobotConstants.START_DIR);
+            this.robot = robotSimulator;
+        }else{
+            this.robotReal = new RobotReal(arena.grids[RobotConstants.START_ROW][RobotConstants.START_COL]);
+            robotReal.setOrientation(RobotConstants.START_DIR);
+            this.robot = robotReal;
+        }
+    }
+
     public void resetMap(boolean simulate){
-        this.arena = new Arena();
+        this.arena = new Arena(true);
         if (simulate) {
             this.robotSimulator = new RobotSimulator(arena.grids[RobotConstants.START_ROW][RobotConstants.START_COL]);
             robotSimulator.setOrientation(RobotConstants.START_DIR);
@@ -62,11 +80,11 @@ public class Map extends JPanel {
         }
     }
 
-    protected boolean inStartZone(int row, int col) {
+    protected static boolean inStartZone(int row, int col) {
         return (row >= ArenaConstants.START_ROW - 1 && row <= ArenaConstants.START_ROW + 1 && col >= ArenaConstants.START_COL - 1 && col <= ArenaConstants.START_COL + 1);
     }
 
-    private boolean inGoalZone(int row, int col) {
+    public static boolean inGoalZone(int row, int col) {
         return (row >= ArenaConstants.GOAL_ROW - 1 && row <= ArenaConstants.GOAL_ROW + 1 && col >= ArenaConstants.GOAL_COL - 1 && col <= ArenaConstants.GOAL_COL + 1);
     }
 
@@ -109,41 +127,74 @@ public class Map extends JPanel {
                 g.fillRect(_gridCells[gr.getY()][gr.getX()].cellX + SimulatorConstants.MAP_X_OFFSET, _gridCells[gr.getY()][gr.getX()].cellY, _gridCells[gr.getY()][gr.getX()].cellSize, _gridCells[gr.getY()][gr.getX()].cellSize);
             }
 
-            // Paint WayPoint
-            g.setColor(SimulatorConstants.C_WAYPOINT);
-            g.fillRect(_gridCells[waypoint_y][waypoint_x].cellX + SimulatorConstants.MAP_X_OFFSET, _gridCells[waypoint_y][waypoint_x].cellY, _gridCells[waypoint_y][waypoint_x].cellSize, _gridCells[waypoint_y][waypoint_x].cellSize);
+            if(!isExploration) {
+                // Paint WayPoint
+                g.setColor(SimulatorConstants.C_WAYPOINT);
+                g.fillRect(_gridCells[waypoint_y][waypoint_x].cellX + SimulatorConstants.MAP_X_OFFSET, _gridCells[waypoint_y][waypoint_x].cellY, _gridCells[waypoint_y][waypoint_x].cellSize, _gridCells[waypoint_y][waypoint_x].cellSize);
+            }
+            // Paint the robot on-screen.
+            g.setColor(SimulatorConstants.C_ROBOT);
+            int r = ArenaConstants.ARENA_ROWS - this.robotReal.getRobotPosRow();
+            int c = robotReal.getRobotPosCol();
 
+            g.fillOval((c - 1) * SimulatorConstants.CELL_SIZE + SimulatorConstants.ROBOT_X_OFFSET + SimulatorConstants.MAP_X_OFFSET, SimulatorConstants.MAP_H - (r * SimulatorConstants.CELL_SIZE + SimulatorConstants.ROBOT_Y_OFFSET), SimulatorConstants.ROBOT_W, SimulatorConstants.ROBOT_H);
+
+            // Paint the robot's direction indicator on-screen.
+            g.setColor(SimulatorConstants.C_ROBOT_DIR);
+            Orientation o = robot.getOrientation();
+            switch (o) {
+                case North:
+                    g.fillOval(c * SimulatorConstants.CELL_SIZE + 10 + SimulatorConstants.MAP_X_OFFSET, SimulatorConstants.MAP_H - r * SimulatorConstants.CELL_SIZE - 15, SimulatorConstants.ROBOT_DIR_W, SimulatorConstants.ROBOT_DIR_H);
+                    break;
+                case East:
+                    g.fillOval(c * SimulatorConstants.CELL_SIZE + 35 + SimulatorConstants.MAP_X_OFFSET, SimulatorConstants.MAP_H - r * SimulatorConstants.CELL_SIZE + 10, SimulatorConstants.ROBOT_DIR_W, SimulatorConstants.ROBOT_DIR_H);
+                    break;
+                case South:
+                    g.fillOval(c * SimulatorConstants.CELL_SIZE + 10 + SimulatorConstants.MAP_X_OFFSET, SimulatorConstants.MAP_H - r * SimulatorConstants.CELL_SIZE + 35, SimulatorConstants.ROBOT_DIR_W, SimulatorConstants.ROBOT_DIR_H);
+                    break;
+                case West:
+                    g.fillOval(c * SimulatorConstants.CELL_SIZE - 15 + SimulatorConstants.MAP_X_OFFSET, SimulatorConstants.MAP_H - r * SimulatorConstants.CELL_SIZE + 10, SimulatorConstants.ROBOT_DIR_W, SimulatorConstants.ROBOT_DIR_H);
+                    break;
+                case NorthEast:
+                    g.fillOval(c * SimulatorConstants.CELL_SIZE + 20 + SimulatorConstants.MAP_X_OFFSET, SimulatorConstants.MAP_H - r * SimulatorConstants.CELL_SIZE - 15, SimulatorConstants.ROBOT_DIR_W, SimulatorConstants.ROBOT_DIR_H);
+                    break;
+                case NorthWest:
+                    g.fillOval(c * SimulatorConstants.CELL_SIZE - 10 + SimulatorConstants.MAP_X_OFFSET, SimulatorConstants.MAP_H - r * SimulatorConstants.CELL_SIZE - 1, SimulatorConstants.ROBOT_DIR_W, SimulatorConstants.ROBOT_DIR_H);
+                    break;
+            }
         }
 
-        // Paint the robot on-screen.
-        g.setColor(SimulatorConstants.C_ROBOT);
-        int r = ArenaConstants.ARENA_ROWS - this.robot.getCur().getY();
-        int c = robot.getCur().getX();
+        else {
+            // Paint the robot on-screen.
+            g.setColor(SimulatorConstants.C_ROBOT);
+            int r = ArenaConstants.ARENA_ROWS - this.robot.getCur().getY();
+            int c = robot.getCur().getX();
 
-        g.fillOval((c - 1) * SimulatorConstants.CELL_SIZE + SimulatorConstants.ROBOT_X_OFFSET + SimulatorConstants.MAP_X_OFFSET, SimulatorConstants.MAP_H - (r * SimulatorConstants.CELL_SIZE + SimulatorConstants.ROBOT_Y_OFFSET), SimulatorConstants.ROBOT_W, SimulatorConstants.ROBOT_H);
+            g.fillOval((c - 1) * SimulatorConstants.CELL_SIZE + SimulatorConstants.ROBOT_X_OFFSET + SimulatorConstants.MAP_X_OFFSET, SimulatorConstants.MAP_H - (r * SimulatorConstants.CELL_SIZE + SimulatorConstants.ROBOT_Y_OFFSET), SimulatorConstants.ROBOT_W, SimulatorConstants.ROBOT_H);
 
-        // Paint the robot's direction indicator on-screen.
-        g.setColor(SimulatorConstants.C_ROBOT_DIR);
-        Orientation o = robot.getOrientation();
-        switch (o) {
-            case North:
-                g.fillOval(c * SimulatorConstants.CELL_SIZE + 10 + SimulatorConstants.MAP_X_OFFSET, SimulatorConstants.MAP_H - r * SimulatorConstants.CELL_SIZE - 15, SimulatorConstants.ROBOT_DIR_W, SimulatorConstants.ROBOT_DIR_H);
-                break;
-            case East:
-                g.fillOval(c * SimulatorConstants.CELL_SIZE + 35 + SimulatorConstants.MAP_X_OFFSET, SimulatorConstants.MAP_H - r * SimulatorConstants.CELL_SIZE + 10, SimulatorConstants.ROBOT_DIR_W, SimulatorConstants.ROBOT_DIR_H);
-                break;
-            case South:
-                g.fillOval(c * SimulatorConstants.CELL_SIZE + 10 + SimulatorConstants.MAP_X_OFFSET, SimulatorConstants.MAP_H - r * SimulatorConstants.CELL_SIZE + 35, SimulatorConstants.ROBOT_DIR_W, SimulatorConstants.ROBOT_DIR_H);
-                break;
-            case West:
-                g.fillOval(c * SimulatorConstants.CELL_SIZE - 15 + SimulatorConstants.MAP_X_OFFSET, SimulatorConstants.MAP_H - r * SimulatorConstants.CELL_SIZE + 10, SimulatorConstants.ROBOT_DIR_W, SimulatorConstants.ROBOT_DIR_H);
-                break;
-            case NorthEast:
-                g.fillOval(c * SimulatorConstants.CELL_SIZE + 20 + SimulatorConstants.MAP_X_OFFSET, SimulatorConstants.MAP_H - r * SimulatorConstants.CELL_SIZE - 15, SimulatorConstants.ROBOT_DIR_W, SimulatorConstants.ROBOT_DIR_H);
-                break;
-            case NorthWest:
-                g.fillOval(c * SimulatorConstants.CELL_SIZE - 10 + SimulatorConstants.MAP_X_OFFSET, SimulatorConstants.MAP_H - r * SimulatorConstants.CELL_SIZE - 1, SimulatorConstants.ROBOT_DIR_W, SimulatorConstants.ROBOT_DIR_H);
-                break;
+            // Paint the robot's direction indicator on-screen.
+            g.setColor(SimulatorConstants.C_ROBOT_DIR);
+            Orientation o = robot.getOrientation();
+            switch (o) {
+                case North:
+                    g.fillOval(c * SimulatorConstants.CELL_SIZE + 10 + SimulatorConstants.MAP_X_OFFSET, SimulatorConstants.MAP_H - r * SimulatorConstants.CELL_SIZE - 15, SimulatorConstants.ROBOT_DIR_W, SimulatorConstants.ROBOT_DIR_H);
+                    break;
+                case East:
+                    g.fillOval(c * SimulatorConstants.CELL_SIZE + 35 + SimulatorConstants.MAP_X_OFFSET, SimulatorConstants.MAP_H - r * SimulatorConstants.CELL_SIZE + 10, SimulatorConstants.ROBOT_DIR_W, SimulatorConstants.ROBOT_DIR_H);
+                    break;
+                case South:
+                    g.fillOval(c * SimulatorConstants.CELL_SIZE + 10 + SimulatorConstants.MAP_X_OFFSET, SimulatorConstants.MAP_H - r * SimulatorConstants.CELL_SIZE + 35, SimulatorConstants.ROBOT_DIR_W, SimulatorConstants.ROBOT_DIR_H);
+                    break;
+                case West:
+                    g.fillOval(c * SimulatorConstants.CELL_SIZE - 15 + SimulatorConstants.MAP_X_OFFSET, SimulatorConstants.MAP_H - r * SimulatorConstants.CELL_SIZE + 10, SimulatorConstants.ROBOT_DIR_W, SimulatorConstants.ROBOT_DIR_H);
+                    break;
+                case NorthEast:
+                    g.fillOval(c * SimulatorConstants.CELL_SIZE + 20 + SimulatorConstants.MAP_X_OFFSET, SimulatorConstants.MAP_H - r * SimulatorConstants.CELL_SIZE - 15, SimulatorConstants.ROBOT_DIR_W, SimulatorConstants.ROBOT_DIR_H);
+                    break;
+                case NorthWest:
+                    g.fillOval(c * SimulatorConstants.CELL_SIZE - 10 + SimulatorConstants.MAP_X_OFFSET, SimulatorConstants.MAP_H - r * SimulatorConstants.CELL_SIZE - 1, SimulatorConstants.ROBOT_DIR_W, SimulatorConstants.ROBOT_DIR_H);
+                    break;
+            }
         }
 
     }

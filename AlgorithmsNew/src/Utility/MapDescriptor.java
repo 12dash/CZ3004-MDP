@@ -151,7 +151,7 @@ public class MapDescriptor {
     }
 
 
-    public static void generateMapDescriptor(Arena arena) {
+    public static String[] generateMapDescriptor(Arena arena) {
         /*
         Used to convert the arena to P1, P2 string
          */
@@ -204,5 +204,6 @@ public class MapDescriptor {
         }
         System.out.println("P1 string : " + p1_string);
         System.out.println("P2 string : " + p2_string);
+        return new String[]{p1_string.toString(), p2_string.toString()};
     }
 }

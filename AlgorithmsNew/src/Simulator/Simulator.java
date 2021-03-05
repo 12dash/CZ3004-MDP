@@ -20,7 +20,7 @@ public class Simulator {
     static LoadMap lMap;
 
     public static void main(String[] args) {
-        map = new Map(new Arena(), true);
+        map = new Map(new Arena(true), true);
         fPathSimulate = new FastestPathSimulations(map);
         eSimulate = new ExplorationSimulations(map);
         lMap = new LoadMap(map);
