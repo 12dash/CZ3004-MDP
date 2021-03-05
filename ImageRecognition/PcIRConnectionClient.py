@@ -11,6 +11,7 @@ import os
 from detect import detect
 
 from PIL import Image
+from ipython_genutils.py3compat import xrange
 
 class PcConnectionClient:
   def __init__(self):
@@ -33,7 +34,7 @@ class PcConnectionClient:
   def process_image(self, processing_queue):
     while self.connected:
       if not processing_queue.empty():
-        obj = processing_queue.get_nowait()
+        obj = processing_queue.get_nowait()        
 
         arr = np.asarray(obj["imageArr"]).astype(np.uint8) #convert to numpy arr        
         coords = obj["coords"]
@@ -46,15 +47,26 @@ class PcConnectionClient:
         # Sabrina: Predict Image ID here
         predicted_img = detect(path)
 
-
         if predicted_img == -1:
           print("Removed file")
           os.remove(f"output/{path}")
+
         #TODO: Save the raw image captured with bounding box here -- need to display as output as end of run
         if predicted_img != -1:
           #Then send to android
           json_outgoing = json.dumps({"image": [coords[0], coords[1], predicted_img]})
           self.send_to_server_ir_data(f"an|{json_outgoing}")
+
+        if(len(os.listdir("./output")) >= 5):
+          img_path = os.listdir("./output")
+          new_im = Image.new('RGB', (256,256))
+          for i in img_path:
+            for j in xrange(0,256,256):
+              img_temp = Image.open(f"output/{i}")
+              new_im.paste(img_temp,(j,0))
+          new_im.save("final.jpg")
+          self.send_to_server_ir_data("pc|done")
+          return 
 
   # Modified version of reading -- reading image from RPI
   def read_from_server(self):
