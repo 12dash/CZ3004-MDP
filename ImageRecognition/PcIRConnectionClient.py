@@ -59,7 +59,7 @@ class PcConnectionClient:
 
         if(len(os.listdir("./output")) >= 5):
           img_path = os.listdir("./output")
-          new_im = Image.new('RGB', (256,256))
+          new_im = Image.new('RGB', (256*5,128))
           for i in img_path:
             for j in xrange(0,256,256):
               img_temp = Image.open(f"output/{i}")
