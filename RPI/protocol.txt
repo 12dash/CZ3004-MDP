@@ -8,14 +8,13 @@ Android -> Arduino: ar|T -- To calibrate
 // For Fastest Path
 Android -> Algo: pc|"waypoint:x:y"  -- Value is the coords of waypoint
 Algo -> Arduino: ar|"0,L,R,5" -- Refer to Arduino commmands list for more.
-RPI -> Arduino: "0" -- Single command at a time -- TBC
-Arduino -> RPI: pc|Done -- To indicate that a single movement is done -- TBC
 
 // For Image Recognition
 Algo -> RPI: ir|{"coords": [x,y] } -- Tells RPI to capture. 
 RPI -> Algo: {"imageCaptured" : "true"} -- After image has been taken, RPI tells Algo to resume movement
 RPI -> PC: {"imageArr": <3d pixel array>, "coords": [x,y] }
 PC -> Android: an|{"image":[x,y,id]}
+IR PC -> Algo: pc|done         -- After 5 images have been captured, tell Algo to stop moving.
 
 // For Exploration 
 Algo -> Arduino: ar|"L"
@@ -68,3 +67,19 @@ U: Turn Right, fastest Path
 
 For arduino team,
 'S': moveSlow, but straight
+
+EXPLORATION
+Order of the sensors' readings:
+
+FL;FC;FR;LC;LL;RR
+
+Legend:
+FL: Front Left
+FC: Front Center
+FR: Front Right
+LC: Left Center
+LL: Left Left
+RR: Right Right
+
+
+

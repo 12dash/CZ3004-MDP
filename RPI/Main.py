@@ -84,37 +84,78 @@ class Main(threading.Thread):
         android_queue.put_nowait(msg_lst[1])
       else:
         print("Invalid recipient from Arduino")
-    
 
-  
-  def start_multi_threads(self):
+  def start_pc_threads(self):
     # PC Write and Read Multi-threading
-    pc_read_thread = threading.Thread(target = self.read_from_pc, args = (self.android_queue, self.arduino_queue) )
-    pc_write_thread = threading.Thread(target = self.send_to_pc, args = (self.pc_queue,) )
-
-     # ANDROID Write and Read Multi-threading
-    android_read_thread = threading.Thread(target = self.read_from_android, args = (self.pc_queue, self.arduino_queue) )
-    android_write_thread = threading.Thread(target = self.send_to_android, args = (self.android_queue,) )
-
-    # ARDUINO Write and Read Multi-therading
-    arduino_read_thread = threading.Thread(target = self.read_from_arduino, args=(self.pc_queue, self.android_queue) )
-    arduino_write_thread = threading.Thread(target = self.send_to_arduino, args=(self.arduino_queue,) )
+    self.pc_read_thread = threading.Thread(target = self.read_from_pc, args = (self.android_queue, self.arduino_queue) )
+    self.pc_write_thread = threading.Thread(target = self.send_to_pc, args = (self.pc_queue,) )
 
     # Start threads
-    pc_read_thread.start()
-    pc_write_thread.start()
+    self.pc_read_thread.start()
+    self.pc_write_thread.start()
 
-    android_read_thread.start()
-    android_write_thread.start()
+  
+  def start_android_threads(self):
+    # ANDROID Write and Read Multi-threading
+    self.android_read_thread = threading.Thread(target = self.read_from_android, args = (self.pc_queue, self.arduino_queue) )
+    self.android_write_thread = threading.Thread(target = self.send_to_android, args = (self.android_queue,) )
 
-    arduino_read_thread.start()
-    arduino_write_thread.start()
+    # Start threads
+    self.android_read_thread.start()
+    self.android_write_thread.start()
 
+  def start_arduino_threads(self):
+    # ARDUINO Write and Read Multi-threadading
+    self.arduino_read_thread = threading.Thread(target = self.read_from_arduino, args=(self.pc_queue, self.android_queue) )
+    self.arduino_write_thread = threading.Thread(target = self.send_to_arduino, args=(self.arduino_queue,) )
 
+    # Start threads
+    self.arduino_read_thread.start()
+    self.arduino_write_thread.start()
 
-if __name__ == "__main__":
+  def start_multi_threads(self):
+    self.start_pc_threads()
+    self.start_android_threads()
+    self.start_arduino_threads()
+    
+
+if __name__ == "__main__":  
   print("Start main program")
   main = Main()
-
   main.start_multi_threads()
+  print(f"Running threads: {threading.active_count()}")
+
+  # Listen for disconnect and reconnect when that occurs
+  while True:
+    if not main.pc_read_thread.is_alive() or not main.pc_write_thread.is_alive():
+      print(f"Running threads: {threading.active_count()}")
+      print("Please reconnect PC")
+      main.pc_connection = PcConnectionServer()
+      main.pc_connection.start_connection()
+      main.pc_queue.queue.clear()
+
+      main.start_pc_threads()
+      print(f"Running threads: {threading.active_count()}")
+    
+    if not main.android_read_thread.is_alive() or not main.android_write_thread.is_alive():
+      print(f"Running threads: {threading.active_count()}")
+      print("Please reconnect Android")
+      main.android_connection = AndroidBluetoothServer()
+      main.android_connection.start_connection()
+      main.android_queue.queue.clear()
+
+      main.start_android_threads()
+      print(f"Running threads: {threading.active_count()}")
+
+    if not main.arduino_read_thread.is_alive() or not main.arduino_write_thread.is_alive():
+      print(f"Running threads: {threading.active_count()}")
+      print("Please reconnect Arduino")
+      main.arduino_connection = ArduinoConnectionServer()
+      main.arduino_connection.start_connection()
+      main.arduino_queue.queue.clear()
+
+      main.start_arduino_threads()
+      print(f"Running threads: {threading.active_count()}")
   
+
+

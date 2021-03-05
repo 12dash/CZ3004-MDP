@@ -87,7 +87,7 @@ class Main(threading.Thread):
         msg = ir_pc_queue.get_nowait()
         self.ir_pc_connection.send_to_client(msg)
     
-  def read_from_ir_pc(self, android_queue):
+  def read_from_ir_pc(self, android_queue, pc_queue):
     # Receive predicted Image ID and Coords and send to android
     while self.ir_pc_connection.connected:
       msg = self.ir_pc_connection.read_from_client()
@@ -96,9 +96,10 @@ class Main(threading.Thread):
 
       if header == "an":
         android_queue.put_nowait(msg_lst[1])
+      elif header == "pc":
+        pc_queue.put_nowait(msg_lst[1])
       else:
-        print("Invalid recipient from Android")
-    pass
+        print("Invalid recipient from IR PC")
 
   def send_to_android(self, android_queue):
     while self.android_connection.connected:
@@ -138,37 +139,49 @@ class Main(threading.Thread):
       else:
         print("Invalid recipient from Arduino")
     
-
-  
-  def start_multi_threads(self):
+  def start_pc_threads(self):
     # PC Write and Read Multi-threading
-    pc_read_thread = threading.Thread(target = self.read_from_pc, args = (self.android_queue, self.arduino_queue) )
-    pc_write_thread = threading.Thread(target = self.send_to_pc, args = (self.pc_queue,) )
-
-     # ANDROID Write and Read Multi-threading
-    android_read_thread = threading.Thread(target = self.read_from_android, args = (self.pc_queue, self.arduino_queue) )
-    android_write_thread = threading.Thread(target = self.send_to_android, args = (self.android_queue,) )
-
-    # ARDUINO Write and Read Multi-therading
-    arduino_read_thread = threading.Thread(target = self.read_from_arduino, args=(self.pc_queue, self.android_queue) )
-    arduino_write_thread = threading.Thread(target = self.send_to_arduino, args=(self.arduino_queue,) )
-
-    # IR PC Write and Read Multi-therading
-    ir_pc_read_thread = threading.Thread(target = self.read_from_ir_pc, args=(self.android_queue, ) )
-    ir_pc_write_thread = threading.Thread(target = self.send_to_ir_pc, args=(self.ir_pc_queue,) )
+    self.pc_read_thread = threading.Thread(target = self.read_from_pc, args = (self.android_queue, self.arduino_queue) )
+    self.pc_write_thread = threading.Thread(target = self.send_to_pc, args = (self.pc_queue,) )
 
     # Start threads
-    pc_read_thread.start()
-    pc_write_thread.start()
+    self.pc_read_thread.start()
+    self.pc_write_thread.start()
 
-    android_read_thread.start()
-    android_write_thread.start()
+  def start_android_threads(self):
+    # ANDROID Write and Read Multi-threading
+    self.android_read_thread = threading.Thread(target = self.read_from_android, args = (self.pc_queue, self.arduino_queue) )
+    self.android_write_thread = threading.Thread(target = self.send_to_android, args = (self.android_queue,) )
 
-    arduino_read_thread.start()
-    arduino_write_thread.start()
+    # Start threads
+    self.android_read_thread.start()
+    self.android_write_thread.start()
 
-    ir_pc_read_thread.start()
-    ir_pc_write_thread.start()
+  def start_arduino_threads(self):
+    # ARDUINO Write and Read Multi-threadading
+    self.arduino_read_thread = threading.Thread(target = self.read_from_arduino, args=(self.pc_queue, self.android_queue) )
+    self.arduino_write_thread = threading.Thread(target = self.send_to_arduino, args=(self.arduino_queue,) )
+
+    # Start threads
+    self.arduino_read_thread.start()
+    self.arduino_write_thread.start()
+
+  def start_ir_pc_threads(self):
+    # IR PC Write and Read Multi-therading
+    self.ir_pc_read_thread = threading.Thread(target = self.read_from_ir_pc, args=(self.android_queue, self.pc_queue ) )
+    self.ir_pc_write_thread = threading.Thread(target = self.send_to_ir_pc, args=(self.ir_pc_queue,) )
+
+    # Start threads
+    self.ir_pc_read_thread.start()
+    self.ir_pc_write_thread.start()
+
+  def start_multi_threads(self):
+    self.start_pc_threads()
+    self.start_android_threads()
+    self.start_arduino_threads()
+    self.start_ir_pc_threads()
+
+
 
 # For passing numpy arrays into json
 class NumpyEncoder(json.JSONEncoder):
@@ -183,3 +196,48 @@ if __name__ == "__main__":
   main = Main()
 
   main.start_multi_threads()
+  print(f"Running threads: {threading.active_count()}")
+
+  # Listen for disconnect and reconnect when that occurs
+  while True:
+    if not main.pc_read_thread.is_alive() or not main.pc_write_thread.is_alive():
+      print(f"Running threads: {threading.active_count()}")
+      print("Please reconnect Algo PC")
+      main.pc_connection = PcConnectionServer()
+      main.pc_connection.start_connection()
+      main.pc_queue.queue.clear()
+
+      main.start_pc_threads()
+      print(f"Running threads: {threading.active_count()}")
+
+    if not main.android_read_thread.is_alive() or not main.android_write_thread.is_alive():
+      print(f"Running threads: {threading.active_count()}")
+      print("Please reconnect Android")
+      main.android_connection = AndroidBluetoothServer()
+      main.android_connection.start_connection()
+      main.android_queue.queue.clear()
+
+      main.start_android_threads()
+      print(f"Running threads: {threading.active_count()}")
+
+    if not main.arduino_read_thread.is_alive() or not main.arduino_write_thread.is_alive():
+      print(f"Running threads: {threading.active_count()}")
+      print("Please reconnect Arduino")
+      main.arduino_connection = ArduinoConnectionServer()
+      main.arduino_connection.start_connection()
+      main.arduino_queue.queue.clear()
+
+      main.start_arduino_threads()
+      print(f"Running threads: {threading.active_count()}")
+
+    if not main.ir_pc_read_thread.is_alive() or not main.ir_pc_write_thread.is_alive():
+      print(f"Running threads: {threading.active_count()}")
+      print("Please reconnect IR PC")
+      main.ir_pc_connection = PcIRConnectionServer(8081)
+      main.ir_pc_connection.start_connection()
+      main.ir_pc_queue.queue.clear()
+
+      main.start_ir_pc_threads()
+      print(f"Running threads: {threading.active_count()}")
+
+
