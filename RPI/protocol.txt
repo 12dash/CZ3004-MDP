@@ -16,6 +16,7 @@ Algo -> RPI: ir|{"coords": [x,y] } -- Tells RPI to capture.
 RPI -> Algo: {"imageCaptured" : "true"} -- After image has been taken, RPI tells Algo to resume movement
 RPI -> PC: {"imageArr": <3d pixel array>, "coords": [x,y] }
 PC -> Android: an|{"image":[x,y,id]}
+IR PC -> Algo: pc|done         -- After 5 images have been captured, tell Algo to stop moving.
 
 // For Exploration 
 Algo -> Arduino: ar|"L"
