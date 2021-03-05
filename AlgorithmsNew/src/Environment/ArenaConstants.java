@@ -10,4 +10,7 @@ public class ArenaConstants{
     public static final int GOAL_COL = 13;      // col no. of goal cell
     public static final int START_ROW = 18;     // row no. of start cell
     public static final int START_COL = 1;     // col no. of start cell
+
+    public static final int MAX_COVERAGE = 300;
+    public static final int MAX_TIME_LIMIT = 3600;
 }

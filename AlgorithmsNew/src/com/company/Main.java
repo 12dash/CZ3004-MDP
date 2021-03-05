@@ -17,7 +17,7 @@ public class Main {
         String[] p_string = FileManager.readFile(path);
         int[][] obs = MapDescriptor.getMap(p_string[0], p_string[1]);
 
-        Arena arena = new Arena();
+        Arena arena = new Arena(true);
         arena.make_arena(obs);
 
         RobotSimulator robot = new RobotSimulator(arena.grids[RobotConstants.START_ROW][RobotConstants.START_COL]);
