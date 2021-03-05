@@ -45,9 +45,10 @@ class PcConnectionClient:
         # Do processing here
         # Sabrina: Predict Image ID here
         predicted_img = detect(path)
-        if predicted_img == "-1":
+
+
+        if predicted_img == -1:
           print("Removed file")
-          os.remove(f"raw/{path}")
           os.remove(f"output/{path}")
         #TODO: Save the raw image captured with bounding box here -- need to display as output as end of run
         if predicted_img != -1:
