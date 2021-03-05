@@ -87,7 +87,7 @@ class Main(threading.Thread):
         msg = ir_pc_queue.get_nowait()
         self.ir_pc_connection.send_to_client(msg)
     
-  def read_from_ir_pc(self, android_queue):
+  def read_from_ir_pc(self, android_queue, pc_queue):
     # Receive predicted Image ID and Coords and send to android
     while self.ir_pc_connection.connected:
       msg = self.ir_pc_connection.read_from_client()
@@ -96,9 +96,10 @@ class Main(threading.Thread):
 
       if header == "an":
         android_queue.put_nowait(msg_lst[1])
+      elif header == "pc":
+        pc_queue.put_nowait(msg_lst[1])
       else:
-        print("Invalid recipient from Android")
-    pass
+        print("Invalid recipient from IR PC")
 
   def send_to_android(self, android_queue):
     while self.android_connection.connected:
@@ -167,7 +168,7 @@ class Main(threading.Thread):
 
   def start_ir_pc_threads(self):
     # IR PC Write and Read Multi-therading
-    self.ir_pc_read_thread = threading.Thread(target = self.read_from_ir_pc, args=(self.android_queue, ) )
+    self.ir_pc_read_thread = threading.Thread(target = self.read_from_ir_pc, args=(self.android_queue, self.pc_queue ) )
     self.ir_pc_write_thread = threading.Thread(target = self.send_to_ir_pc, args=(self.ir_pc_queue,) )
 
     # Start threads
