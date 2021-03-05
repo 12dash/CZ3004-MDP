@@ -15,11 +15,11 @@ from utils.plots import plot_one_box
 from utils.torch_utils import select_device, load_classifier, time_synchronized
 
 
-def detect(save_img=False):
+def detect(path, save_img=False):
 
     qwe = -1
    
-    source = "temp/1.jpg"
+    source = f"raw/{path}"
     weights = "weights/best.pt"
     view_img = False
     save_txt = False
@@ -63,7 +63,6 @@ def detect(save_img=False):
     names = model.module.names if hasattr(model, 'module') else model.names
     colors = [[random.randint(0, 255) for _ in range(3)] for _ in names]
 
-    print(names)
 
     # Run inference
     if device.type != 'cpu':

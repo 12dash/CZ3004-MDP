@@ -5,6 +5,7 @@ import queue
 import numpy as np
 from config import *
 from struct import unpack
+import os
 
 #from predict import makePrediction
 from detect import detect
@@ -38,16 +39,21 @@ class PcConnectionClient:
         coords = obj["coords"]
 
         img = Image.fromarray(arr)
-        img.save("temp/1.jpg")
+        path = f"{obj['coords']}.jpg"
+        img.save(f"raw/{path}")
 
         # Do processing here
         # Sabrina: Predict Image ID here
-        predicted_img = detect()
+        predicted_img = detect(path)
+        if predicted_img == "-1":
+          print("Removed file")
+          os.remove(f"raw/{path}")
+          os.remove(f"output/{path}")
         #TODO: Save the raw image captured with bounding box here -- need to display as output as end of run
-
-        #Then send to android
-        json_outgoing = json.dumps({"image": [coords[0], coords[1], predicted_img]})
-        self.send_to_server_ir_data(f"an|{json_outgoing}")
+        if predicted_img != -1:
+          #Then send to android
+          json_outgoing = json.dumps({"image": [coords[0], coords[1], predicted_img]})
+          self.send_to_server_ir_data(f"an|{json_outgoing}")
 
   # Modified version of reading -- reading image from RPI
   def read_from_server(self):
