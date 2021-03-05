@@ -8,8 +8,6 @@ Android -> Arduino: ar|T -- To calibrate
 // For Fastest Path
 Android -> Algo: pc|"waypoint:x:y"  -- Value is the coords of waypoint
 Algo -> Arduino: ar|"0,L,R,5" -- Refer to Arduino commmands list for more.
-RPI -> Arduino: "0" -- Single command at a time -- TBC
-Arduino -> RPI: pc|Done -- To indicate that a single movement is done -- TBC
 
 // For Image Recognition
 Algo -> RPI: ir|{"coords": [x,y] } -- Tells RPI to capture. 
