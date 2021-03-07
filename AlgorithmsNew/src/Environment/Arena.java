@@ -35,7 +35,7 @@ public class Arena {
         }
 
         //Add the border to the padding.
-        getBorderPadding();
+        addBorderPadding();
     }
 
     public void checkCellModifyAcc(int i, int j) {
@@ -74,7 +74,7 @@ public class Arena {
         checkCellModifyAcc(x_2, y_2);//Down - Right
     }
 
-    public void getBorderPadding() {
+    public void addBorderPadding() {
         /*
         Method for padding the borders of the arena.
          */
@@ -166,6 +166,7 @@ public class Arena {
         return (row >= ArenaConstants.GOAL_ROW - 1 && row <= ArenaConstants.GOAL_ROW + 1 && col >= ArenaConstants.GOAL_COL - 1 && col <= ArenaConstants.GOAL_COL + 1);
     }
 
+    // Removes padding around the obstacles apart from the padding near border of the arena
     private void removePaddingFromNonObstacles(){
         for (int i = 0; i < ArenaConstants.ARENA_ROWS; i++) {
             for (int j = 0; j < ArenaConstants.ARENA_COLS; j++) {
@@ -174,6 +175,7 @@ public class Arena {
                 }
             }
         }
+        addBorderPadding();
     }
 
 
