@@ -60,7 +60,7 @@ public class ActualSimulatorFastestPath {
                 }
             }
             else{
-                System.out.println("Not a valid command: Didn't find a colon (:) ");
+                System.out.println("Not a valid command: Doesn't have a colon (:) ");
             }
         }
     }
