@@ -3,6 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="150dp"
+    android:background="#99D9EA"
     android:orientation="vertical">
 
     <ScrollView
@@ -15,7 +16,7 @@
             android:id="@+id/chatboxMsgTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/design_default_color_primary"
+            android:background="#FFB97857"
             android:textColor="@color/design_default_color_on_primary"
             />
     </ScrollView>
