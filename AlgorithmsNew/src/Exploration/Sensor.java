@@ -92,8 +92,8 @@ public class Sensor {
      * Uses the sensor Orientation and given value from the actual sensor to update the map.
      */
     public void senseReal(Map exploredMap, int sensorVal) {
-        String debug = String.format("%s:%s", this.id, this.sensorDir);
-        System.out.println(debug);
+//        String debug = String.format("%s:%s", this.id, this.sensorDir);
+//        System.out.println(debug);
 
         switch (this.sensorDir) {
             case North:

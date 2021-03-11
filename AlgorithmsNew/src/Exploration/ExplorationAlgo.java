@@ -94,13 +94,13 @@ public class ExplorationAlgo {
         endTime = startTime + (timeLimit * 1000);
 
         if(!simulate) {
-            Communication.getCommunication().sendMsg(null, CommunicationConstants.START_EPLORATION);
+            Communication.getCommunication().sendMsg(CommunicationConstants.ARDUINO, CommunicationConstants.START_EPLORATION);
         }
         senseAndRepaint(this.simulate);
         areaExplored = calculateAreaExplored();
         System.out.println("Explored Area: " + areaExplored);
 
-        explorationLoop(exploredMap.robotReal.getRobotPosRow(), exploredMap.robotReal.getRobotPosCol());
+//        explorationLoop(exploredMap.robotReal.getRobotPosRow(), exploredMap.robotReal.getRobotPosCol());
     }
 
     /**
@@ -121,7 +121,9 @@ public class ExplorationAlgo {
 //                    break;
 //                }
             }
-            TimeUnit.MILLISECONDS.sleep(RobotConstants.SPEED);
+            if(this.simulate) {
+                TimeUnit.MILLISECONDS.sleep(RobotConstants.SPEED);
+            }
         } while (areaExplored <= coverageLimit && System.currentTimeMillis() <= endTime);
 
 

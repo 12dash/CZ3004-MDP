@@ -15,7 +15,8 @@ public class testsComm {
     public static void main(String[] args){
 
 //        testRobotMovements();
-        testMapDescriptor();
+//        testMapDescriptor();
+        testSendComm();
     }
 
 
@@ -40,6 +41,23 @@ public class testsComm {
             String androidMsg = "{move:" + (inp) + "}";
             comm.sendMsg(CommunicationConstants.ANDROID, androidMsg);
         }
+    }
+
+    public static void testSendComm(){
+        Scanner sc= new Scanner(System.in);
+        Communication comm = Communication.getCommunication();
+
+        String[] p1p2 = new String[]{"FF007E00FC0180030004000800100020004000800000000000000000000000000007000E001F", "000004000000"};  // This ret
+        String anMssg = "{p1:\"" + p1p2[0] + "\",p2:\"" + p1p2[1] + "\"}";
+
+
+        comm.openConnection();
+        while(true) {
+            sc.nextLine();
+            comm.sendMsg(CommunicationConstants.ANDROID, anMssg);
+        }
+
+
     }
 
 
