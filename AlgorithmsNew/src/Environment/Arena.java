@@ -25,7 +25,7 @@ public class Arena {
         Initialize the arena setting the grids as :
             1. Type = Free
             2. Accessible = True
-            3. Explored = False
+            3. Explored = setExplore (Function Parameter)
          */
         for (int i = 0; i < ArenaConstants.ARENA_ROWS; i++) {
             for (int j = 0; j < ArenaConstants.ARENA_COLS; j++) {
@@ -41,7 +41,6 @@ public class Arena {
 
         //Add the border to the padding.
         addBorderPadding();
-//        markStartNGoalZoneAsExplored();
     }
 
     public void checkCellModifyAcc(int i, int j) {

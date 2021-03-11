@@ -56,9 +56,38 @@ public class testsComm {
             sc.nextLine();
             comm.sendMsg(CommunicationConstants.ANDROID, anMssg);
         }
-
-
     }
 
+    public void testExploration(){
 
+        int[] result = new int[6];
+        Communication comm = Communication.getCommunication();
+        comm.openConnection();
+
+        Scanner sc = new Scanner(System.in);
+
+        while(true){
+            String inp = sc.nextLine();
+            comm.sendMsg(CommunicationConstants.ARDUINO, inp);
+            String msg = comm.recvMsg();
+            String[] msgArr = msg.split(";");
+
+            result[0] = (int)Double.parseDouble(msgArr[0]);  //FL
+            result[1] = (int)Double.parseDouble(msgArr[1]);  //FC
+            result[2] = (int)Double.parseDouble(msgArr[2]);  //FR
+            result[3] = (int)Double.parseDouble(msgArr[3]);  //LC  This is  because of the order of the sensor reading sent
+            result[4] = (int)Double.parseDouble(msgArr[4]);  //LL
+            result[5] = (int)Double.parseDouble(msgArr[5]);  //RR
+
+            // LOGGING
+            System.out.println("Received Sensor Readings: ");
+            System.out.print("Front Left:" + result[0]);
+            System.out.print("; Front Center:" + result[1]);
+            System.out.print("; Front Right:" + result[2]);
+            System.out.print("; Left Center:" + result[3]);
+            System.out.print("; Left Left:" + result[4]);
+            System.out.print("; Right Right:" + result[5]);
+            System.out.println();
+        }
+    }
 }

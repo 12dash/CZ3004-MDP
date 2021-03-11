@@ -94,13 +94,14 @@ public class ExplorationAlgo {
         endTime = startTime + (timeLimit * 1000);
 
         if(!simulate) {
+            // Sends command to android to start exploration: E
             Communication.getCommunication().sendMsg(CommunicationConstants.ARDUINO, CommunicationConstants.START_EPLORATION);
         }
         senseAndRepaint(this.simulate);
         areaExplored = calculateAreaExplored();
         System.out.println("Explored Area: " + areaExplored);
 
-//        explorationLoop(exploredMap.robotReal.getRobotPosRow(), exploredMap.robotReal.getRobotPosCol());
+        explorationLoop(exploredMap.robotReal.getRobotPosRow(), exploredMap.robotReal.getRobotPosCol());
     }
 
     /**
@@ -147,7 +148,6 @@ public class ExplorationAlgo {
             moveBot(MOVEMENT.LEFT_TURN);
             if (lookForward()) moveBot(MOVEMENT.FORWARD);
         } else {
-
             moveBot(MOVEMENT.TURN_AROUND);
         }
     }
@@ -375,18 +375,28 @@ public class ExplorationAlgo {
         int row = exploredMap.robotReal.getRobotPosRow();
         int col = exploredMap.robotReal.getRobotPosCol();
 
+        int  calibrationBlockInFront = 0;
         switch (botDir) {
             case North:
-                return exploredMap.arena.getIsObstacleOrWall(row - 2, col - 1) && exploredMap.arena.getIsObstacleOrWall(row - 2, col) && exploredMap.arena.getIsObstacleOrWall(row - 2, col + 1);
+                if(exploredMap.arena.getIsObstacleOrWall(row - 2, col - 1)) calibrationBlockInFront++ ;
+                if(exploredMap.arena.getIsObstacleOrWall(row - 2, col)) calibrationBlockInFront++ ;
+                if(exploredMap.arena.getIsObstacleOrWall(row - 2, col + 1)) calibrationBlockInFront++ ;
             case East:
-                return exploredMap.arena.getIsObstacleOrWall(row + 1, col + 2) && exploredMap.arena.getIsObstacleOrWall(row, col + 2) && exploredMap.arena.getIsObstacleOrWall(row - 1, col + 2);
+
+                if (exploredMap.arena.getIsObstacleOrWall(row + 1, col + 2)) calibrationBlockInFront++;
+                if (exploredMap.arena.getIsObstacleOrWall(row, col + 2)) calibrationBlockInFront++;
+                if (exploredMap.arena.getIsObstacleOrWall(row - 1, col + 2)) calibrationBlockInFront++;
             case South:
-                return exploredMap.arena.getIsObstacleOrWall(row + 2, col - 1) && exploredMap.arena.getIsObstacleOrWall(row + 2, col) && exploredMap.arena.getIsObstacleOrWall(row + 2, col + 1);
+                if (exploredMap.arena.getIsObstacleOrWall(row + 2, col - 1)) calibrationBlockInFront++;
+                if (exploredMap.arena.getIsObstacleOrWall(row + 2, col)) calibrationBlockInFront++;
+                if (exploredMap.arena.getIsObstacleOrWall(row + 2, col + 1)) calibrationBlockInFront++;
             case West:
-                return exploredMap.arena.getIsObstacleOrWall(row + 1, col - 2) && exploredMap.arena.getIsObstacleOrWall(row, col - 2) && exploredMap.arena.getIsObstacleOrWall(row - 1, col - 2);
+                if (exploredMap.arena.getIsObstacleOrWall(row + 1, col - 2)) calibrationBlockInFront++;
+                if (exploredMap.arena.getIsObstacleOrWall(row, col - 2)) calibrationBlockInFront++;
+                if (exploredMap.arena.getIsObstacleOrWall(row - 1, col - 2)) calibrationBlockInFront++;
         }
 
-        return false;
+        return calibrationBlockInFront >= 2;
     }
 
     /**
