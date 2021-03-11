@@ -23,7 +23,7 @@ public class Main {
 
 
     public static void main(String[] args) {
-        map = new Map(new Arena(), false);
+        map = new Map(new Arena(true), false);
 
         String map_file = INPUT_MAP_FILE;
         String[] p_string = FileManager.readFile(map_file);

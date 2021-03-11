@@ -122,7 +122,7 @@ public class AStar {
          */
         int x = node.grid.getX();
         int y = node.grid.getY();
-        return (x >= ArenaConstants.GOAL_COL-1) && (y <= ArenaConstants.GOAL_ROW+1);
+        return (x >= ArenaConstants.GOAL_COL) && (y <= ArenaConstants.GOAL_ROW);
     }
 
     private void getSolution() {

@@ -6,6 +6,7 @@
     android:layout_height="match_parent"
     tools:context=".BluetoothActivity"
     android:orientation="vertical"
+    android:background="#99D9EA"
     android:padding="15dp">
 
     <LinearLayout
@@ -57,6 +58,7 @@
         android:layout_width="match_parent"
         android:layout_height="300dp"
         tools:listitem="@layout/device_adapter_view"
+        android:layout_marginBottom="30dp"
     />
 
     <include layout="@layout/chatbox" />

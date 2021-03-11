@@ -5,7 +5,7 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 
 
-public class Communication extends Thread{
+public class Communication{
 
     private static Communication Communication = null;
     private static Socket conn = null;
