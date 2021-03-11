@@ -37,7 +37,7 @@ class AndroidBluetoothServer:
               if client_info[0] == OUR_MAC_ADR:
                 break
               else:
-                print("Wrong BT shit connected")
+                print("Wrong BT connected")
                 self.stop_connection()
 
         except Exception as error:
