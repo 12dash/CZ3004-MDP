@@ -26,7 +26,7 @@ public class ActualSimulatorFastestPath {
     //          SET THESE VALUES
     //#############################################
 
-    private static String INPUT_MAP_FILE = "example_1.txt";
+    private static String INPUT_MAP_FILE = "example_4.txt";
     private static int wayP_x = 12;   // Default Waypoint
     private static int wayP_y = 12;   // Default Waypoint
 
@@ -56,7 +56,6 @@ public class ActualSimulatorFastestPath {
                     if (msgArr[1].equals(CommunicationConstants.FASTEST_PATH)) {
                         fastestPath();
                     }
-
                 }
             }
             else{

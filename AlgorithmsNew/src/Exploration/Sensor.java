@@ -43,11 +43,11 @@ public class Sensor {
     public int sense(Map exploredMap, Map realMap) {
         switch (sensorDir) {
             case North:
-                return getSensorVal(exploredMap, realMap, 1, 0);
+                return getSensorVal(exploredMap, realMap, -1, 0);
             case East:
                 return getSensorVal(exploredMap, realMap, 0, 1);
             case South:
-                return getSensorVal(exploredMap, realMap, -1, 0);
+                return getSensorVal(exploredMap, realMap, 1, 0);
             case West:
                 return getSensorVal(exploredMap, realMap, 0, -1);
         }
@@ -59,33 +59,32 @@ public class Sensor {
      * -1 if no obstacle is detected.
      */
     private int getSensorVal(Map exploredMap, Map realMap, int rowInc, int colInc) {
-//        // Check if starting point is valid for sensors with lowerRange > 1.
-//        if (lowerRange > 1) {
-//            for (int i = 1; i < this.lowerRange; i++) {
-//                int row = this.sensorPosRow + (rowInc * i);
-//                int col = this.sensorPosCol + (colInc * i);
-//
-//                if (!exploredMap.checkValidCoordinates(row, col)) return i;
-//                if (realMap.getCell(row, col).getIsObstacle()) return i;
-//            }
-//        }
-//
-//        // Check if anything is detected by the sensor and return that value.
-//        for (int i = this.lowerRange; i <= this.upperRange; i++) {
-//            int row = this.sensorPosRow + (rowInc * i);
-//            int col = this.sensorPosCol + (colInc * i);
-//
-//            if (!exploredMap.checkValidCoordinates(row, col)) return i;
-//
-//            exploredMap.getCell(row, col).setIsExplored(true);
-//
-//            if (realMap.getCell(row, col).getIsObstacle()) {
-//                exploredMap.setObstacleCell(row, col, true);
-//                return i;
-//            }
-//        }
-//
-//        // Else, return -1.
+        // Check if starting point is valid for sensors with lowerRange > 1.
+        if (lowerRange > 1) {
+            for (int i = 1; i < this.lowerRange; i++) {
+                int row = this.sensorPosRow + (rowInc * i);
+                int col = this.sensorPosCol + (colInc * i);
+
+                if (!exploredMap.arena.areValidCoordinates(row, col)) return i;
+                if (realMap.arena.getGrid(row, col).isObstacle()) return i;
+            }
+        }
+
+        // Check if anything is detected by the sensor and return that value.
+        for (int i = 1; i <= this.upperRange; i++) {
+            int row = this.sensorPosRow + (rowInc * i);
+            int col = this.sensorPosCol + (colInc * i);
+
+            if (!exploredMap.arena.areValidCoordinates(row, col)) return i;
+            exploredMap.arena.setGridExplored(row, col, true);
+
+            if (realMap.arena.getGrid(row, col).isObstacle()) {
+                exploredMap.arena.setObstacleCell(row, col, true);
+                return i;
+            }
+        }
+
+        // Else, return -1.
         return -1;
     }
 
@@ -93,6 +92,9 @@ public class Sensor {
      * Uses the sensor Orientation and given value from the actual sensor to update the map.
      */
     public void senseReal(Map exploredMap, int sensorVal) {
+        String debug = String.format("%s:%s", this.id, this.sensorDir);
+        System.out.println(debug);
+
         switch (this.sensorDir) {
             case North:
                 processSensorVal(exploredMap, sensorVal, -1, 0);
@@ -125,7 +127,7 @@ public class Sensor {
         }
 
         // Update map according to sensor's value.
-        for (int i = this.lowerRange; i <= this.upperRange; i++) {
+        for (int i = 1; i <= this.upperRange; i++) {
             int row = this.sensorPosRow + (rowInc * i);
             int col = this.sensorPosCol + (colInc * i);
 

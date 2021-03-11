@@ -1,16 +1,33 @@
 package Exploration;
 
+import Algo.AStar;
+import Algo.Exploration;
+import Algo.ExplorationUtility;
+import Algo.InnerExploration;
+import Environment.Arena;
 import Environment.ArenaConstants;
 import Environment.Grid;
+import Robot.Robot;
+import Robot.RobotConstants;
 import Values.Orientation;
 import Simulator.Map;
 import Communication.Communication;
 import Communication.CommunicationConstants;
 import Robot.RobotConstants.MOVEMENT;
+import Robot.RobotReal;
+import Exploration.IslandExploration;
+
+import javax.naming.CommunicationException;
+import java.util.ArrayList;
+import java.util.ConcurrentModificationException;
+import java.util.concurrent.TimeUnit;
 
 
 public class ExplorationAlgo {
     private final Map exploredMap;
+    private final Map realMap;
+    private final boolean simulate;
+
     private final int timeLimit;
     private final int coverageLimit;
     private int areaExplored;
@@ -25,35 +42,47 @@ public class ExplorationAlgo {
         this.timeLimit = timeLimit;
         this.coverageLimit = coverageLimit;
         this.comm = comm;
+        this.simulate = false;
+        this.realMap = null;
+    }
+
+    public ExplorationAlgo(Map exploredMap, Map realMap, int timeLimit, int coverageLimit){
+        this.exploredMap = exploredMap;
+        this.timeLimit = timeLimit;
+        this.coverageLimit = coverageLimit;
+        this.realMap = realMap;
+        this.simulate = true;
     }
 
     /**
      * Main method that is called to start the exploration.
      */
 
-    public static void initialCalibration(Map exploredMap){
+    public void initialCalibration(Map exploredMap){
         System.out.println("Starting calibration...");
         //comm.getCommunication().recvMsg(); //TODO: DOES ARDUINO SEND A MESSAGE BEFORE STARTING TO ASK FOR COMMANDS FOR CALIBRATION
         // INITIAL CALIBRATION: Right_Turn -> Calibrate -> Right_Turn -> Calibrate -> Left_Turn -> Calibrate -> Lef_Turn
 
-        exploredMap.robotReal.move(MOVEMENT.RIGHT_TURN, false);
-        Communication.getCommunication().recvMsg(); // Receive Acknowledgement
-        exploredMap.robotReal.move(MOVEMENT.CALIBRATE, false);
-        Communication.getCommunication().recvMsg(); // Receive Acknowledgement
-        exploredMap.robotReal.move(MOVEMENT.RIGHT_TURN, false);
-        Communication.getCommunication().recvMsg(); // Receive Acknowledgement
-        exploredMap.robotReal.move(MOVEMENT.CALIBRATE, false);
-        Communication.getCommunication().recvMsg(); // Receive Acknowledgement
-        exploredMap.robotReal.move(MOVEMENT.LEFT_TURN, false);
-        Communication.getCommunication().recvMsg(); // Receive Acknowledgement
-        exploredMap.robotReal.move(MOVEMENT.CALIBRATE, false);
-        Communication.getCommunication().recvMsg(); // Receive Acknowledgement
-        exploredMap.robotReal.move(MOVEMENT.LEFT_TURN, false);
+//        comm.sendMsg(CommunicationConstants.ARDUINO, CommunicationConstants.INITIAL_CALIBRATION);
+
+//        exploredMap.robotReal.move(MOVEMENT.RIGHT_TURN, false);
+//        Communication.getCommunication().recvMsg(); // Receive Acknowledgement
+//        exploredMap.robotReal.move(MOVEMENT.CALIBRATE, false);
+//        Communication.getCommunication().recvMsg(); // Receive Acknowledgement
+//        exploredMap.robotReal.move(MOVEMENT.RIGHT_TURN, false);
+//        Communication.getCommunication().recvMsg(); // Receive Acknowledgement
+//        exploredMap.robotReal.move(MOVEMENT.CALIBRATE, false);
+//        Communication.getCommunication().recvMsg(); // Receive Acknowledgement
+//        exploredMap.robotReal.move(MOVEMENT.LEFT_TURN, false);
+//        Communication.getCommunication().recvMsg(); // Receive Acknowledgement
+//        exploredMap.robotReal.move(MOVEMENT.CALIBRATE, false);
+//        Communication.getCommunication().recvMsg(); // Receive Acknowledgement
+//        exploredMap.robotReal.move(MOVEMENT.LEFT_TURN, false);
 
     }
 
 
-    public void runExploration() {
+    public void runExploration() throws InterruptedException {
 
         // ##########################################
         //         START EXPLORATION
@@ -64,10 +93,10 @@ public class ExplorationAlgo {
         startTime = System.currentTimeMillis();
         endTime = startTime + (timeLimit * 1000);
 
-
-//        Communication.getCommunication().sendMsg(null, Communication.BOT_START);  TODO: DO WE NEED THIS? SEDING A MESSAGE TO ARDUINO TO START EXPLORATION
-
-        senseAndRepaint();
+        if(!simulate) {
+            Communication.getCommunication().sendMsg(null, CommunicationConstants.START_EPLORATION);
+        }
+        senseAndRepaint(this.simulate);
         areaExplored = calculateAreaExplored();
         System.out.println("Explored Area: " + areaExplored);
 
@@ -80,20 +109,27 @@ public class ExplorationAlgo {
      * 2. areaExplored > coverageLimit
      * 3. System.currentTimeMillis() > endTime
      */
-    private void explorationLoop(int r, int c) {
+    private void explorationLoop(int r, int c) throws InterruptedException {
         do {
             nextMove();
             areaExplored = calculateAreaExplored();
             System.out.println("Area explored: " + areaExplored);
 
             if (exploredMap.robotReal.getRobotPosRow() == r && exploredMap.robotReal.getRobotPosCol() == c) {
-                if (areaExplored >= 100) {
-                    break;
-                }
+                break; // TODO: Breaks after reaching home
+//                if (areaExplored >= coverageLimit) {
+//                    break;
+//                }
             }
+            TimeUnit.MILLISECONDS.sleep(RobotConstants.SPEED);
         } while (areaExplored <= coverageLimit && System.currentTimeMillis() <= endTime);
 
-        goHome();
+
+
+        System.out.println("Completed loop");
+        if (exploredMap.robotReal.getRobotPosRow() != r || exploredMap.robotReal.getRobotPosCol() != c) {
+            goHome();
+        }
     }
 
     /**
@@ -109,6 +145,7 @@ public class ExplorationAlgo {
             moveBot(MOVEMENT.LEFT_TURN);
             if (lookForward()) moveBot(MOVEMENT.FORWARD);
         } else {
+
             moveBot(MOVEMENT.TURN_AROUND);
         }
     }
@@ -204,31 +241,37 @@ public class ExplorationAlgo {
      * Returns the robot to START after exploration and points the bot northwards.
      */
 
-    // TODO: Right code for go to home
+    // TODO: Right code for go to home; Tell arduino to have a flag for go home, after this will give the whole string, and just go to home
+    // Will append the path after that Eg-> GH:0LR2R
+
     private void goHome() {
-        if (!exploredMap.robotReal.getTouchedGoal() && coverageLimit == ArenaConstants.MAX_COVERAGE && timeLimit == ArenaConstants.MAX_TIME_LIMIT) {
+
+        Grid robotCurGrid = exploredMap.arena.getGrid(exploredMap.robotReal.getRobotPosRow(), exploredMap.robotReal.getRobotPosCol());
+        Grid homeGrid = exploredMap.arena.getGrid(ArenaConstants.START_ROW, ArenaConstants.START_COL);
+
+        // TODO: Implement got to goal state if haven't
+//        if (!exploredMap.robotReal.getTouchedGoal() && coverageLimit == ArenaConstants.MAX_COVERAGE && timeLimit == ArenaConstants.MAX_TIME_LIMIT) {
 //            FastestPathAlgo goToGoal = new FastestPathAlgo(exploredMap, bot, realMap);
 //            goToGoal.runFastestPath(RobotConstants.GOAL_ROW, RobotConstants.GOAL_COL);
-        }
-//
-//        FastestPathAlgo returnToStart = new FastestPathAlgo(exploredMap, bot, realMap);
-//        returnToStart.runFastestPath(RobotConstants.START_ROW, RobotConstants.START_COL);
-//
+//        }
+
+        AStar astar = new AStar();
+        astar.startSearch(exploredMap.arena, robotCurGrid, homeGrid, false);
+        exploredMap.robotReal.setPath(astar.solution);
+        String commandString = exploredMap.robotReal.generateMovementCommands(exploredMap.robotReal.getOrientation());
+        commandString = CommunicationConstants.GO_HOME + ":" + commandString;      // TODO: Finalise on this protocol
+        comm.sendMsg(CommunicationConstants.ARDUINO, commandString);
+
+        //TODO: Do we need to calibrate after reaching home?
+        turnBotDirection(Orientation.East);
+        comm.sendMsg(CommunicationConstants.ARDUINO, CommunicationConstants.INITIAL_CALIBRATION);
+
 //        System.out.println("Exploration complete!");
 //        areaExplored = calculateAreaExplored();
 //        System.out.printf("%.2f%% Coverage", (areaExplored / 300.0) * 100.0);
 //        System.out.println(", " + areaExplored + " Cells");
 //        System.out.println((System.currentTimeMillis() - startTime) / 1000 + " Seconds");
-//
-//        if (bot.getRealBot()) {
-//            turnBotDirection(DIRECTION.WEST);
-//            moveBot(MOVEMENT.CALIBRATE);
-//            turnBotDirection(DIRECTION.SOUTH);
-//            moveBot(MOVEMENT.CALIBRATE);
-//            turnBotDirection(DIRECTION.WEST);
-//            moveBot(MOVEMENT.CALIBRATE);
-//        }
-//        turnBotDirection(DIRECTION.NORTH);
+
     }
 
     /**
@@ -272,15 +315,20 @@ public class ExplorationAlgo {
      * Moves the bot, repaints the map and calls senseAndRepaint().
      */
     private void moveBot(MOVEMENT m) {
-        if(m.equals(MOVEMENT.CALIBRATE)){
+        if(m.equals(MOVEMENT.CALIBRATE) && !simulate){
             exploredMap.robotReal.move(m, false);
             comm.recvMsg();
             exploredMap.repaint();
         }
         else{
-            exploredMap.robotReal.move(m);
+            if(!simulate) {
+                exploredMap.robotReal.move(m);
+            }
+            else{
+                exploredMap.robotReal.moveSimulate(m);
+            }
             exploredMap.repaint();
-            senseAndRepaint();
+            senseAndRepaint(simulate);
         }
 
         if (!calibrationMode) {
@@ -307,9 +355,14 @@ public class ExplorationAlgo {
     /**
      * Sets the bot's sensors, processes the sensor data and repaints the map.
      */
-    private void senseAndRepaint() {
+    private void senseAndRepaint(boolean simulate) {
         exploredMap.robotReal.setSensors();
-        exploredMap.robotReal.senseMap(exploredMap);
+        if(simulate){
+            exploredMap.robotReal.senseSimulate(exploredMap, realMap);
+        }
+        else {
+            exploredMap.robotReal.senseMap(exploredMap);
+        }
         exploredMap.repaint();
     }
 
@@ -382,4 +435,23 @@ public class ExplorationAlgo {
             moveBot(MOVEMENT.TURN_AROUND);
         }
     }
+
+
+    private void exploreIslands(){
+
+        Grid curGrid = exploredMap.arena.getGrid(exploredMap.robotReal.getRobotPosRow(), exploredMap.robotReal.getRobotPosCol());
+        RobotReal tempRobot = new RobotReal(curGrid);
+
+        IslandExploration islandExploration = new IslandExploration(exploredMap.arena, tempRobot);
+        while ((islandExploration.percentExplored < ArenaConstants.MAX_COVERAGE_PERCENTAGE) && (System.currentTimeMillis() < endTime)) {
+            exploredMap.robotReal.setPath(islandExploration.getPathtoNearestUnexplored());
+            islandExploration.percentExplored = ExplorationUtility.percentExplore(exploredMap.arena);
+            String commandString = exploredMap.robotReal.generateMovementCommands(exploredMap.robotReal.getOrientation());
+            if (exploredMap.robotReal.getRobotPosRow() != ArenaConstants.START_ROW || exploredMap.robotReal.getRobotPosCol() != ArenaConstants.START_COL) {
+                break;
+            }
+        }
+        goHome();
+    }
+
 }

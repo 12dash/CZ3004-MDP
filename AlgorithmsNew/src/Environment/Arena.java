@@ -30,13 +30,18 @@ public class Arena {
         for (int i = 0; i < ArenaConstants.ARENA_ROWS; i++) {
             for (int j = 0; j < ArenaConstants.ARENA_COLS; j++) {
                 //Grids(Type type, boolean acc, int x , int y)
-                this.grids[i][j] = new Grid(Type.FREE, true, j, i, setExplored);
+                if(inStartZone(i,j) || inGoalZone(i, j)){
+                    this.grids[i][j] = new Grid(Type.FREE, true, j, i, true);
+                }
+                else {
+                    this.grids[i][j] = new Grid(Type.FREE, true, j, i, setExplored);
+                }
             }
         }
 
         //Add the border to the padding.
         addBorderPadding();
-        markStartNGoalZoneAsExplored();
+//        markStartNGoalZoneAsExplored();
     }
 
     public void checkCellModifyAcc(int i, int j) {
@@ -48,24 +53,24 @@ public class Arena {
         }
     }
 
-    public void markStartNGoalZoneAsExplored(){
-
-        //Start Zone
-        for (int r = ArenaConstants.ARENA_ROWS-1; r >= ArenaConstants.ARENA_ROWS - 3; r-- ) { // from rows 17 to 19
-            for (int c  = 0; c <=2; c ++){
-                this.grids[r][c].isExplored();
-            }
-        }
-
-        //Goal Zone
-        for (int r = 0; r <=2; r ++){
-            for (int c = ArenaConstants.ARENA_COLS-3; c <=ArenaConstants.ARENA_COLS-1; c++){
-                this.grids[r][c].isExplored();
-            }
-        }
-
-
-    }
+//    public void markStartNGoalZoneAsExplored(){
+//
+//        //Start Zone
+//        for (int r = ArenaConstants.ARENA_ROWS-1; r >= ArenaConstants.ARENA_ROWS - 3; r-- ) { // from rows 17 to 19
+//            for (int c  = 0; c <=2; c ++){
+//                this.grids[r][c].isExplored();
+//            }
+//        }
+//
+//        //Goal Zone
+//        for (int r = 0; r <=2; r ++){
+//            for (int c = ArenaConstants.ARENA_COLS-3; c <=ArenaConstants.ARENA_COLS-1; c++){
+//                this.grids[r][c].isExplored();
+//            }
+//        }
+//
+//
+//    }
 
 
     public void addNeighbourPadding(int i, int j) {

@@ -26,6 +26,7 @@ public class ActualSimulatorExploration {
     public static Map map;   // real arena
     private static final Communication comm = Communication.getCommunication();
 
+    private static String INPUT_MAP_FILE = "example_3.txt";
 
     //#############################################
     //          SET THESE VALUES
@@ -33,30 +34,40 @@ public class ActualSimulatorExploration {
 
     private static int timeLimit = ArenaConstants.MAX_TIME_LIMIT;
     private static int coverage = ArenaConstants.MAX_COVERAGE;
+    private static boolean simulate = true;
 
     //#############################################
     //
     //#############################################
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
 
         map = new Map(new Arena(false), false, true);
         displayAll();
-        comm.openConnection();
+        if(!simulate) {
+            comm.openConnection();
 
-        ExplorationAlgo.initialCalibration(map);
 
-        while (true) {
+            while (true) {
 
-            String msg = comm.recvMsg();
-            String[] msgArr = msg.split(":");
+                String msg = comm.recvMsg();
+                String[] msgArr = msg.split(":");
 
-           if (msgArr[0].equals(CommunicationConstants.START)) {
-               if(msgArr[1].equals(CommunicationConstants.EXPLORATION)) {
-                    ExplorationAlgo explorationTask = new ExplorationAlgo(map, timeLimit, coverage, comm);
-                    explorationTask.runExploration();
+                if (msgArr[0].equals(CommunicationConstants.START)) {
+                    if (msgArr[1].equals(CommunicationConstants.EXPLORATION)) {
+                        ExplorationAlgo explorationTask = new ExplorationAlgo(map, timeLimit, coverage, comm);
+                        explorationTask.initialCalibration(map);
+                        explorationTask.runExploration();
+                    }
                 }
             }
+        }
+        else{
+            Map realMap = new Map(new Arena(true), true, true);
+            loadMap(realMap);
+            ExplorationAlgo explorationTask = new ExplorationAlgo(map, realMap, timeLimit, coverage);
+            explorationTask.runExploration();
+
         }
     }
 
@@ -82,6 +93,14 @@ public class ActualSimulatorExploration {
         cl.show(_mapCards, "MAP");
     }
 
+
+    private static void loadMap(Map map){
+        String[] p_string = FileManager.readFile(INPUT_MAP_FILE);
+        int[][] obs = MapDescriptor.getMap(p_string[0], p_string[1]);
+        map.arena.make_arena(obs);
+        map.arena.setExplored();
+        map.repaint();
+    }
 
 
 }
