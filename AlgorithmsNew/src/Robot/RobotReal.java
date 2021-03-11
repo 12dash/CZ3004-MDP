@@ -450,7 +450,7 @@ public class RobotReal extends Robot{
             RightRightSR.senseReal(explorationMap, result[5]+1);
 
             String[] p1p2 =  MapDescriptor.generateMapDescriptor(explorationMap.arena);  // This ret
-            String anMssg = "{p1:" + p1p2[0] + ",p2:" + p1p2[1] +"}";
+            String anMssg = "{p1:\"" + p1p2[0] + "\",p2:\"" + p1p2[1] + "\"}";
             comm.sendMsg(CommunicationConstants.ANDROID, anMssg);
         return result;
     }

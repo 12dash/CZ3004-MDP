@@ -1,0 +1,256 @@
+#include <ZSharpIR.h>
+#include <RunningMedian.h>
+
+ZSharpIR SFL_S = ZSharpIR(A0, 1080);
+ZSharpIR SR1_S = ZSharpIR(A1, 1080);
+ZSharpIR SR2_S = ZSharpIR(A2, 1080);
+ZSharpIR SFR_S = ZSharpIR(A4, 1080);
+ZSharpIR SL_S = ZSharpIR(A3, 20150);
+ZSharpIR SFM_S= ZSharpIR(A5,1080);
+
+int medno=11;
+
+double SFM_R2()
+{
+  RunningMedian med = RunningMedian(medno);
+  for(int i = 0;i<medno;i++)
+    {
+        med.add(SFM_S.distance());
+    }
+  double ar = med.getMedian();
+  return (ar/10)-2;
+}
+
+double SL_R2()
+{
+  RunningMedian med = RunningMedian(medno);
+  for(int i = 0;i<medno;i++)
+    {
+        med.add(SL_S.distance());
+    }
+  double ar = med.getMedian();
+  return (ar/10)-10;
+}
+
+double SR2_R2()
+{
+  RunningMedian med = RunningMedian(medno);
+  for(int i = 0;i<medno;i++)
+    {
+        med.add(SR2_S.distance());
+    }
+  double ar = med.getMedian();
+  return (ar/10)-5;
+}
+
+double SR1_R2()
+{
+  RunningMedian med = RunningMedian(medno);
+  for(int i = 0;i<medno;i++)
+    {
+        med.add(SR1_S.distance());
+    }
+  double ar = med.getMedian();
+  return (ar/10)-5;
+}
+
+double SFL_R2()
+{
+  RunningMedian med = RunningMedian(medno);
+  for(int i = 0;i<medno;i++)
+    {
+        med.add(SFL_S.distance());
+    }
+  double ar = med.getMedian();
+  return (ar/10)-4;
+}
+
+double SFR_R2()
+{
+  RunningMedian med = RunningMedian(medno);
+  for(int i = 0;i<medno;i++)
+    {
+        med.add(SFR_S.distance());
+    }
+  double ar = med.getMedian();
+  return (ar/10)-4.2;
+}
+
+int SFL_IR() {
+ double ans;
+     ans=SFL_R2();
+  
+    if (ans > 0 && ans <= 10){
+      ans=1;
+    } 
+    else if (ans > 10 && ans <= 18){
+      ans=2;
+    } 
+    else{
+      ans=-1;
+    }
+  return ans;
+}
+
+
+int SFR_IR() {
+ double ans;
+     ans=SFR_R2();
+
+    
+  
+    if (ans > 0 && ans <= 9){
+      ans=1;
+    } 
+    else if (ans > 9 && ans <= 18){
+      ans=2;
+    } 
+    else{
+      ans=-1;
+    }
+  return ans;
+
+}
+int SFM_IR() {
+ double ans;
+     ans=SFM_R2();
+
+    
+  
+    if (ans > 0 && ans <= 10){
+      ans=1;
+    } 
+    else if (ans > 10 && ans <= 20){
+      ans=2;
+    } 
+    else{
+      ans=-1;
+    }
+  return ans;
+}
+
+int SR1_IR() {
+ double ans;
+     ans=SR1_R2();
+    
+  
+    if (ans > 0 && ans <= 11.3){
+      ans=1;
+    } 
+    else if (ans > 11.3 && ans <= 18.5){
+      ans=2;
+    } 
+    else{
+      ans=-1;
+    }
+  return ans;
+}
+int SR2_IR() {
+ double ans;
+    ans=SR2_R2();
+  
+    if (ans > 0 && ans <= 9.5){
+      ans=1;
+    } 
+    else if (ans > 9.5 && ans <= 16.5){
+      ans=2;
+    } 
+    else{
+      ans=-1;
+    }
+  return ans;
+}
+
+int SL_IR() {
+ double ans;
+    ans=SL_R2();
+  
+    if (ans > 0 && ans <= 11.55){
+      ans=1;
+    } 
+    else if (ans > 11.55 && ans <= 20.25){
+      ans=2;
+    } 
+else if (ans > 20.25 && ans <= 32.4){
+      ans=3;
+    } 
+    else if (ans > 32.4 && ans< 42){
+      ans=4;
+    } 
+    else if (ans >= 42 && ans<=54){
+      ans=5;
+    } 
+    else{
+      ans=-1;
+    }
+  return ans;
+}
+
+
+void caliFront() {
+
+  double distL = SFL_R2();
+  double distR = SFR_R2();
+  double diff = distL-distR;
+  //Serial.print(diff);
+    //while ((( diff>=0.1 && diff<=5.8 ) || (diff<=-0.05 && diff>=-5.4)) && (distL<10 && distL<10))
+    while ((diff>=-5.4 && diff<=5.8) && (distL<10 && distL<10))
+    {
+      if (diff <=-0.05)
+      {
+        moveL45(0.000001);
+        //delay(30);
+      }
+      else if (diff >= 0.1)
+      {
+        moveR45(0.000001);
+        //delay(30);
+      }
+      
+      diff = SFL_R2()-SFR_R2();
+      
+      if (diff<=0.1 && diff>=-0.05)
+        break;
+    }
+while(SFR_R2()<=4.6)
+   {
+      moveB(0.000001)
+      if(SFL_R2()>10)
+      {
+        //delay(5);
+        break;
+      }
+    }
+    while(SFL_R2()<=4.6)
+    {
+      moveB(0.000001);
+      //delay(10);
+      if(SFR_R2()>10)
+      {
+        //delay(5);
+        break;
+      }
+    }
+    while(((SFL_R2()>4.6)&&(SFR_R2()>4.6)) && ((SFR_R2()<10)&&(SFL_R2()<10))) 
+    {
+      moveF(0.000001);
+      //delay(5);
+    }
+}
+
+void caliRight()
+{
+  delay(10);
+  if(SR1_R2()<10 && SR2_R2()<10)
+  {while(1)
+  {
+      double d = SR1_R2()-SR2_R2();
+      if(d<=0.1 && d>= -0.1)
+        break;
+      if(d< -0.1 )
+        moveL45(0.0000001);
+      else 
+        moveR45(0.0000001);
+      
+  }}
+}

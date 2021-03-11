@@ -34,7 +34,7 @@ public class ActualSimulatorExploration {
 
     private static int timeLimit = ArenaConstants.MAX_TIME_LIMIT;
     private static int coverage = ArenaConstants.MAX_COVERAGE;
-    private static boolean simulate = true;
+    private static boolean simulate = false;
 
     //#############################################
     //
