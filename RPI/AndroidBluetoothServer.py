@@ -5,6 +5,8 @@ from config import *
 Connection between RPI and Android via rfcomm
 """
 
+OUR_MAC_ADR = "CC:46:4E:E1:D1:6D"
+
 class AndroidBluetoothServer:
     def __init__(self):
         self.server_sock = None
@@ -14,22 +16,29 @@ class AndroidBluetoothServer:
 
     def start_connection(self):
         try:
-            self.server_sock = BluetoothSocket(RFCOMM)
-            #port must indicate what port RPI is in.
-            self.server_sock.bind(("",RFCOMM_CHNL))
-            self.server_sock.listen(3)
-            port = self.server_sock.getsockname()[1]
+            while True:
+              self.server_sock = BluetoothSocket(RFCOMM)
+              #port must indicate what port RPI is in.
+              self.server_sock.bind(("",RFCOMM_CHNL))
+              self.server_sock.listen(3)
+              port = self.server_sock.getsockname()[1]
 
-            advertise_service( self.server_sock, "RPI Bluetooth Server",
-             service_id = UUID,
-             service_classes = [ UUID, SERIAL_PORT_CLASS ],
-             profiles = [ SERIAL_PORT_PROFILE ],
-              )
+              advertise_service( self.server_sock, "RPI Bluetooth Server",
+              service_id = UUID,
+              service_classes = [ UUID, SERIAL_PORT_CLASS ],
+              profiles = [ SERIAL_PORT_PROFILE ],
+               )
 
-            print("Waiting for connection on RFCOMM channel %d" % port)
-            self.client_sock, client_info = self.server_sock.accept()
-            print("[NEW CONNECTION] Bluetooth connection with Android connected to ", client_info)
-            self.connected = True
+              print("Waiting for connection on RFCOMM channel %d" % port)
+              self.client_sock, client_info = self.server_sock.accept()
+              print("[NEW CONNECTION] Bluetooth connection with Android connected to ", client_info)
+              self.connected = True
+              
+              if client_info[0] == OUR_MAC_ADR:
+                break
+              else:
+                print("Wrong BT shit connected")
+                self.stop_connection()
 
         except Exception as error:
             print("[ERROR] Connection to Andorid failed: " + str(error))
