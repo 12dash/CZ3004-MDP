@@ -110,13 +110,7 @@ public class BluetoothActivity extends AppCompatActivity {
 
             if (action.equals(BluetoothDevice.ACTION_FOUND)) {
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-                if (device.getAddress().startsWith("38:00:25:3C:FB:1C") || device.getAddress().startsWith("B8:27:EB:BA:8D:EE"))
-                {
-                    Toast.makeText(context, "added" + device.getAddress(), Toast.LENGTH_SHORT).show();
-                    btDevices.add(0, device);
-                }
-                else
-                    btDevices.add(device);
+                btDevices.add(device);
                 Log.d(TAG, "Receiver3 : " + device.getName() + ": " + device.getAddress());
                 deviceListAdapter = new DeviceListAdapter(context, R.layout.device_adapter_view, btDevices);
                 lvDevices.setAdapter(deviceListAdapter);

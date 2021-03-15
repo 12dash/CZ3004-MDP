@@ -63,7 +63,6 @@ def detect(path, save_img=False):
     names = model.module.names if hasattr(model, 'module') else model.names
     colors = [[random.randint(0, 255) for _ in range(3)] for _ in names]
 
-
     # Run inference
     if device.type != 'cpu':
         model(torch.zeros(1, 3, imgsz, imgsz).to(device).type_as(next(model.parameters())))  # run once
@@ -80,17 +79,15 @@ def detect(path, save_img=False):
         pred = model(img, augment=False)[0]
 
         # Apply NMS
-        pred = non_max_suppression(pred,0.75, 0.50, classes=None, agnostic=False)
+        pred = non_max_suppression(pred,0.6, 0.50, classes=None, agnostic=False)
+        print("\n\nOriginal : ",(pred))
         t2 = time_synchronized()
 
         if (len(pred[0]>0)) :
-            print("Predictions : ", pred[0][0][-1])
+            print("\n\nPredictions : ", pred[0][0][-1])
             qwe = (int)(pred[0][0][-1])
             qwe = names[qwe]
         
-
-        
-
         sac = print(names)
         # Apply Classifier
         if classify:
