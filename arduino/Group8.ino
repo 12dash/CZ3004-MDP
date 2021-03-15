@@ -5,9 +5,11 @@
  * 
  */
 
+// Isaac's Notes
+// only did getCm for sensor 5/3/6
+// getCmX(current_filter_y) x = sensor number, y = filter number aka port number
 
-// (Reading - 8) / 10
-// Offset 7.1 for now due to tilting
+
 
 
 
@@ -18,6 +20,7 @@
 #include "DualVNH5019MotorShield.h"
 #include <math.h>
 #include <string.h>
+#include <RunningMedian.h>
 /* setting up global variables
  */
 DualVNH5019MotorShield motor;
@@ -30,6 +33,8 @@ double delayconst = 0;
 char arguments;
 char degree;
 double degreeconst = 0;
+bool debug = false;
+int medno = 100;
 
 void setup()
 {
@@ -41,35 +46,34 @@ void setup()
 }
 
 
-void printIRReading() {
 
-  // FL > FC > FR > LC > LL > RR
-  //Serial.print("RR");
-  //Serial.println(getReading1());
+
+void printIRReading1(double cur0, double cur1, double cur2, double cur3, double cur4, double cur5)
+{
+  //Serial.print("Sensor 1 "); // DOne
+  //Serial.println(Sensor1(cur5));
   
-  //Serial.print("FL");
-  //Serial.println(getReading2());
-   
-  //Serial.print("FC");
-  //Serial.println(getReading5());
+  //Serial.print("Sensor 2 "); // Done
+  //Serial.println(Sensor2(cur1)); 
+  
+  //Serial.print("Sensor 4 "); // Recalibrate aka spoilt
+  //Serial.println(Sensor4(cur3));
+  
+  //Serial.print("Sensor 5 "); //Done
+  //Serial.println(Sensor5(cur0));
 
-  //Serial.print("FR");  
-  //Serial.println(getReading3());
+  //Serial.print("Sensor 3 "); // Done
+  //Serial.println(Sensor3(cur2));
+  
+  //Serial.print("Sensor 6 "); // Done
+  //Serial.println(Sensor6(cur4));
 
-  //Serial.print("LC");
-  //Serial.println(getReading4());
-
-  //Serial.print("LL");  
-  //Serial.println(getReading6());
-
-
-  // 2,5,3,4,6,1
-    String stringOne = "pc|" + String(getReading2()) + ';' + String(getReading5()) + ';' + String(getReading3()) + ';' + String(getReading4()) + ';' + String(getReading6()) + ';' + String(getReading1()) + ';' ; 
-   Serial.println(stringOne);
-
-//  Serial.flush();
-//  delay(10);
+  
+  //FL > FC > FR > LC > LL > RR
+  String stringOne = "pc|" + String(Sensor5(cur0)) + ';' + String(Sensor3(cur2)) + ';' + String(Sensor6(cur4)) + ';' + String(Sensor2(cur1)) + ';' + String(Sensor4(cur3)) + ';' + String(Sensor1(cur5)) + ';' ;
+  Serial.println(stringOne);
 }
+
 
 void loopAngle()
 {
@@ -124,10 +128,54 @@ void testcaliFront(){
     Serial.println("Block not detected");  
   }
   delay(500);
-  
-}
+}  
+
+
 void loop()
 {
+    double V0 = analogRead(A0); // Read voltage
+    double V1 = analogRead(A1);
+    double V2 = analogRead(A2);
+    double V3 = analogRead(A3);
+    double V4 = analogRead(A4);
+    double V5 = analogRead(A5); 
+    double oldFiltered0 =-1; double curFiltered0;
+    double oldFiltered1 =-1; double curFiltered1;
+    double oldFiltered2 =-1; double curFiltered2;
+    double oldFiltered3 =-1; double curFiltered3;
+    double oldFiltered4 =-1; double curFiltered4;
+    double oldFiltered5 =-1; double curFiltered5;
+
+    if(oldFiltered0 == -1) // sanity check for t=0
+      oldFiltered0 = V0;
+    curFiltered0 = filter(V0, oldFiltered0); // Exponential filter
+    oldFiltered0 = curFiltered0;
+
+    if(oldFiltered1 == -1) // sanity check for t=0
+      oldFiltered1 = V1;
+    curFiltered1 = filter(V1, oldFiltered1); // Exponential filter
+    oldFiltered1 = curFiltered1;
+
+    if(oldFiltered2 == -1) // sanity check for t=0
+      oldFiltered2 = V2;
+    curFiltered2 = filter(V2, oldFiltered2); // Exponential filter
+    oldFiltered2 = curFiltered2;
+
+    if(oldFiltered3 == -1) // sanity check for t=0
+      oldFiltered3 = V3;
+    curFiltered3 = filter(V3, oldFiltered3); // Exponential filter
+    oldFiltered3 = curFiltered3;
+
+    if(oldFiltered4 == -1) // sanity check for t=0
+      oldFiltered4 = V4;
+    curFiltered4 = filter(V4, oldFiltered4); // Exponential filter
+    oldFiltered4 = curFiltered4;
+
+    if(oldFiltered5 == -1) // sanity check for t=0
+      oldFiltered5 = V5;
+    curFiltered5 = filter(V5, oldFiltered5); // Exponential filter
+    oldFiltered5 = curFiltered5;
+    
    //main code
    //Pre-run calibration
 
@@ -157,7 +205,7 @@ void loop()
 //  delay(3000);
     
    double setdistance [20] = {9.6, 19.1, 29.1, 37.8, 48.1, 58.1, 68.6, 79.2, 89.2, 99.2 //}
-      ,110.8, 121.7, 132.8, 144.1, 155.5, 167.1, 178.8, 190.6, 214.7}; 
+      ,108.8, 118.8, 128.8, 138.8, 148.8, 158.8, 168.8, 178.8, 188.8}; 
    // custom distance for fastest path {9.65, 19.4, 29.4, 38.6, 48.5, 58.5, 69.2, 79.2, 89.6, 99.6} 
    // 10 onwards unchecked
 
@@ -182,24 +230,27 @@ void loop()
       
       if (arguments>= '0' && arguments <= '9' ){
         moveblock = int(arguments - '0');
-        printIRReading();
       }
       
       if (moveblock > -1){
         double movedist = setdistance[moveblock];
         moveF(movedist);
-      }
+        
+        printIRReading1(curFiltered0,curFiltered1,curFiltered2,curFiltered3,curFiltered4,curFiltered5);
+        
+               }
 
         //delay(200);<<<<<<<<<<<<<<<<<
         
       switch(arguments){
-
          // Take in sensor reading from starting position right when exploration starts
-        case 'E': printIRReading();
+        case 'E': 
+                  printIRReading1(curFiltered0,curFiltered1,curFiltered2,curFiltered3,curFiltered4,curFiltered5);
+                  //test123(curFiltered4);
                   break;
          //rotate 180
         case 'I': moveReverse();
-                  printIRReading();
+                  printIRReading1(curFiltered0,curFiltered1,curFiltered2,curFiltered3,curFiltered4,curFiltered5);
                   break; 
                   
         // 1 grid forward       
@@ -218,8 +269,9 @@ void loop()
                   if(SFR_IR()==1 && SFL_IR()==1)
                           caliFront();
                   //delay(10);
-                  printIRReading();
+                  
                 //Serial.println("R");
+                  
                   break;         
 
          case 'H': caliFront();
@@ -250,19 +302,19 @@ void loop()
         // turn 90 left
         case 'L': moveL(); 
                   delay(delayconst);           
-                  printIRReading();
+                  printIRReading1(curFiltered0,curFiltered1,curFiltered2,curFiltered3,curFiltered4,curFiltered5);
                   break;
                   
         // turn 90 right
         case 'R': moveR(); 
                   delay(delayconst); 
-                  printIRReading();
+                  printIRReading1(curFiltered0,curFiltered1,curFiltered2,curFiltered3,curFiltered4,curFiltered5);
                   break;
                   
         // turn 90 right Fastest Path
         case 'U': moveRF(); 
                   delay(delayconst); 
-                  printIRReading();
+                  printIRReading1(curFiltered0,curFiltered1,curFiltered2,curFiltered3,curFiltered4,curFiltered5);
                   break;
 
         // turn degree left
@@ -274,7 +326,7 @@ void loop()
                   degreeconst = ((degreeconst*4.1236)/ 4.68);
                   moveL45F(degreeconst);
                   delay(delayconst);
-                  printIRReading();
+                  printIRReading1(curFiltered0,curFiltered1,curFiltered2,curFiltered3,curFiltered4,curFiltered5);
                   break;
 
          // turn degree right
@@ -286,7 +338,7 @@ void loop()
                   degreeconst = ((degreeconst*4.1548)/ 4.68);
                   moveR45F(degreeconst);
                   delay(delayconst);
-                  printIRReading();
+                  printIRReading1(curFiltered0,curFiltered1,curFiltered2,curFiltered3,curFiltered4,curFiltered5);
                   break;
                   
                   
@@ -295,7 +347,7 @@ void loop()
                   delay(delayconst);
                   caliFront();
                   delay(delayconst);
-                  printIRReading();
+                  printIRReading1(curFiltered0,curFiltered1,curFiltered2,curFiltered3,curFiltered4,curFiltered5);
                   //delay(10);
                   moveL();
                   delay(20);
@@ -315,7 +367,7 @@ void loop()
                   delay(delayconst);
                   caliFront();
                   delay(delayconst);
-                  printIRReading();
+                  printIRReading1(curFiltered0,curFiltered1,curFiltered2,curFiltered3,curFiltered4,curFiltered5);
                   //delay(10);
                   moveR();
                   delay(20);
@@ -329,7 +381,7 @@ void loop()
                           caliFront();
                   else 
                           caliRight();
-                  printIRReading();
+                  printIRReading1(curFiltered0,curFiltered1,curFiltered2,curFiltered3,curFiltered4,curFiltered5);
                   break; 
         
         // end exploration calibration          
@@ -357,7 +409,7 @@ void loop()
                           caliFront();
                   else 
                           caliRight();
-                  printIRReading();
+                  printIRReading1(curFiltered0,curFiltered1,curFiltered2,curFiltered3,curFiltered4,curFiltered5);
                   break;
 
         case 'Z':  
@@ -369,7 +421,7 @@ void loop()
                    if(SFR_IR()==1 && SFL_IR()==1)
                           caliFront();
                   delay(10);
-                  printIRReading();
+                  printIRReading1(curFiltered0,curFiltered1,curFiltered2,curFiltered3,curFiltered4,curFiltered5);
                   break;
                 
         
@@ -378,8 +430,7 @@ void loop()
       } // end switch 
 } // end main loop
 
-// FL: -1, FC: -1, FR: -1, LT: -1, LB: -1, LR: -1
-// Frontleft, frontcenter, frontright, lefttop, leftbottom, leftrear
+
 
 void loop7(){
 
@@ -517,4 +568,233 @@ void loop6(){
   }
   moveF(setdistance[3]);
   delay(50000);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//int printIRReading2(double old4)
+//{
+//  return filter4(old4);
+//}
+//
+//int printIRReadingM(double cur4)
+//{
+//  //Serial.print("Sensor 6 "); // Done
+//  return(getDist6(cur4 * 0.0049));
+//}
+//
+//int filter4(double oldFiltered4) 
+//{   
+//      double curFiltered4;
+//      medno = 30;
+//      RunningMedian med = RunningMedian(medno); 
+//       
+//      for(int i = 0;i<30;i++)
+//      {
+//       double V4 = analogRead(A4);
+//      if(oldFiltered4 == -1) // sanity check for t=0
+//      oldFiltered4 = V4;
+//    curFiltered4 = filter(V4, oldFiltered4); // Exponential filter
+//    oldFiltered4 = curFiltered4;
+//    med.add(printIRReadingM(curFiltered4));
+//    Serial.println(printIRReadingM(curFiltered4));
+//      }
+//    return med.getMedian();
+//}
+
+
+int Sensor6(double old4) 
+{       
+    medno = 50;
+    double V4;
+    RunningMedian med = RunningMedian(medno); 
+    double oldFiltered4 =old4; double curFiltered4;
+    for(int x =0;x<medno;x++)
+    {
+    V4 = analogRead(A4);
+    curFiltered4 = filter(V4, oldFiltered4); // Exponential filter
+    oldFiltered4 = curFiltered4;
+    med.add(getDist6(curFiltered4 * 0.0049));
+    //Serial.println(getDist6(curFiltered4*0.0049));
+    }
+    return (med.getMedian()) ;
+
+}
+
+int Sensor5(double old0) 
+{       
+    medno = 50;
+    double V0;
+    RunningMedian med = RunningMedian(medno); 
+    double oldFiltered0 =old0; double curFiltered0;
+    for(int x =0;x<medno;x++)
+    {
+    V0 = analogRead(A0);
+    curFiltered0 = filter(V0, oldFiltered0); // Exponential filter
+    oldFiltered0 = curFiltered0;
+    med.add(getDist5(curFiltered0 * 0.0049));
+    //Serial.println(getDist5(curFiltered0*0.0049));
+    }
+    return (med.getMedian()) ;
+
+}
+
+int Sensor3(double old2) 
+{       
+    medno = 50;
+    double V2;
+    RunningMedian med = RunningMedian(medno); 
+    double oldFiltered2 =old2; double curFiltered2;
+    for(int x =0;x<medno;x++)
+    {
+    V2 = analogRead(A2);
+    curFiltered2 = filter(V2, oldFiltered2); // Exponential filter
+    oldFiltered2 = curFiltered2;
+    med.add(getDist4(curFiltered2 * 0.0049));
+    //Serial.println(getDist4(curFiltered2*0.0049));
+    }
+    return (med.getMedian()) ;
+
+}
+
+int Sensor1(double old5) 
+{       
+    medno = 50;
+    double V5;
+    RunningMedian med = RunningMedian(medno); 
+    double oldFiltered5 =old5; double curFiltered5;
+    for(int x =0;x<medno;x++)
+    {
+    V5 = analogRead(A5);
+    curFiltered5 = filter(V5, oldFiltered5); // Exponential filter
+    oldFiltered5 = curFiltered5;
+    med.add(getDist1(curFiltered5 * 0.0049));
+    //Serial.println(getDist1(curFiltered5*0.0049));
+    }
+    return (med.getMedian()) ;
+
+}
+
+int Sensor2(double old1) 
+{       
+    medno = 50;
+    double V1;
+    RunningMedian med = RunningMedian(medno); 
+    double oldFiltered1 =old1; double curFiltered1;
+    for(int x =0;x<medno;x++)
+    {
+    V1 = analogRead(A1);
+    curFiltered1 = filter(V1, oldFiltered1); // Exponential filter
+    oldFiltered1 = curFiltered1;
+    med.add(getDist2(curFiltered1 * 0.0049));
+    //Serial.println(getDist2(curFiltered1*0.0049));
+    }
+    return (med.getMedian()) ;
+
+}
+
+int Sensor4(double old3) 
+{       
+    medno = 50;
+    double V3;
+    RunningMedian med = RunningMedian(medno); 
+    double oldFiltered3 = old3; double curFiltered3;
+    for(int x =0;x<medno;x++)
+    {
+    V3 = analogRead(A3);
+    curFiltered3 = filter(V3, oldFiltered3); // Exponential filter
+    oldFiltered3 = curFiltered3;
+    med.add(getDist3(curFiltered3 * 0.0049));
+    //Serial.println(getDist3(curFiltered3*0.0049));
+    }
+    return (med.getMedian()) ;
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+void printIRReading() {
+
+  // FL > FC > FR > LC > LL > RR
+  //Serial.print("RR");
+  //Serial.println(getReading1());
+  
+  //Serial.print("FL");
+  //Serial.println(getReading2());
+   
+  //Serial.print("FC");
+  //Serial.println(getReading5());
+
+  //Serial.print("FR");  
+  //Serial.println(getReading3());
+
+  //Serial.print("LC");
+  //Serial.println(getReading4());
+
+  //Serial.print("LL");  
+  //Serial.println(getReading6());
+
+
+  // 2,5,3,4,6,1
+//    String stringOne = "pc|" + String(getReading2()) + ';' + String(getReading5()) + ';' + String(getReading3()) + ';' + String(getReading4()) + ';' + String(getReading6()) + ';' + String(getReading1()) + ';' ; 
+//   Serial.println(stringOne);
+
+//  Serial.flush();
+//  delay(10);
 }

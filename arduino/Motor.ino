@@ -1,9 +1,13 @@
 // const double kp = 1.0, ki = 0.0, kd = 0.0;
 //0.090 - 0.0909
 
-//const double kp = 0.0908, ki = 0.001, kd = 0.0;
-const double kp = 0.09, ki = 0.001, kd = 0.0;
+const double kp = 0.0910, ki = 0.0, kd = 0.0;
+//const double kp = 0.105, ki = 0.0, kd = 0.0;
+//const double kp = 0.1, ki = 0.001, kd = 0.0;
+//const double kp = 0.09, ki = 0.001, kd = 0.0;
 //const double kp = 0.0, ki = 0.0, kd = 0.0;
+//const double kp = 0.0808, ki = 0.001, kd = 0.0;
+//const double kp = 0, ki = 0, kd = 0;
 //0.25 to 0.5
 
 // setMotor(Right,Left)
@@ -48,15 +52,18 @@ void moveF(double MoveDist) {
   
   initMove();
   initStart();
-  int speed_R = 283;
-//  int speed_R = 295; 
-  motor.setSpeeds(300, 283);
+  int speed_R = 272; 
+  motor.setSpeeds(300, 272);
       
   while (tick_R <= Ticks || tick_L <= Ticks ) {
     GetRPM();
     myPID.Compute();
     speed_R += (1)*PID_RPM_R;
-//    Serial.print(PID_RPM_R);
+//    if(debug){
+//      Serial.print(tick_L);
+//      Serial.print(" ");
+//      Serial.println(tick_R);
+//    }
     motor.setSpeeds(300, speed_R);//speed_R
   }
   initEnd(); 
@@ -67,18 +74,18 @@ void moveR() {
   PID_RPM_R = 0;
   //76 to 78
   //75.75
-  int Ticks = getDegreeTicks(80.615); //81.5 for speed 350, for robot to turn right 90
+  int Ticks = getDegreeTicks(79.1); //81.5 for speed 350, for robot to turn right 90
   initMove();
   initStart();
-  int speed_R = -292;
-  motor.setSpeeds(300, -292);
+  int speed_R = -273;
+  motor.setSpeeds(300, -273);
       
   while (tick_R <= Ticks || tick_L <= Ticks ) {
     GetRPM();
     myPID.Compute();
-    Serial.print(tick_L);
-    Serial.print(" ");
-    Serial.println(tick_R);
+//    Serial.print(tick_L);
+//    Serial.print(" ");
+//    Serial.println(tick_R);
     speed_R += (-1)*PID_RPM_R;
     motor.setSpeeds(300, speed_R);
   }
@@ -90,11 +97,11 @@ void moveReverse(){
   PID_RPM_R = 0;
   //76 to 78
   //75.75
-  int Ticks = getDegreeTicks(171.6); //81.5 for speed 350, for robot to turn right 90
+  int Ticks = getDegreeTicks(164); //81.5 for speed 350, for robot to turn right 90
   initMove();
   initStart();
-  int speed_R = -289;
-  motor.setSpeeds(300, -289);
+  int speed_R = -290;
+  motor.setSpeeds(300, speed_R);
       
   while (tick_R <= Ticks || tick_L <= Ticks ) {
     GetRPM();
@@ -123,20 +130,21 @@ void moveL() {
 //  int Ticks = getDegreeTicks(76.0); 
 //  int Ticks = getDegreeTicks(77.75); 
 //78.5
-  int Ticks = getDegreeTicks(82.05); 
+  int Ticks = getDegreeTicks(79.5); 
+  // 78.6
   initMove();
   initStart();
-  int speed_R = 272;
-//  int speed_R = 300;
-  motor.setSpeeds(-300, 272);
-  Serial.println(Ticks);
+  int speed_R = 288;
+//  int sp0eed_R = 300;
+  motor.setSpeeds(-300, speed_R);
+//  Serial.println(Ticks);
       // 9,L,9
   while (tick_R <= Ticks || tick_L <= Ticks ) {
     GetRPM();
     myPID.Compute();
-    Serial.print(tick_L);
-    Serial.print(" ");
-    Serial.println(tick_R);
+//    Serial.print(tick_L);
+//    Serial.print(" ");
+//    Serial.println(tick_R);
     speed_R += PID_RPM_R;
     motor.setSpeeds(-300, speed_R);
   }

@@ -9,7 +9,6 @@ ZSharpIR SFR_S = ZSharpIR(A4, 1080);
 ZSharpIR SL_S = ZSharpIR(A3, 20150);
 ZSharpIR SFM_S= ZSharpIR(A5,1080);
 
-int medno=100;
 
 double SFM_R2()
 {
@@ -197,7 +196,7 @@ double FrontLeftReading(char leftBlock){
       med.add(ReadCm2());
 //      return ReadCm2();
     }else if(leftBlock == 'C'){
-      med.add(ReadCm5());
+     // med.add(ReadCm5());
 //      return ReadCm5();
     }
   }
@@ -208,7 +207,7 @@ double RightFrontReading(){
   medno = 10;
   RunningMedian med = RunningMedian(medno);
   for(int i = 0;i<medno;i++){
-      med.add(ReadCm5());
+      //med.add(ReadCm5());
   }
   return(med.getMedian());
 }
@@ -217,7 +216,7 @@ double RightRearReading(){
   medno = 10;
   RunningMedian med = RunningMedian(medno);
   for(int i = 0;i<medno;i++){
-      med.add(ReadCm5());
+      //med.add(ReadCm5());
   }
   return(med.getMedian());
 }
@@ -227,11 +226,11 @@ double FrontRightReading(char leftBlock){
   RunningMedian med = RunningMedian(medno);
   for(int i = 0;i<medno;i++){
     if(leftBlock=='R'){
-      med.add(ReadCm3());
+//      med.add(ReadCm3());
 //      return ReadCm5();
     }else if(leftBlock == 'C'){
 //      return ReadCm5();
-      med.add(ReadCm5());
+     // med.add(ReadCm5());
     }
   }
   return(med.getMedian());
@@ -241,7 +240,7 @@ double FrontFrontReading(){
   medno = 10;
   RunningMedian med = RunningMedian(medno);
   for(int i = 0;i<medno;i++){
-      med.add(ReadCm5());
+      //med.add(ReadCm5());
 //    }
   }
   return(med.getMedian());
@@ -380,6 +379,32 @@ void caliRight()
 }
 
 
+int getReading2()
+{
+  return 0;
+}
+
+int getReading3()
+{
+  return 0;
+}
+
+int getReading5()
+{
+  return 0;
+}
+
+
+double ReadCm2(){
+  }
+
+
+
+double getCm2(double x)
+{
+
+}
+
 
 // Define model and input pin:
 //define model 1080
@@ -424,288 +449,150 @@ double oldFiltered3 =-1; double curFiltered3;
 double oldFiltered4 =-1; double curFiltered4;
 double oldFiltered5 =-1; double curFiltered5;
 
-double getReading1() {
-  //===== change according to pin (A0 = PS1, A1 = PS2, etc) =====
-  medno = 30;
-  RunningMedian med = RunningMedian(medno);
-  for(int i = 0;i<medno;i++)
-  {
-    V0 = analogRead(A0);
-    if(oldFiltered0 == -1) // sanity check for t=0
-      oldFiltered0 = V0;
-    curFiltered0 = filter(V0, oldFiltered0); // Exponential filter
-    oldFiltered0 = curFiltered0; // get old value
-//    if(i==10){
-      med.add(getDist1(curFiltered0*0.0049));
-      if(getDist1(curFiltered0*0.0049) == 0)
-      return 0;
-//    }
-    delay(5);
-  }
-  return(med.getMedian());
-  
-}
 
-double getReading2() {
-  //===== change according to pin (A0 = PS1, A1 = PS2, etc) =====
-  medno = 40;
-  RunningMedian med = RunningMedian(medno);
-  for(int i = 0;i<medno;i++)
-  {
-    V1 = analogRead(A1);
-    if(oldFiltered1 == -1) // sanity check for t=0
-      oldFiltered1 = V1;
-    curFiltered1 = filter(V1, oldFiltered1); // Exponential filter
-    oldFiltered1 = curFiltered1; // get old value
-//    if(i==10){
-      med.add(getDist2(curFiltered1*0.0049));
-      //if(getDist2(curFiltered0*0.0049) == 0)
-       // return 0;
-      //if(getDist2(curFiltered0*0.0049) == -1)
-        //return -1;
-      
-//    }
-    delay(5);
-  }
-  return(med.getMedian());
-  
-}
 
-double getReading3() {
-  //===== change according to pin (A0 = PS1, A1 = PS2, etc) =====
-  medno = 30;
-  RunningMedian med = RunningMedian(medno);
-  for(int i = 0;i<medno;i++)
-  {
+
+// Returns sensor 3 readingsin Cm
+double ReadCm3(double old2){
+  medno = 50;
+  RunningMedian med = RunningMedian(medno); 
+  double V2;
+  double oldFiltered = old2; double curFiltered2;
+    for(int x =0;x<medno;x++)
+    {
     V2 = analogRead(A2);
-    if(oldFiltered2 == -1) // sanity check for t=0
-      oldFiltered2 = V2;
     curFiltered2 = filter(V2, oldFiltered2); // Exponential filter
-    oldFiltered2 = curFiltered2; // get old value
-//    if(i==10){
-      med.add(getDist3(curFiltered2*0.0049));
-      //if(getDist3(curFiltered0*0.0049) == 0)
-      //return 0;
-      //if(getDist3(curFiltered0*0.0049) == -1)
-      //return -1;
-      
-//    }
-    delay(5);
-  }
-  return(med.getMedian());
-  
+    oldFiltered2 = curFiltered2;
+    med.add(getCm3(curFiltered2 * 0.0049));
+    //Serial.println(getCm3(curFiltered2 * 0.0049));
+    }
+    return (med.getMedian()) ;
 }
 
-double getReading4() {
-  //===== change according to pin (A0 = PS1, A1 = PS2, etc) =====
-  medno = 30;
-  RunningMedian med = RunningMedian(medno);
-  for(int i = 0;i<medno;i++)
-  {
-    V3 = analogRead(A3);
-    if(oldFiltered3 == -1) // sanity check for t=0
-      oldFiltered3 = V3;
-    curFiltered3 = filter(V3, oldFiltered3); // Exponential filter
-    oldFiltered3 = curFiltered3; // get old value
-//    if(i==10){
-      med.add(getDist4(curFiltered3*0.0049));
-      
-//    }
-    delay(5);
-  }
-  return(med.getMedian());
-  
+double getCm3(double x)
+{
+  double temp = 30.442*pow(x,-1.076) -6 ;
+  return round(temp);
 }
 
-double getReading5() {
-  //===== change according to pin (A0 = PS1, A1 = PS2, etc) =====
-  medno = 30;
-  RunningMedian med = RunningMedian(medno);
-  for(int i = 0;i<medno;i++)
-  {
+
+// Returns sensor 5 readings in cm 
+double ReadCm5(double old0){
+  medno = 50;
+  RunningMedian med = RunningMedian(medno); 
+  double V0;
+  double oldFiltered = old0; double curFiltered0;
+    for(int x =0;x<medno;x++)
+    {
+    V0 = analogRead(A0);
+    curFiltered0 = filter(V0, oldFiltered0); // Exponential filter
+    oldFiltered0 = curFiltered0;
+    med.add(getCm5(curFiltered0 * 0.0049));
+    //Serial.println(getCm5(curFiltered0 * 0.0049));
+    }
+    return (med.getMedian()) ;
+}
+
+double getCm5(double x) {
+  double temp = 27.537*pow(x,-0.976) -6 ;
+  return round(temp);
+}
+
+double ReadCm6(double old4){
+  medno = 50;
+  RunningMedian med = RunningMedian(medno); 
+  double V4;
+  double oldFiltered = old4; double curFiltered4;
+    for(int x =0;x<medno;x++)
+    {
     V4 = analogRead(A4);
-    if(oldFiltered4 == -1) // sanity check for t=0
-      oldFiltered4 = V4;
     curFiltered4 = filter(V4, oldFiltered4); // Exponential filter
-    oldFiltered4 = curFiltered4; // get old value
-//    if(i==10){
-      med.add(getDist5(curFiltered4*0.0049));
-      //if(getDist5(curFiltered0*0.0049) == 0)
-      //return 0;
-      //if(getDist5(curFiltered0*0.0049) == -1)
-      //return -1;
-      
-//    }
-    delay(5);
-  }
-  return(med.getMedian());
+    oldFiltered4 = curFiltered4;
+    med.add(getCm6(curFiltered4 * 0.0049));
+    Serial.println(getCm6(curFiltered4 * 0.0049));
+    }
+    return (med.getMedian()) ;
 }
 
-double getReading6() {
-  //===== change according to pin (A0 = PS1, A1 = PS2, etc) =====
-  medno = 30;
-  RunningMedian med = RunningMedian(medno);
-  for(int i = 0;i<medno;i++)
-  {
-    V5 = analogRead(A5);
-    if(oldFiltered5 == -1) // sanity check for t=0
-      oldFiltered5 = V5;
-    curFiltered5 = filter(V5, oldFiltered5); // Exponential filter
-    oldFiltered5 = curFiltered5; // get old value
-//    if(i==10){
-      med.add(getDist6(curFiltered5*0.0049));
-      
-//    }
-    delay(5);
-  }
-  return(med.getMedian());
+double getCm6(double x) {
+  double temp = 31.130*pow(x,-1.046) -6;
+  return round(temp);
 }
+
+
+
 
 // Returns sensor 1 readings in units
 double getDist1(double x){
- int temp = 29.117*pow(x,-1.083) -7.1;
-  if(temp < 10)
- return 0; // obstacle is directly beside it
- if(temp > 60)
+ double temp = 30.027*pow(x,-1.017) ;
+ int temp1 = temp;
+ //Serial.println(temp1);
+ if(temp1 > 40)
  return -1; // out of range)
- return temp/10;
+ return temp1/10;
 
 }
 
 // Returns sensor 2 readings in units
 double getDist2(double x){
-  
- int temp = 29.57*pow(x,-1.015) -8 +5;
- if(temp > 31)
+ double temp = 5.5679*pow(x,4)-53.073*pow(x,3)+ 189.98*pow(x,2) - 319.54*pow(x,1) + 248.95 -1;
+ //double temp = 71.086*pow(x,-1.127) -1;
+ int temp1 = temp;
+ //Serial.println(temp1);
+ if(temp1 <= 20)
+ return 0;
+ if(temp1 > 80)
  return -1; // out of range)
- 
- return temp/10;
+ return temp1/10;
 }
-
-// Returns sensor 2 readingsin Cm
-double ReadCm2(){
-    medno = 30;
-    RunningMedian med = RunningMedian(medno);
-    V1 = analogRead(A1);
-    for(int x = 0; x<30;x++)
-    {
-      if(oldFiltered1 == -1) // sanity check for t=0
-      oldFiltered1 = V1;
-    curFiltered1 = filter(V1, oldFiltered1); // Exponential filter
-    oldFiltered1 = curFiltered1; // get old value
-//    if(i==10){
-      med.add((getCm2(curFiltered1*0.0049)));
-    }
-      //return round(getCm2(curFiltered1*0.0049));
-
-      return round(med.getMedian());
-}
-
-
-
-double getCm2(double x)
-{
-  double temp = 29.57*pow(x,-1.015) -8;
-  //double temp = 29.57*pow(x,-1.015);
-  return round(temp); // 8 = offset
-}
-
-
-
 
 // Returns sensor 3 (FR) readings in units
 double getDist3(double x){
- int temp = 33.359*pow(x,-1.159) -8;
- // 33.359*pow(x,-1.159)
- 
- if(temp < 5)
- return 0; 
- if(temp > 31)
+ double temp = 30.442*pow(x,-1.076) -6 ;
+ int temp1 = temp;
+ if(temp1 > 40)
  return -1; // out of range)
  
- return temp/10;
+ return temp1/10;
 
-}
-
-// Returns sensor 3 readingsin Cm
-double ReadCm3(){
-    medno = 30;
-    RunningMedian med = RunningMedian(medno);
-    V2 = analogRead(A2);
-    for(int x = 0; x<30;x++)
-    {
-      if(oldFiltered2 == -1) // sanity check for t=0
-      oldFiltered2 = V2;
-    curFiltered2 = filter(V2, oldFiltered2); // Exponential filter
-    oldFiltered2 = curFiltered2; // get old value
-//    med.add((getCm2(curFiltered1*0.0049)));
-      med.add(getCm3(curFiltered2*0.0049));
-    }
-      //return round(getCm2(curFiltered1*0.0049));
-
-      return med.getMedian();
-}
-
-double getCm3(double x)
-{
-  double temp = 33.359*pow(x,-1.159) - 8;
-  //double temp = 33.359*pow(x,-1.159);
-  return temp; 
 }
 
 
 // Returns sensor 4 readings in units
 double getDist4(double x){
- int temp = 26.423*pow(x,-1.267) +4 ;
- if(temp < 10)
- return 0; //0 obstacle is directly beside it
- if(temp > 40)
+ double temp = 32.022*pow(x,-1.052) - 5;
+ int temp1 = temp;
+ if(temp1 == 28 || temp1 ==29)
+ temp1 = temp1 + 2;
+ //Serial.println(temp1);
+ if(temp1 >= 37)
  return -1; // out of range)
- return temp/10;
+ return temp1/10;
 }
 
 // Returns sensor 5 readings in units
 double getDist5(double x){
- int temp = 28.396*pow(x,-1.121) -8;
- //Serial.println(temp);
- //delay(50);
- if(temp > 31)
+ double temp = 27.537*pow(x,-0.976) -4 ;
+ int temp1 = temp;
+ if(temp1 == 28 || temp1 == 29 || temp1 == 27)
+ temp1 = temp1 + 3;
+ //Serial.println(temp1);
+ if(temp1 >= 35)
  return -1; // out of range)
- return temp/10;
+ return temp1/10;
 }
-
-// Returns sensor 5 readings in cm 
-double getCm5(double x){
-  double temp = 28.396*pow(x,-1.121) - 8;
-  // 28.396*pow(x,-1.121);
-  return temp;
-}
-
-double ReadCm5() {
-  
-  V4 = analogRead(A4);
-  for(int x =0 ; x<30;x++)
-  {
-    if(oldFiltered4 == -1) // sanity check for t=0
-    oldFiltered4 = V4;
-  curFiltered4 = filter(V4, oldFiltered4); // Exponential filter
-  oldFiltered4 = curFiltered4; // get old value
-  }
-  
-  return round(getCm5(curFiltered4*0.0049));
-}
-
 
 
 // Returns sensor 6 readings in units
 double getDist6(double x){
- int temp = -6.1503*pow(x,4) + 25.403*pow(x,3) + 0.1423*pow(x,2) - 122.19*x + 169.76 ;
- temp = temp - 6;
- if(temp < 20)
- return 0; // obstacle is directly beside it
- if(temp > 60)
+ int temp = 31.130*pow(x,-1.046) -4;
+ int temp1 = temp;
+ if(temp1 == 29)
+ temp1 = temp1 + 2;
+ //Serial.println(temp1);
+ if(temp > 38)
  return -1; // out of range)
- return temp/10;
+ return temp1/10;
 }
 
 double alpha = 0.1; // Smoothing Factor
