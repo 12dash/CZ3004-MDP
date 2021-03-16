@@ -26,10 +26,7 @@ public class ActualSimulatorExploration {
     public static Map map;   // real arena
     private static final Communication comm = Communication.getCommunication();
 
-<<<<<<< HEAD
     private static String INPUT_MAP_FILE = "example_1.txt";
-=======
->>>>>>> 85f65feb76c562bbf9f1f3f4399b3fa16ad97aac
 
     //#############################################
     //          SET THESE VALUES
@@ -37,33 +34,24 @@ public class ActualSimulatorExploration {
 
     private static int timeLimit = ArenaConstants.MAX_TIME_LIMIT;
     private static int coverage = ArenaConstants.MAX_COVERAGE;
-<<<<<<< HEAD
     private static boolean simulate = true;
-=======
->>>>>>> 85f65feb76c562bbf9f1f3f4399b3fa16ad97aac
 
     //#############################################
     //
     //#############################################
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
 
         map = new Map(new Arena(false), false, true);
         displayAll();
-        comm.openConnection();
+        if(!simulate) {
+            comm.openConnection();
 
-<<<<<<< HEAD
             while (true) {
-=======
-        ExplorationAlgo.initialCalibration(map);
 
-        while (true) {
->>>>>>> 85f65feb76c562bbf9f1f3f4399b3fa16ad97aac
+                String msg = comm.recvMsg();
+                String[] msgArr = msg.split(":");
 
-            String msg = comm.recvMsg();
-            String[] msgArr = msg.split(":");
-
-<<<<<<< HEAD
                 if (msgArr[0].equals(CommunicationConstants.START)) {
                     if (msgArr[1].equals(CommunicationConstants.EXPLORATION)) {
                         ExplorationAlgo explorationTask = new ExplorationAlgo(map, timeLimit, coverage, comm);
@@ -79,15 +67,6 @@ public class ActualSimulatorExploration {
             ExplorationAlgo explorationTask = new ExplorationAlgo(map, realMap, timeLimit, coverage);
             explorationTask.runExploration();
         }
-=======
-           if (msgArr[0].equals(CommunicationConstants.START)) {
-               if(msgArr[1].equals(CommunicationConstants.EXPLORATION)) {
-                    ExplorationAlgo explorationTask = new ExplorationAlgo(map, timeLimit, coverage, comm);
-                    explorationTask.runExploration();
-                }
-            }
-        }
->>>>>>> 85f65feb76c562bbf9f1f3f4399b3fa16ad97aac
     }
 
     public static void displayAll() {
@@ -112,6 +91,14 @@ public class ActualSimulatorExploration {
         cl.show(_mapCards, "MAP");
     }
 
+
+    private static void loadMap(Map map){
+        String[] p_string = FileManager.readFile(INPUT_MAP_FILE);
+        int[][] obs = MapDescriptor.getMap(p_string[0], p_string[1]);
+        map.arena.make_arena(obs);
+        map.arena.setExplored();
+        map.repaint();
+    }
 
 
 }

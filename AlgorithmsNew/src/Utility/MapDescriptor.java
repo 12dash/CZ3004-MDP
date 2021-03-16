@@ -191,7 +191,7 @@ public class MapDescriptor {
 
 
         while (p2_list.size() % 16 != 0) {
-            p2_list.add(0,0);
+            p2_list.add(0);
         }
         StringBuilder p2_string = new StringBuilder();
 

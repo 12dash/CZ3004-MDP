@@ -9,7 +9,6 @@ public class CommunicationConstants {
     public static final String START = "start";
     public static final String WAYPOINT = "waypoint";
 
-<<<<<<< HEAD
 
     public static final String FASTEST_PATH = "FS";         // Android --> PC: Fastest Path
     public static final String EXPLORATION = "ES";          // Android --> PC: Exploration
@@ -32,14 +31,4 @@ public class CommunicationConstants {
 //    public static final String BOT_START = "BOT_START";     // PC --> Arduino
 //    public static final String INSTRUCTIONS = "INSTR";      // PC --> Arduino
 //    public static final String SENSOR_DATA = "SDATA";       // Arduino --> PC
-=======
-//    public static final String EX_START = "EX_START";       // Android --> PC
-    public static final String FASTEST_PATH = "FS";                   // Android --> PC: Fastest Path
-    public static final String EXPLORATION = "ES";                   // Android --> PC: Exploration
-    public static final String MAP_STRINGS = "MAP";         // PC --> Android
-    public static final String BOT_POS = "BOT_POS";         // PC --> Android
-    public static final String BOT_START = "BOT_START";     // PC --> Arduino
-    public static final String INSTRUCTIONS = "INSTR";      // PC --> Arduino
-    public static final String SENSOR_DATA = "SDATA";       // Arduino --> PC
->>>>>>> 85f65feb76c562bbf9f1f3f4399b3fa16ad97aac
 }
