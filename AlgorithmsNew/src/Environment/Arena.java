@@ -25,22 +25,17 @@ public class Arena {
         Initialize the arena setting the grids as :
             1. Type = Free
             2. Accessible = True
-            3. Explored = setExplore (Function Parameter)
+            3. Explored = False
          */
         for (int i = 0; i < ArenaConstants.ARENA_ROWS; i++) {
             for (int j = 0; j < ArenaConstants.ARENA_COLS; j++) {
                 //Grids(Type type, boolean acc, int x , int y)
-                if(inStartZone(i,j) || inGoalZone(i, j)){
-                    this.grids[i][j] = new Grid(Type.FREE, true, j, i, true);
-                }
-                else {
-                    this.grids[i][j] = new Grid(Type.FREE, true, j, i, setExplored);
-                }
+                this.grids[i][j] = new Grid(Type.FREE, true, j, i, setExplored);
             }
         }
 
         //Add the border to the padding.
-        addBorderPadding();
+        getBorderPadding();
     }
 
     public void checkCellModifyAcc(int i, int j) {
@@ -51,26 +46,6 @@ public class Arena {
             if (this.grids[j][i].getAcc()) this.grids[j][i].setAcc(false);
         }
     }
-
-//    public void markStartNGoalZoneAsExplored(){
-//
-//        //Start Zone
-//        for (int r = ArenaConstants.ARENA_ROWS-1; r >= ArenaConstants.ARENA_ROWS - 3; r-- ) { // from rows 17 to 19
-//            for (int c  = 0; c <=2; c ++){
-//                this.grids[r][c].isExplored();
-//            }
-//        }
-//
-//        //Goal Zone
-//        for (int r = 0; r <=2; r ++){
-//            for (int c = ArenaConstants.ARENA_COLS-3; c <=ArenaConstants.ARENA_COLS-1; c++){
-//                this.grids[r][c].isExplored();
-//            }
-//        }
-//
-//
-//    }
-
 
     public void addNeighbourPadding(int i, int j) {
         /*
@@ -99,7 +74,7 @@ public class Arena {
         checkCellModifyAcc(x_2, y_2);//Down - Right
     }
 
-    public void addBorderPadding() {
+    public void getBorderPadding() {
         /*
         Method for padding the borders of the arena.
          */
@@ -191,7 +166,6 @@ public class Arena {
         return (row >= ArenaConstants.GOAL_ROW - 1 && row <= ArenaConstants.GOAL_ROW + 1 && col >= ArenaConstants.GOAL_COL - 1 && col <= ArenaConstants.GOAL_COL + 1);
     }
 
-    // Removes padding around the obstacles apart from the padding near border of the arena
     private void removePaddingFromNonObstacles(){
         for (int i = 0; i < ArenaConstants.ARENA_ROWS; i++) {
             for (int j = 0; j < ArenaConstants.ARENA_COLS; j++) {
@@ -200,7 +174,6 @@ public class Arena {
                 }
             }
         }
-        addBorderPadding();
     }
 
 

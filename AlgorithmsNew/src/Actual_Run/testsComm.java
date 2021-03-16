@@ -4,15 +4,21 @@ import Algo.Exploration;
 import Communication.*;
 import Communication.CommunicationConstants;
 import Environment.Arena;
+<<<<<<< HEAD
 import Environment.ArenaConstants;
 import Robot.RobotConstants;
+=======
+>>>>>>> 85f65feb76c562bbf9f1f3f4399b3fa16ad97aac
 import Simulator.Map;
 import Simulator.SimulatorConstants;
 import Utility.FileManager;
 import Utility.MapDescriptor;
+<<<<<<< HEAD
 import javafx.scene.shape.MoveTo;
 import Exploration.ExplorationAlgo;
 import Robot.RobotConstants.MOVEMENT;
+=======
+>>>>>>> 85f65feb76c562bbf9f1f3f4399b3fa16ad97aac
 
 import javax.swing.*;
 import java.awt.*;
@@ -28,6 +34,7 @@ public class testsComm {
     private static JPanel _mapCards = null;         // JPanel for map views
 
     public static void main(String[] args){
+<<<<<<< HEAD
 
 //        testRobotMovements();
 //        testMapDescriptor();
@@ -39,8 +46,10 @@ public class testsComm {
 
 
     public static void testMapDescriptor(){
+=======
+>>>>>>> 85f65feb76c562bbf9f1f3f4399b3fa16ad97aac
         Communication comm = Communication.getCommunication();
-        String[] p1p2 = new String[]{"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF0000","000000000000010042038400000000000000030C000000000000021F8400080000000000040"};
+        String[] p1p2 = new String[]{"FFFFFFFFFFFFFFFFFFF91FF001E003C007800F001E007C00F801F003E003C00F803F007E00FF","000700000000000001C000444444000004000020"};
         String anMssg = "{p1:" + p1p2[0] + ",p2:" + p1p2[1] +"}";
         comm.openConnection();
         Scanner sc= new Scanner(System.in);
@@ -49,6 +58,7 @@ public class testsComm {
             comm.sendMsg(CommunicationConstants.ANDROID, anMssg);
         }
     }
+<<<<<<< HEAD
 
     public static void testRobotMovements(){
         Communication comm = Communication.getCommunication();
@@ -186,4 +196,6 @@ public class testsComm {
             System.out.println(b);
         }
     }
+=======
+>>>>>>> 85f65feb76c562bbf9f1f3f4399b3fa16ad97aac
 }

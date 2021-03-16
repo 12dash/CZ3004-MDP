@@ -37,15 +37,39 @@ class Main(threading.Thread):
   def read_from_pc(self, android_queue, arduino_queue):
     while self.pc_connection.connected:
       msg = self.pc_connection.read_from_client()
-      msg_lst = msg.split("|")
-      header = msg_lst[0]
+      if "_" in msg: # This is for multi-recipients (From Algo PC to Android and Arduino)
+        msg_1, msg_2 = msg.split("_")
+        
+        # First Message
+        msg_lst_1 = msg_1.split("|")
+        header = msg_lst_1[0]
+        if header == "an":
+          android_queue.put_nowait(msg_lst_1[1])
+        elif header == "ar":
+          arduino_queue.put_nowait(msg_lst_1[1])
+        else:
+          print("Invalid recipient from PC")
+        
+        # Second Message
+        msg_lst_2 = msg_2.split("|")
+        header = msg_lst_2[0]
+        if header == "an":
+          android_queue.put_nowait(msg_lst_2[1])
+        elif header == "ar":
+          arduino_queue.put_nowait(msg_lst_2[1])
+        else:
+          print("Invalid recipient from PC")
+      
+      else: # Single recipient
+        msg_lst = msg.split("|")
+        header = msg_lst[0]
 
-      if header == "an":
-        android_queue.put_nowait(msg_lst[1])
-      elif header == "ar":
-        arduino_queue.put_nowait(msg_lst[1])
-      else:
-        print("Invalid recipient from PC")
+        if header == "an":
+          android_queue.put_nowait(msg_lst[1])
+        elif header == "ar":
+          arduino_queue.put_nowait(msg_lst[1])
+        else:
+          print("Invalid recipient from PC")
 
   def send_to_android(self, android_queue):
     while self.android_connection.connected:

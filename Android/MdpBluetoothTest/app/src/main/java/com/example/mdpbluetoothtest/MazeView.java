@@ -29,8 +29,6 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class MazeView extends View {
 
@@ -102,7 +100,7 @@ public class MazeView extends View {
         blackPaint.setStyle(Paint.Style.FILL_AND_STROKE);
         obstacleColor.setColor(Color.BLACK);
         robotColor.setColor(Color.GREEN);
-        endColor.setColor(Color.YELLOW);
+        endColor.setColor(Color.GREEN);
         startColor.setColor(Color.CYAN);
         waypointColor.setColor(Color.YELLOW);
         unexploredColor.setColor(Color.LTGRAY);
@@ -172,7 +170,6 @@ public class MazeView extends View {
                         case "waypoint" :
                             canvas.drawBitmap(waypointBitmap, null, rectF, null);
                             break;
-                        case "robot" :
                         case "explored" :
                             canvas.drawBitmap(exploredBitmap, null, rectF, null);
                             break;
@@ -180,7 +177,6 @@ public class MazeView extends View {
                             canvas.drawBitmap(unexploredBitmap, null, rectF, null);
                             break;
                         default :
-                            Log.d(TAG, "drawIndividualCellXXX: " + cells[x][y].type);
                             canvas.drawRect(cells[x][y].startX, cells[x][y].startY, cells[x][y].endX, cells[x][y].endY, cells[x][y].paint);
                             break;
                     }
@@ -471,7 +467,7 @@ public class MazeView extends View {
         row = this.convertRow(row);
         cells[col][row].setType("waypoint");
 
-        bluetoothConnectionService.write(String.format("pc|waypoint:%d:%d", waypointCoord[0]-1, waypointCoord[1]-1));
+        bluetoothConnectionService.write(String.format("pc|{\"waypoint\":[%d,%d]}", waypointCoord[0]-1, waypointCoord[1]-1));
         TextView waypointTextView = ((Activity)this.getContext()).findViewById(R.id.waypointTextView);
         waypointTextView.setText(String.format("(%d, %d)", waypointCoord[0] - 1, waypointCoord[1] - 1)); // Yeap weird reversal for the column
         showLog("Exiting setWaypointCoord");
@@ -610,45 +606,36 @@ public class MazeView extends View {
                             for (int y = startCoord[1] - 1; y <= startCoord[1] + 1; y++)
                                 cells[x][y].setType("unexplored");
                     }
-                } else
-                    canDrawRobot = true;
-
-                if (column > 14 || column < 0 || row > 19 || row < 0) {
-                    Toast.makeText(this.getContext(), "Invalid starting position)", Toast.LENGTH_LONG).show();
                 }
-                else {
+                else
+                    canDrawRobot = true;
                 this.setStartCoord(column, row);
                 startCoordStatus = false;
-
                 String direction = getRobotDirection();
-                if (direction.equals("None")) {
+                if(direction.equals("None")) {
                     direction = "up";
                 }
-
                 try {
                     int directionInt = 0;
-                    if (direction.equals("up")) {
+                    if(direction.equals("up")){
                         directionInt = 0;
-                    } else if (direction.equals("left")) {
+                    } else if(direction.equals("left")) {
                         directionInt = 3;
-                    } else if (direction.equals("right")) {
+                    } else if(direction.equals("right")) {
                         directionInt = 1;
-                    } else if (direction.equals("down")) {
+                    } else if(direction.equals("down")) {
                         directionInt = 2;
                     }
 //                  MainActivity.printMessage("starting " + "(" + String.valueOf(row-1) + "," + String.valueOf(column-1) + "," + String.valueOf(directionInt) + ")");
-                    //bluetoothConnectionService.write(String.format("starting (%d,%d,%d)", row - 1, column - 1, directionInt));
+                    bluetoothConnectionService.write(String.format("starting (%d,%d,%d)", row-1, column-1, directionInt));
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
                 updateRobotAxis(column, row, direction);
                 if (setStartPointToggleBtn.isChecked())
                     setStartPointToggleBtn.toggle();
-
-            }
                 this.invalidate();
                 return true;
-
             }
             if (setWaypointStatus) {
                 int[] waypointCoord = this.getWaypointCoord();
@@ -783,7 +770,6 @@ public class MazeView extends View {
                     hexBigIntegerExplored = new BigInteger(hexStringExplored, 16);
                     exploredString = hexBigIntegerExplored.toString(2);
                     showLog("updateMapInformation.exploredString: " + exploredString);
-                    Log.d("P1 SHOW SHOW", hexStringExplored);
 
                     int x, y, onesCount = 0;
                     for (int j = 0; j < exploredString.length() - 4; j++) {
@@ -791,33 +777,26 @@ public class MazeView extends View {
                         x = 1 + j - ((19 - y) * 15);
                         if ((String.valueOf(exploredString.charAt(j + 2))).equals("1") && !cells[x][y].type.equals("robot")) {
                             cells[x][y].setType("explored");
-                            //onesCount += 1;
+                            onesCount += 1;
                         }
                         else if ((String.valueOf(exploredString.charAt(j + 2))).equals("0") && !cells[x][y].type.equals("robot"))
                             cells[x][y].setType("unexplored");
                     }
 
-
+                    int length = onesCount;
                     //int length = infoJsonObject.getInt("length");
 
                     hexStringObstacle = mapInformation.getString("p2");
                     editor.putString("P2", hexStringObstacle);
                     editor.commit();
                     showLog("updateMapInformation hexStringObstacle: " + hexStringObstacle);
-
-
                     hexBigIntegerObstacle = new BigInteger(hexStringObstacle, 16);
                     showLog("updateMapInformation hexBigIntegerObstacle: " + hexBigIntegerObstacle);
                     obstacleString = hexBigIntegerObstacle.toString(2);
-
-                    int diff = (hexStringObstacle.length()*4) - obstacleString.length();
-                    Log.d("value of Diff",String.valueOf(diff));
-                    for (int d = 0; d <diff; d++)
-                    {
+                    while (obstacleString.length() < length) {
                         obstacleString = "0" + obstacleString;
                     }
                     showLog("updateMapInformation obstacleString: " + obstacleString);
-                    Log.d("length of the digit",String.valueOf(obstacleString.length()));
                     setPublicMDFExploration(hexStringExplored);
                     setPublicMDFObstacle(hexStringObstacle);
 
@@ -883,9 +862,11 @@ public class MazeView extends View {
                     }
                     break;
                 case "move":
-                    String infoDirection = mapInformation.getString("move");
+                    infoJsonArray = mapInformation.getJSONArray("move");
+                    infoJsonObject = infoJsonArray.getJSONObject(0);
                     if (canDrawRobot)
-                        moveRobot(infoDirection);
+                        moveRobot(infoJsonObject.getString("direction"));
+                    message = "moveDirection: " + infoJsonObject.getString("direction");
                     break;
                 case "status":
 //                    infoJsonArray = mapInformation.getJSONArray("status");
@@ -925,330 +906,143 @@ public class MazeView extends View {
     }
 
     public void moveRobot(String direction) {
+        showLog("Entering moveRobot");
+        setValidPosition(false);
+        int[] curCoord = this.getCurCoord();
+        ArrayList<int[]> obstacleCoord = this.getObstacleCoord();
+        this.setOldRobotCoord(curCoord[0], curCoord[1]);
+        int[] oldCoord = this.getOldRobotCoord();
+        String robotDirection = getRobotDirection();
+        String backupDirection = robotDirection;
 
-        MainActivity main = new MainActivity();
-        ArrayList<ArrayList<Integer>> loopimagelist = main.returnArrayList();
-
-        Pattern pattern = Pattern.compile("[a-zA-Z0-9]*");
-        Matcher matcher = pattern.matcher(direction);
-
-        if (!matcher.matches())
-        {
-            switch (direction) {
-                case "!":
-                    direction = "10";
-                    break;
-                case "@":
-                    direction = "11";
-                    break;
-                case "#":
-                    direction = "12";
-                    break;
-                case "$":
-                    direction = "13";
-                    break;
-                case "%":
-                    direction = "14";
-                    break;
-                case "^":
-                    direction = "15";
-                    break;
-                case "&":
-                    direction = "16";
-                    break;
-                case "*":
-                    direction = "17";
-                    break;
-                case "(":
-                    direction = "18";
-                    break;
-                default:
-                    Log.d("Check number", direction);
-            }
-        }
-
-        if (direction.matches("\\d+(?:\\.\\d+)?")){
-
-            int directionNumeric = Integer.parseInt(direction);
-            direction = "forward";
-            directionNumeric = directionNumeric + 1;
-            for (int z = 0; z < directionNumeric; z++) {
-                showLog("Entering moveRobot");
-                setValidPosition(false);
-                int[] curCoord = this.getCurCoord();
-                ArrayList<int[]> obstacleCoord = this.getObstacleCoord();
-                this.setOldRobotCoord(curCoord[0], curCoord[1]);
-                int[] oldCoord = this.getOldRobotCoord();
-                String robotDirection = getRobotDirection();
-                String backupDirection = robotDirection;
-                switch (robotDirection) {
-                    case "up":
-                        switch (direction) {
-                            case "forward":
-                                if (curCoord[1] != 19) {
-                                    curCoord[1] += 1;
-                                    validPosition = true;
-                                }
-                                break;
-                            case "R":
-                                direction = "right";
-                                robotDirection = "right";
-                                break;
-                            case "I":
-                                direction = "back";
-                                robotDirection = "down";
-                                break;
-                            case "L":
-                                direction = "left";
-                                robotDirection = "left";
-                                break;
-                            default:
-                                robotDirection = "error up";
-                                break;
+        switch (robotDirection) {
+            case "up":
+                switch (direction) {
+                    case "forward":
+                        if (curCoord[1] != 19) {
+                            curCoord[1] += 1;
+                            validPosition = true;
                         }
                         break;
                     case "right":
-                        switch (direction) {
-                            case "forward":
-                                if (curCoord[0] != 14) {
-                                    curCoord[0] += 1;
-                                    validPosition = true;
-                                }
-                                break;
-                            case "R":
-                                direction = "right";
-                                robotDirection = "down";
-                                break;
-                            case "I":
-                                direction = "back";
-                                robotDirection = "left";
-                                break;
-                            case "L":
-                                direction = "left";
-                                robotDirection = "up";
-                                break;
-                            default:
-                                robotDirection = "error right";
-                        }
+                        robotDirection = "right";
                         break;
-                    case "down":
-                        switch (direction) {
-                            case "forward":
-                                if (curCoord[1] != 2) {
-                                    curCoord[1] -= 1;
-                                    validPosition = true;
-                                }
-                                break;
-                            case "R":
-                                direction = "right";
-                                robotDirection = "left";
-                                break;
-                            case "I":
-                                direction = "back";
-                                robotDirection = "up";
-                                break;
-                            case "L":
-                                direction = "left";
-                                robotDirection = "right";
-                                break;
-                            default:
-                                robotDirection = "error down";
+                    case "back":
+                        if (curCoord[1] != 2) {
+                            curCoord[1] -= 1;
+                            validPosition = true;
                         }
                         break;
                     case "left":
-                        switch (direction) {
-                            case "forward":
-                                if (curCoord[0] != 2) {
-                                    curCoord[0] -= 1;
-                                    validPosition = true;
-                                }
-                                break;
-                            case "R":
-                                direction = "right";
-                                robotDirection = "up";
-                                break;
-                            case "I":
-                                direction = "back";
-                                robotDirection = "right";
-                                break;
-                            case "L":
-                                direction = "left";
-                                robotDirection = "down";
-                                break;
-                            default:
-                                robotDirection = "error left";
-                        }
+                        robotDirection = "left";
                         break;
                     default:
-                        robotDirection = "error moveCurCoord";
+                        robotDirection = "error up";
                         break;
                 }
-
-            if (getValidPosition())
-                for (int x = curCoord[0] - 1; x <= curCoord[0] + 1; x++) {
-                    for (int y = curCoord[1] - 1; y <= curCoord[1] + 1; y++) {
-                        for (int i = 0; i < obstacleCoord.size(); i++) {
-                            if (obstacleCoord.get(i)[0] != x || obstacleCoord.get(i)[1] != y)
-                                setValidPosition(true);
-                            else {
-                                setValidPosition(false);
-                                break;
-                            }
+                break;
+            case "right":
+                switch (direction) {
+                    case "forward":
+                        if (curCoord[0] != 14) {
+                            curCoord[0] += 1;
+                            validPosition = true;
                         }
-                        if (!getValidPosition())
-                            break;
-                    }
-                    if (!getValidPosition())
                         break;
-                }
-            if (getValidPosition())
-                this.setCurCoord(curCoord[0], curCoord[1], robotDirection);
-            else {
-                if (direction.equals("forward"))
-                    robotDirection = backupDirection;
-                this.setCurCoord(oldCoord[0], oldCoord[1], robotDirection);
-            }
-            this.invalidate();
-            showLog("Exiting moveRobot");}
-        } else {
-            showLog("Entering moveRobot");
-            setValidPosition(false);
-            int[] curCoord = this.getCurCoord();
-            ArrayList<int[]> obstacleCoord = this.getObstacleCoord();
-            this.setOldRobotCoord(curCoord[0], curCoord[1]);
-            int[] oldCoord = this.getOldRobotCoord();
-            String robotDirection = getRobotDirection();
-            String backupDirection = robotDirection;
-            switch (robotDirection) {
-                case "up":
-                    switch (direction) {
-                        case "forward":
-                            if (curCoord[1] != 19) {
-                                curCoord[1] += 1;
-                                validPosition = true;
-                                this.setCurCoord(curCoord[0], curCoord[1], robotDirection);
-                            }
-                            break;
-                        case "R":
-                            direction = "right";
-                            robotDirection = "right";
-                            break;
-                        case "I":
-                            direction = "back";
-                            robotDirection = "down";
-                            break;
-                        case "L":
-                            direction = "left";
-                            robotDirection = "left";
-                            break;
-                        default:
-                            robotDirection = "error up";
-                            break;
-                    }
-                    break;
-                case "right":
-                    switch (direction) {
-                        case "forward":
-                            if (curCoord[0] != 14) {
-                                curCoord[0] += 1;
-                                validPosition = true;
-                            }
-                            break;
-                        case "R":
-                            direction = "right";
-                            robotDirection = "down";
-                            break;
-                        case "I":
-                            direction = "back";
-                            robotDirection = "left";
-                            break;
-                        case "L":
-                            direction = "left";
-                            robotDirection = "up";
-                            break;
-                        default:
-                            robotDirection = "error right";
-                    }
-                    break;
-                case "down":
-                    switch (direction) {
-                        case "forward":
-                            if (curCoord[1] != 2) {
-                                curCoord[1] -= 1;
-                                validPosition = true;
-                            }
-                            break;
-                        case "R":
-                            direction = "right";
-                            robotDirection = "left";
-                            break;
-                        case "I":
-                            direction = "back";
-                            robotDirection = "up";
-                            break;
-                        case "L":
-                            direction = "left";
-                            robotDirection = "right";
-                            break;
-                        default:
-                            robotDirection = "error down";
-                    }
-                    break;
-                case "left":
-                    switch (direction) {
-                        case "forward":
-                            if (curCoord[0] != 2) {
-                                curCoord[0] -= 1;
-                                validPosition = true;
-                            }
-                            break;
-                        case "R":
-                            direction = "right";
-                            robotDirection = "up";
-                            break;
-                        case "I":
-                            direction = "back";
-                            robotDirection = "right";
-                            break;
-                        case "L":
-                            direction = "left";
-                            robotDirection = "down";
-                            break;
-                        default:
-                            robotDirection = "error left";
-                    }
-                    break;
-                default:
-                    robotDirection = "error moveCurCoord";
-                    break;
-            }
-            if (getValidPosition())
-                for (int x = curCoord[0] - 1; x <= curCoord[0] + 1; x++) {
-                    for (int y = curCoord[1] - 1; y <= curCoord[1] + 1; y++) {
-                        for (int i = 0; i < obstacleCoord.size(); i++) {
-                            if (obstacleCoord.get(i)[0] != x || obstacleCoord.get(i)[1] != y)
-                                setValidPosition(true);
-                            else {
-                                setValidPosition(false);
-                                break;
-                            }
+                    case "right":
+                        robotDirection = "down";
+                        break;
+                    case "back":
+                        if (curCoord[0] != 2) {
+                            curCoord[0] -= 1;
+                            validPosition = true;
                         }
-                        if (!getValidPosition())
-                            break;
-                    }
-                    if (!getValidPosition())
                         break;
+                    case "left":
+                        robotDirection = "up";
+                        break;
+                    default:
+                        robotDirection = "error right";
                 }
-            if (getValidPosition())
-                this.setCurCoord(curCoord[0], curCoord[1], robotDirection);
-            else {
-                if (direction.equals("forward"))
-                    robotDirection = backupDirection;
-                this.setCurCoord(oldCoord[0], oldCoord[1], robotDirection);
-            }
-            this.invalidate();
-            showLog("Exiting moveRobot");
+                break;
+            case "down":
+                switch (direction) {
+                    case "forward":
+                        if (curCoord[1] != 2) {
+                            curCoord[1] -= 1;
+                            validPosition = true;
+                        }
+                        break;
+                    case "right":
+                        robotDirection = "left";
+                        break;
+                    case "back":
+                        if (curCoord[1] != 19) {
+                            curCoord[1] += 1;
+                            validPosition = true;
+                        }
+                        break;
+                    case "left":
+                        robotDirection = "right";
+                        break;
+                    default:
+                        robotDirection = "error down";
+                }
+                break;
+            case "left":
+                switch (direction) {
+                    case "forward":
+                        if (curCoord[0] != 2) {
+                            curCoord[0] -= 1;
+                            validPosition = true;
+                        }
+                        break;
+                    case "right":
+                        robotDirection = "up";
+                        break;
+                    case "back":
+                        if (curCoord[0] != 14) {
+                            curCoord[0] += 1;
+                            validPosition = true;
+                        }
+                        break;
+                    case "left":
+                        robotDirection = "down";
+                        break;
+                    default:
+                        robotDirection = "error left";
+                }
+                break;
+            default:
+                robotDirection = "error moveCurCoord";
+                break;
         }
+        if (getValidPosition())
+            for (int x = curCoord[0] - 1; x <= curCoord[0] + 1; x++) {
+                for (int y = curCoord[1] - 1; y <= curCoord[1] + 1; y++) {
+                    for (int i = 0; i < obstacleCoord.size(); i++) {
+                        if (obstacleCoord.get(i)[0] != x || obstacleCoord.get(i)[1] != y)
+                            setValidPosition(true);
+                        else {
+                            setValidPosition(false);
+                            break;
+                        }
+                    }
+                    if (!getValidPosition())
+                        break;
+                }
+                if (!getValidPosition())
+                    break;
+            }
+        if (getValidPosition())
+            this.setCurCoord(curCoord[0], curCoord[1], robotDirection);
+        else {
+            if (direction.equals("forward") || direction.equals("back"))
+                robotDirection = backupDirection;
+            this.setCurCoord(oldCoord[0], oldCoord[1], robotDirection);
+        }
+        this.invalidate();
+        showLog("Exiting moveRobot");
     }
 
     public JSONObject getCreateJsonObject() {

@@ -20,7 +20,7 @@ public class Map extends JPanel {
     public int waypoint_x;
     public int waypoint_y;
     public boolean simulate;
-    boolean isExploration = false; // this for not drawing way point for exploration task in arena JPanel
+    boolean isExploration = false;
 
     public Map(Arena arena, boolean simulate) {
         this.arena = arena;

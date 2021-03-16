@@ -10,231 +10,105 @@
     android:orientation="vertical">
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="522dp"
-        android:layout_marginLeft="20dp"
-        android:layout_marginTop="5dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
+        <view
+            android:layout_width="470dp"
+            class="com.example.mdpbluetoothtest.MazeView"
+            android:layout_gravity="center"
+            android:id="@+id/mazeView"
+            android:layout_marginTop="20dp"
+            android:layout_height="600dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            />
+
         <LinearLayout
-            android:id="@+id/leftContainer"
-            android:layout_width="140dp"
+            android:layout_width="100dp"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:layout_marginTop="20dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
             <TextView
-                android:id="@+id/statustitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/purple_500"
                 android:text="Current Status"
-                android:textAlignment="center"
+                android:background="@color/purple_500"
                 android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                android:textColor="@color/design_default_color_on_primary" />
+                android:textColor="@color/design_default_color_on_primary"
+                android:textAlignment="center"/>
 
             <TextView
                 android:id="@+id/currentStatusTextView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center"
                 android:text="Unavailable"
-                android:textAlignment="center" />
-
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/middleContainer"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="20dp"
-            android:orientation="vertical"
-            app:layout_constraintLeft_toRightOf="@id/leftContainer">
+                android:textAlignment="center"/>
 
             <GridLayout
-                android:layout_width="60dp"
-                android:layout_height="wrap_content">
-
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                >
                 <TextView
-                    android:layout_row="0"
-                    android:layout_column="0"
                     android:text="X: "
-                    android:textStyle="bold" />
-
+                    android:textStyle="bold"
+                    android:layout_column="0"
+                    android:layout_row="0"/>
                 <TextView
                     android:id="@+id/robotXCoordinateTextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_row="0"
                     android:layout_column="1"
-                    android:text="0" />
-
+                    android:layout_row="0"
+                    android:text="0"
+                    />
                 <TextView
-                    android:layout_row="1"
-                    android:layout_column="0"
                     android:text="Y: "
-                    android:textStyle="bold" />
-
-                <TextView
+                    android:textStyle="bold"
+                    android:layout_column="0"
+                    android:layout_row="1"
+ />               <TextView
                     android:id="@+id/robotYCoordinateTextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_row="1"
+                    android:text="0"
                     android:layout_column="1"
-                    android:text="0" />
+                    android:layout_row="1"
+                    />
 
             </GridLayout>
 
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="140dp"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="30dp"
-            android:orientation="vertical"
-            app:layout_constraintLeft_toRightOf="@id/directioncontainer">
+            <TextView
+                android:id="@+id/robotDirectionTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Direction unavailable"
+                />
 
             <TextView
-                android:id="@+id/waypointtitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/purple_500"
                 android:text="Waypoint"
-                android:textAlignment="center"
+                android:layout_marginTop="10dp"
+                android:background="@color/purple_500"
                 android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                android:textColor="@color/design_default_color_on_primary" />
+                android:textColor="@color/design_default_color_on_primary"
+                android:textAlignment="center"/>
 
             <TextView
                 android:id="@+id/waypointTextView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center"
                 android:text="Unset"
-                android:textAlignment="center" />
+                android:textAlignment="center"/>
+
 
         </LinearLayout>
 
-
-        <LinearLayout
-            android:id="@+id/directioncontainer"
-            android:layout_width="140dp"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            app:layout_constraintLeft_toRightOf="@id/middleContainer">
-
-            <TextView
-                android:id="@+id/directiontitle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@color/purple_500"
-                android:text="Direction"
-                android:textAlignment="center"
-                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                android:textColor="@color/design_default_color_on_primary" />
-
-
-            <TextView
-                android:id="@+id/robotDirectionTextView"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textAlignment="center"
-                android:text="Direction unavailable" />
-        </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        >
-    <view
-        android:layout_width="470dp"
-        class="com.example.mdpbluetoothtest.MazeView"
-        android:layout_gravity="center"
-        android:id="@+id/mazeView"
-        android:layout_marginTop="10dp"
-        android:layout_marginLeft="40dp"
-        android:layout_marginBottom="10dp"
-        android:layout_height="600dp"
-        />
-        <GridLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            >
-
-            <ImageButton
-                android:id="@+id/obstacleImageBtn"
-                android:layout_width="45dp"
-                android:layout_height="45dp"
-                android:layout_marginLeft="15dp"
-                android:layout_margin="20dp"
-                android:scaleType="centerCrop"
-                android:layout_column="1"
-                android:background="#99D9EA"
-                android:layout_row="0"
-                app:srcCompat="@drawable/ic_obstacle" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="10dp"
-                android:layout_column="1"
-                android:layout_row="0"
-                android:layout_marginTop="70dp"
-                android:layout_marginLeft="20dp"
-                android:textStyle="bold"
-                android:text="Obstacle"
-                />
-
-
-            <ImageButton
-                android:id="@+id/clearImageBtn"
-                android:layout_width="45dp"
-                android:layout_height="45dp"
-                android:scaleType="centerCrop"
-                android:layout_marginTop="10dp"
-                android:layout_marginLeft="15dp"
-                android:background="#99D9EA"
-                android:layout_column="1"
-                android:layout_row="1"
-                app:srcCompat="@drawable/ic_clear" />
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="10dp"
-                android:layout_column="1"
-                android:layout_row="1"
-                android:layout_marginTop="58dp"
-                android:layout_marginLeft="25dp"
-                android:textStyle="bold"
-                android:text="Clear"
-                />
-
-            <Button
-                android:id="@+id/btn_F1"
-                android:layout_width="45dp"
-                android:textSize="10dp"
-                android:layout_marginTop="350dp"
-                android:layout_marginLeft="15dp"
-                android:scaleType="centerCrop"
-                android:tint="@color/black"
-                android:layout_row="2"
-                android:layout_column="1"
-                android:text="F1"/>
-
-            <Button
-                android:id="@+id/btn_F2"
-                android:layout_width="45dp"
-                android:textSize="10dp"
-                android:layout_marginLeft="15dp"
-                android:scaleType="centerCrop"
-                android:layout_marginTop="5dp"
-                android:tint="@color/black"
-                android:layout_row="3"
-                android:layout_column="1"
-                android:text="F2"/>
-        </GridLayout>
-
-    </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -276,11 +150,17 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:splitTrack="false"
-                android:layout_marginTop="110dp"
+                android:layout_below="@id/arrowRightBtn"
                 android:layout_centerHorizontal="true"
                 android:text="TILT" />
 
-
+            <Switch
+                android:id="@+id/manualAutoToggleBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/phoneTiltSwitch"
+                android:text="MANUAL"
+                />
 
 
         </RelativeLayout>
@@ -307,12 +187,11 @@
                 />
 
             <Button
-                android:id="@+id/irBtn"
+                android:id="@+id/updateButton"
                 android:layout_width="143dp"
                 android:layout_height="wrap_content"
                 android:clickable="true"
-                android:textSize="12dp"
-                android:text="Image Recognition"/>
+                android:text="UPDATE"/>
 
 
         </LinearLayout>
@@ -362,28 +241,56 @@
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="horizontal">
 
-            <Button
-                android:id="@+id/updateButton"
-                android:layout_width="143dp"
-                android:layout_height="wrap_content"
-                android:text="Update Map"
-                />
-            <Button
-                android:id="@+id/calibrateButton"
-                android:layout_width="143dp"
-                android:layout_height="wrap_content"
-                android:text="Calibrate"
-                />
-            <Switch
-                android:id="@+id/manualAutoToggleBtn"
+            <GridLayout
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="20dp"
-                android:layout_marginTop="10dp"
-                android:text="MANUAL" />
+                android:layout_height="wrap_content">
+            <ImageButton
+                android:id="@+id/obstacleImageBtn"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginTop="16dp"
+                android:scaleType="centerCrop"
+                android:tint="@color/black"
+                app:srcCompat="@drawable/ic_obstacle" />
 
+            <ImageButton
+                android:id="@+id/clearImageBtn"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginTop="16dp"
+                android:scaleType="centerCrop"
+                android:tint="@color/black"
+                app:srcCompat="@drawable/ic_clear" />
+
+                <Button
+                    android:id="@+id/btn_F1"
+                    android:layout_width="50dp"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginTop="16dp"
+                    android:scaleType="centerCrop"
+                    android:tint="@color/black"
+                    android:layout_row="2"
+                    android:layout_column="0"
+                    android:text="F1"/>
+
+                <Button
+                    android:id="@+id/btn_F2"
+                    android:layout_width="50dp"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginTop="16dp"
+                    android:scaleType="centerCrop"
+                    android:tint="@color/black"
+                    android:layout_row="2"
+                    android:layout_column="1"
+                    android:text="F2"/>
+
+            </GridLayout>
         </LinearLayout>
 
     </LinearLayout>

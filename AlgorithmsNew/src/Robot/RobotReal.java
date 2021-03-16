@@ -42,11 +42,19 @@ public class RobotReal extends Robot{
     private final Sensor FrontLeftSR;       // front-facing left SR
     private final Sensor FrontCenterSR;     // front-facing center SR
     private final Sensor FrontRightSR;      // front-facing right SR
+<<<<<<< HEAD
     private final Sensor LeftRightSR;       // left-facing left SR
     private final Sensor LeftCenterLR;      // left-facing center LR // LONG RANGE
     private final Sensor RightCenterSR;     // right-facing center SR
+=======
+    private final Sensor LeftLeftLR;      // front-facing right SR
+    private final Sensor LeftCenterSR;      // left-facing center LR // LONG RANGE
+    private final Sensor RightRightSR;      // right-facing right SR
+>>>>>>> 85f65feb76c562bbf9f1f3f4399b3fa16ad97aac
 
     private boolean touchedGoal;
+
+    ///TODO: For creating the PC simulator update the cur gird of robot using these posRow and posCol
 
     public RobotReal(Grid g) {
         super(g);
@@ -55,14 +63,19 @@ public class RobotReal extends Robot{
         this.posCol = g.getX();
         this.orientation = RobotConstants.START_DIR; // EAST
 
-        FrontLeftSR = new Sensor(RobotConstants.SENSOR_SHORT_RANGE_L, RobotConstants.SENSOR_SHORT_RANGE_H, this.posRow - 1, this.posCol + 1, this.orientation, "FL");
+        FrontLeftSR = new Sensor(RobotConstants.SENSOR_SHORT_RANGE_L, RobotConstants.SENSOR_SHORT_RANGE_H, this.posRow + 1, this.posCol + 1, this.orientation, "FL");
         FrontCenterSR = new Sensor(RobotConstants.SENSOR_SHORT_RANGE_L, RobotConstants.SENSOR_SHORT_RANGE_H, this.posRow, this.posCol+1, this.orientation, "FC");
         FrontRightSR = new Sensor(RobotConstants.SENSOR_SHORT_RANGE_L, RobotConstants.SENSOR_SHORT_RANGE_H, this.posRow + 1, this.posCol + 1, this.orientation, "FR");
+<<<<<<< HEAD
         LeftRightSR = new Sensor(RobotConstants.SENSOR_SHORT_RANGE_L, RobotConstants.SENSOR_SHORT_RANGE_H, this.posRow - 1, this.posCol + 1, findNewDirection(MOVEMENT.LEFT_TURN), "LR");
         LeftCenterLR = new Sensor(RobotConstants.SENSOR_LONG_RANGE_L, RobotConstants.SENSOR_LONG_RANGE_H, this.posRow - 1 , this.posCol, findNewDirection(MOVEMENT.LEFT_TURN), "LC");
         RightCenterSR = new Sensor(RobotConstants.SENSOR_SHORT_RANGE_L, RobotConstants.SENSOR_SHORT_RANGE_H, this.posRow + 1, this.posCol, findNewDirection(MOVEMENT.RIGHT_TURN), "RC");
+=======
+        LeftLeftLR = new Sensor(RobotConstants.SENSOR_SHORT_RANGE_L, RobotConstants.SENSOR_SHORT_RANGE_H, this.posRow - 1, this.posCol - 1, findNewDirection(MOVEMENT.LEFT_TURN), "LL");
+        LeftCenterSR = new Sensor(RobotConstants.SENSOR_LONG_RANGE_L, RobotConstants.SENSOR_LONG_RANGE_H, this.posRow - 1 , this.posCol, findNewDirection(MOVEMENT.LEFT_TURN), "LC");
+        RightRightSR = new Sensor(RobotConstants.SENSOR_SHORT_RANGE_L, RobotConstants.SENSOR_SHORT_RANGE_H, this.posRow + 1, this.posCol - 1, findNewDirection(MOVEMENT.RIGHT_TURN), "RR");
+>>>>>>> 85f65feb76c562bbf9f1f3f4399b3fa16ad97aac
     }
-
 
 
     //########################################
@@ -244,9 +257,27 @@ public class RobotReal extends Robot{
                         break;
                 }
                 break;
+<<<<<<< HEAD
+=======
+            case BACKWARD:
+                switch (this.orientation) {
+                    case North:
+                        posRow++;
+                        break;
+                    case East:
+                        posCol--;
+                        break;
+                    case South:
+                        posRow--;
+                        break;
+                    case West:
+                        posCol++;
+                        break;
+                }
+                break;
+>>>>>>> 85f65feb76c562bbf9f1f3f4399b3fa16ad97aac
             case RIGHT_TURN:
             case LEFT_TURN:
-            case TURN_AROUND:
                 this.orientation = findNewDirection(m);
                 break;
             default:
@@ -262,6 +293,7 @@ public class RobotReal extends Robot{
      * Overloaded method that calls this.move(MOVEMENT m, boolean sendMoveToAndroid = true).
      */
 
+<<<<<<< HEAD
     public void moveSimulate(MOVEMENT m){
         switch (m) {
         case FORWARD:
@@ -293,6 +325,8 @@ public class RobotReal extends Robot{
     }
 
 
+=======
+>>>>>>> 85f65feb76c562bbf9f1f3f4399b3fa16ad97aac
     /**
      * Uses the Communication to send the next movement to the robot.
      */
@@ -305,11 +339,8 @@ public class RobotReal extends Robot{
     private Orientation findNewDirection(MOVEMENT m) {
         if (m == MOVEMENT.RIGHT_TURN) {
             return Orientation.getNextOrientation(this.orientation);
-        } else if (m==MOVEMENT.LEFT_TURN) {
+        } else {
             return Orientation.getPreviousOrientation(this.orientation);
-        }
-        else{
-            return Orientation.getPreviousOrientation(Orientation.getPreviousOrientation(this.orientation));
         }
     }
 
@@ -343,7 +374,7 @@ public class RobotReal extends Robot{
                 RightCenterSR.setSensor(this.posRow, this.posCol + 1, findNewDirection(MOVEMENT.RIGHT_TURN));
                 break;
             case East:
-                FrontLeftSR.setSensor(this.posRow - 1, this.posCol + 1, this.orientation);
+                FrontLeftSR.setSensor(this.posRow + 1, this.posCol + 1, this.orientation);
                 FrontCenterSR.setSensor(this.posRow, this.posCol+1, this.orientation);
                 FrontRightSR.setSensor(this.posRow + 1, this.posCol + 1, this.orientation);
                 LeftRightSR.setSensor(this.posRow - 1, this.posCol + 1, findNewDirection(MOVEMENT.LEFT_TURN));
@@ -382,6 +413,7 @@ public class RobotReal extends Robot{
             String msg = comm.recvMsg();
             String[] msgArr = msg.split(";");
 
+<<<<<<< HEAD
                 result[0] = (int)Double.parseDouble(msgArr[0]);  //FL
                 result[1] = (int)Double.parseDouble(msgArr[1]);  //FC
                 result[2] = (int)Double.parseDouble(msgArr[2]);  //FR
@@ -405,14 +437,42 @@ public class RobotReal extends Robot{
             LeftCenterLR.senseReal(explorationMap, result[3]+1);
             LeftRightSR.senseReal(explorationMap, result[4]+1);
             RightCenterSR.senseReal(explorationMap, result[5]+1);
+=======
+            if (msgArr[0].equals(CommunicationConstants.SENSOR_DATA)) {
+                result[0] = Integer.parseInt(msgArr[1].split("_")[1]);  //FL
+                result[1] = Integer.parseInt(msgArr[2].split("_")[1]);  //FC
+                result[2] = Integer.parseInt(msgArr[3].split("_")[1]);  //FR
+                result[3] = Integer.parseInt(msgArr[4].split("_")[1]);  //LC  This is  because of the order of the sensor reading sent
+                result[4] = Integer.parseInt(msgArr[5].split("_")[1]);  //LL
+                result[5] = Integer.parseInt(msgArr[6].split("_")[1]);  //RR
+            }
+
+            // LOGGING
+            System.out.println("Received Sensor Readings: ");
+            System.out.print("Front Left: " + result[0]);
+            System.out.print("Front Center: " + result[1]);
+            System.out.print("Front Right: " + result[2]);
+            System.out.print("Left Center: " + result[3]);
+            System.out.print("Left Left: " + result[4]);
+            System.out.print("Right Right: " + result[5]);
+            System.out.println();
+
+            FrontLeftSR.senseReal(explorationMap, result[0]);
+            FrontCenterSR.senseReal(explorationMap, result[1]);
+            FrontRightSR.senseReal(explorationMap, result[2]);
+            LeftCenterSR.senseReal(explorationMap, result[3]);
+            LeftLeftLR.senseReal(explorationMap, result[4]);
+            RightRightSR.senseReal(explorationMap, result[5]);
+>>>>>>> 85f65feb76c562bbf9f1f3f4399b3fa16ad97aac
 
             String[] p1p2 =  MapDescriptor.generateMapDescriptor(explorationMap.arena);  // This ret
-            String anMssg = "{p1:\"" + p1p2[0] + "\",p2:\"" + p1p2[1] + "\"}";
+            String anMssg = "{p1:" + p1p2[0] + ",p2:" + p1p2[1] +"}";
             comm.sendMsg(CommunicationConstants.ANDROID, anMssg);
         return result;
     }
 
 
+<<<<<<< HEAD
     public int[] senseSimulate(Map explorationMap, Map realMap) {
         int[] result = new int[6];
 
@@ -443,6 +503,8 @@ public class RobotReal extends Robot{
     }
 
 
+=======
+>>>>>>> 85f65feb76c562bbf9f1f3f4399b3fa16ad97aac
 }
 
 
