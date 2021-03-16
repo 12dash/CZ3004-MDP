@@ -13,6 +13,17 @@ from detect import detect
 from PIL import Image
 from ipython_genutils.py3compat import xrange
 
+img_info = {}
+
+prev = False
+
+obs = []
+for i in range(20):
+  for j in range(15):
+    obs.append([])
+
+img_grid = []
+
 class PcConnectionClient:
   def __init__(self):
     self.client = None
@@ -29,15 +40,23 @@ class PcConnectionClient:
   
   def send_to_server_ir_data(self, msg):
     msg = msg.encode(FORMAT)
-    self.client.send(msg)
+    self.client.send(msg) 
+  
 
   def process_image(self, processing_queue):
+    def get_number_img():
+      a = 0
+      for i in img_info:
+        if(img_info[i][-1]):
+          a+=1
+      return a
     while self.connected:
       if not processing_queue.empty():
         obj = processing_queue.get_nowait()        
 
         arr = np.asarray(obj["imageArr"]).astype(np.uint8) #convert to numpy arr        
         coords = obj["coords"]
+        nearby = True
 
         img = Image.fromarray(arr)
         path = f"{obj['coords']}.jpg"
@@ -47,28 +66,32 @@ class PcConnectionClient:
         # Sabrina: Predict Image ID here
         predicted_img = detect(path)
 
-        if predicted_img == -2:
+        if predicted_img == -1:
           print("Removed file")
           os.remove(f"output/{path}")
-
-        #TODO: Save the raw image captured with bounding box here -- need to display as output as end of run
-        if predicted_img != -1:
           #Then send to android
-          json_outgoing = json.dumps({"image": [coords[0], coords[1], predicted_img]})
-          self.send_to_server_ir_data(f"an|{json_outgoing}")
 
-        if(len(os.listdir("./output")) >= 5):
-          img_path = os.listdir("./output")
-          new_im = Image.new('RGB', (256*5,256))
+          json_outgoing = json.dumps({"image": [coords[0], coords[1], predicted_img[0]]})
+          self.send_to_server_ir_data(f"an|{json_outgoing}")
+        else:
+          for i in predicted_img:
+            if (i not in img_info.keys()):
+              img_info[i] = [coords, path, nearby]     
+            else:
+              if(img_info[i][-1] == False):
+                img_info[i] = [coords, path, nearby]
+
+        if(get_number_img() >= 5):
           img_path = os.listdir("./output")
           new_im = Image.new('RGB', (256*5,256))
           x_offset = 0
-          for i in range(len(img_path)):
-              img_temp = Image.open(f"output/{img_path[i]}")    
+          for i in img_info:
+              img_temp = Image.open(f"output/{img_info[i][1]}")    
               new_im.paste(img_temp,(x_offset,0))
               x_offset += img_temp.size[0]
           new_im.save("final.jpg")
           self.send_to_server_ir_data("pc|done")
+          print(img_info)
           return 
 
   # Modified version of reading -- reading image from RPI

@@ -84,9 +84,9 @@ def detect(path, save_img=False):
         t2 = time_synchronized()
 
         if (len(pred[0]>0)) :
-            print("\n\nPredictions : ", pred[0][0][-1])
-            qwe = (int)(pred[0][0][-1])
-            qwe = names[qwe]
+            qwe = []
+            for qwer in pred:
+                qwe.append(names[(int)(qwer[0][-1])])
         
         sac = print(names)
         # Apply Classifier
