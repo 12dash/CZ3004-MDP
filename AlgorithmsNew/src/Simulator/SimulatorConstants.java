@@ -14,9 +14,12 @@ public class SimulatorConstants {
     public static final Color C_OBSTACLE = Color.BLACK;
     public static final Color C_PATH = Color.ORANGE;
     public static final Color C_WAYPOINT = Color.CYAN;
+    public static final Color C_PICTURE_CLICKED = Color.CYAN;
 
+    public static final Color C_ROBOT_CALIB = Color.PINK;
     public static final Color C_ROBOT = Color.BLUE;
     public static final Color C_ROBOT_DIR = Color.WHITE;
+    public static final Color C_ROBOT_CLICK_RANDOM_PIC = Color.RED;
 
     public static final int ROBOT_W = 70;
     public static final int ROBOT_H = 70;

@@ -9,6 +9,7 @@ public class Grid {
     private final int x;
     private final int y;
     private boolean explored;
+    private boolean pictureClicked = false;
 
     public Grid(Type type, boolean acc, int x, int y, boolean explored) {
 
@@ -63,5 +64,13 @@ public class Grid {
     public boolean isObstacle(){
         return this.type.equals(Type.OBSTACLE);
     }
+
+    public void setPictureClicked(boolean click){
+        this.pictureClicked = click;
+    }
+    public boolean getPictureClicked(){
+        return this.pictureClicked;
+    }
+
 
 }

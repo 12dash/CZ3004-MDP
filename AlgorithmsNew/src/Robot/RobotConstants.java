@@ -5,7 +5,7 @@ import Values.Orientation;
 import java.util.HashMap;
 
 public class RobotConstants {
-    public static final int SPEED = 500;                             // delay between movements (ms)
+    public static final int SPEED = 200;                             // delay between movements (ms)
     public static final Orientation START_DIR = Orientation.East;  // start direction
     public static final int START_ROW = 18;                          // row no. of start cell
     public static final int START_COL = 1;                          // col no. of start cell
@@ -37,7 +37,7 @@ public class RobotConstants {
 
     // FOR EXPLORATION
     public enum MOVEMENT {
-        FORWARD, RIGHT_TURN, LEFT_TURN, TURN_AROUND, CALIBRATE, ERROR;
+        FORWARD, RIGHT_TURN, LEFT_TURN, TURN_AROUND, ERROR;
 
         public static char print(MOVEMENT m) {
             switch (m) {
@@ -49,8 +49,6 @@ public class RobotConstants {
                     return 'L';
                 case TURN_AROUND:
                     return 'I';
-                case CALIBRATE:
-                    return 'H';
                 case ERROR:
                 default:
                     return 'X';
@@ -62,7 +60,10 @@ public class RobotConstants {
 
     public static final int SENSOR_SHORT_RANGE_L = 1;               // range of short range sensor (cells)
     public static final int SENSOR_SHORT_RANGE_H = 2;               // range of short range sensor (cells)
-    public static final int SENSOR_LONG_RANGE_L = 2;                // range of long range sensor (cells)
+    public static final int SENSOR_LONG_RANGE_L = 3;                // range of long range sensor (cells)
     public static final int SENSOR_LONG_RANGE_H = 8;                // range of long range sensor (cells)
+
+    public static final int NUM_MOVES_AFTER_CLICK_PICTURE = 5;
+    public static final int NUM_MOVES_AFTER_CALIBRATE = 3;
 
 }

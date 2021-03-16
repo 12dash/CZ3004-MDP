@@ -108,13 +108,16 @@ public class Map extends JPanel {
                     cellColor = SimulatorConstants.C_START;
                 else if (inGoalZone(row, col))
                     cellColor = SimulatorConstants.C_GOAL;
+                else if(this.arena.grids[row][col].getPictureClicked()){
+                    cellColor = SimulatorConstants.C_PICTURE_CLICKED;
+                }
                 else if (this.arena.grids[row][col].getType() == Type.OBSTACLE && this.arena.grids[row][col].isExplored() ){
                     cellColor = SimulatorConstants.C_OBSTACLE;
                 }
                 else if (!this.arena.grids[row][col].isExplored()){
                     cellColor = SimulatorConstants.C_UNEXPLORED;
                 }
-                g.setColor(cellColor);
+                    g.setColor(cellColor);
 
                 g.fillRect(_gridCells[row][col].cellX + SimulatorConstants.MAP_X_OFFSET, _gridCells[row][col].cellY, _gridCells[row][col].cellSize, _gridCells[row][col].cellSize);
             }
@@ -133,7 +136,15 @@ public class Map extends JPanel {
                 g.fillRect(_gridCells[waypoint_y][waypoint_x].cellX + SimulatorConstants.MAP_X_OFFSET, _gridCells[waypoint_y][waypoint_x].cellY, _gridCells[waypoint_y][waypoint_x].cellSize, _gridCells[waypoint_y][waypoint_x].cellSize);
             }
             // Paint the robot on-screen.
-            g.setColor(SimulatorConstants.C_ROBOT);
+            if(robotReal.getCalibMode()){
+                g.setColor(SimulatorConstants.C_ROBOT_CALIB);
+            }
+            else if(robotReal.getIfClickingRandomPicture()){
+                g.setColor(SimulatorConstants.C_ROBOT_CLICK_RANDOM_PIC);
+            }
+            else {
+                g.setColor(SimulatorConstants.C_ROBOT);
+            }
             int r = ArenaConstants.ARENA_ROWS - this.robotReal.getRobotPosRow();
             int c = robotReal.getRobotPosCol();
 
@@ -166,7 +177,15 @@ public class Map extends JPanel {
 
         else {
             // Paint the robot on-screen.
-            g.setColor(SimulatorConstants.C_ROBOT);
+            if(robotReal.getCalibMode()){
+                g.setColor(SimulatorConstants.C_ROBOT_CALIB);
+            }
+            else if(robotReal.getIfClickingRandomPicture()){
+                g.setColor(SimulatorConstants.C_ROBOT_CLICK_RANDOM_PIC);
+            }
+            else {
+                g.setColor(SimulatorConstants.C_ROBOT);
+            }
             int r = ArenaConstants.ARENA_ROWS - this.robot.getCur().getY();
             int c = robot.getCur().getX();
 
@@ -203,5 +222,7 @@ public class Map extends JPanel {
         waypoint_x = x;
         waypoint_y = y;
     }
+
+
 
 }

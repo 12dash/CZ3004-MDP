@@ -26,7 +26,7 @@ public class ActualSimulatorFastestPath {
     //          SET THESE VALUES
     //#############################################
 
-    private static String INPUT_MAP_FILE = "example_4.txt";
+    private static String INPUT_MAP_FILE = "final.txt";
     private static int wayP_x = 12;   // Default Waypoint
     private static int wayP_y = 12;   // Default Waypoint
 

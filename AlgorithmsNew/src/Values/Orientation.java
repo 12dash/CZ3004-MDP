@@ -23,10 +23,12 @@ public enum Orientation {
         ORIENTATION_MAPPINGS.put(West, 3);
     }
 
+    // Clockwise
     public static Orientation getNextOrientation(Orientation curOrientation) {
         return orientations[(ORIENTATION_MAPPINGS.get(curOrientation) + 1) % orientations.length];
     }
 
+    //Counter-clockwise
     public static Orientation getPreviousOrientation(Orientation curDirection) {
         return orientations[(ORIENTATION_MAPPINGS.get(curDirection) + orientations.length -1) % orientations.length];
     }

@@ -13,11 +13,11 @@ import Utility.MapDescriptor;
  * *
  * The robot is represented by a 3 x 3 cell space as below:
  *
- *          ^   ^   ^
- *         SR  SR  SR
- *        [X] [X] [X]
- *   < SR [X] [X] [X]
- *   < LR [X] [X] [X] SR >
+ *           ^   ^   ^
+ *          SR  SR  SR
+ *      <SR [X] [X] [X]
+ *      <LR [X] [X] [X] SR>
+ *          [X] [X] [X]
  *
  * SR = Short Range Sensor, LR = Long Range Sensor
  *
@@ -35,14 +35,16 @@ public class RobotReal extends Robot{
     // These are according to the ALGO MAP REPRESENTATION i.e. the top-right cell is (0, 0)
     private int posRow;
     private int posCol;
+    private boolean calibMode = false;
+    private boolean clickingRandomPicture = false;
 
     // Sensors
     private final Sensor FrontLeftSR;       // front-facing left SR
     private final Sensor FrontCenterSR;     // front-facing center SR
     private final Sensor FrontRightSR;      // front-facing right SR
-    private final Sensor LeftLeftLR;      // left-facing left SR
-    private final Sensor LeftCenterSR;      // left-facing center LR // LONG RANGE
-    private final Sensor RightRightSR;      // right-facing right SR
+    private final Sensor LeftRightSR;       // left-facing left SR
+    private final Sensor LeftCenterLR;      // left-facing center LR // LONG RANGE
+    private final Sensor RightCenterSR;     // right-facing center SR
 
     private boolean touchedGoal;
 
@@ -51,14 +53,14 @@ public class RobotReal extends Robot{
 
         this.posRow = g.getY();
         this.posCol = g.getX();
-        this.orientation = RobotConstants.START_DIR;
+        this.orientation = RobotConstants.START_DIR; // EAST
 
         FrontLeftSR = new Sensor(RobotConstants.SENSOR_SHORT_RANGE_L, RobotConstants.SENSOR_SHORT_RANGE_H, this.posRow - 1, this.posCol + 1, this.orientation, "FL");
         FrontCenterSR = new Sensor(RobotConstants.SENSOR_SHORT_RANGE_L, RobotConstants.SENSOR_SHORT_RANGE_H, this.posRow, this.posCol+1, this.orientation, "FC");
         FrontRightSR = new Sensor(RobotConstants.SENSOR_SHORT_RANGE_L, RobotConstants.SENSOR_SHORT_RANGE_H, this.posRow + 1, this.posCol + 1, this.orientation, "FR");
-        LeftLeftLR = new Sensor(RobotConstants.SENSOR_LONG_RANGE_L, RobotConstants.SENSOR_LONG_RANGE_H, this.posRow - 1, this.posCol - 1, findNewDirection(MOVEMENT.LEFT_TURN), "LL");
-        LeftCenterSR = new Sensor(RobotConstants.SENSOR_SHORT_RANGE_L, RobotConstants.SENSOR_SHORT_RANGE_H, this.posRow - 1 , this.posCol, findNewDirection(MOVEMENT.LEFT_TURN), "LC");
-        RightRightSR = new Sensor(RobotConstants.SENSOR_SHORT_RANGE_L, RobotConstants.SENSOR_SHORT_RANGE_H, this.posRow + 1, this.posCol - 1, findNewDirection(MOVEMENT.RIGHT_TURN), "RR");
+        LeftRightSR = new Sensor(RobotConstants.SENSOR_SHORT_RANGE_L, RobotConstants.SENSOR_SHORT_RANGE_H, this.posRow - 1, this.posCol + 1, findNewDirection(MOVEMENT.LEFT_TURN), "LR");
+        LeftCenterLR = new Sensor(RobotConstants.SENSOR_LONG_RANGE_L, RobotConstants.SENSOR_LONG_RANGE_H, this.posRow - 1 , this.posCol, findNewDirection(MOVEMENT.LEFT_TURN), "LC");
+        RightCenterSR = new Sensor(RobotConstants.SENSOR_SHORT_RANGE_L, RobotConstants.SENSOR_SHORT_RANGE_H, this.posRow + 1, this.posCol, findNewDirection(MOVEMENT.RIGHT_TURN), "RC");
     }
 
 
@@ -223,7 +225,7 @@ public class RobotReal extends Robot{
      * Takes in a MOVEMENT and moves the robot accordingly by changing its position and direction. Sends the movement
      * if this.realBot is set.
      */
-    public void move(MOVEMENT m, boolean sendMoveToAndroid) {
+    public void move(MOVEMENT m) {
 
         switch (m) {
             case FORWARD:
@@ -242,44 +244,23 @@ public class RobotReal extends Robot{
                         break;
                 }
                 break;
-//            case BACKWARD:
-//                switch (this.orientation) {
-//                    case North:
-//                        posRow++;
-//                        break;
-//                    case East:
-//                        posCol--;
-//                        break;
-//                    case South:
-//                        posRow--;
-//                        break;
-//                    case West:
-//                        posCol++;
-//                        break;
-//                }
-//                break;
             case RIGHT_TURN:
             case LEFT_TURN:
             case TURN_AROUND:
                 this.orientation = findNewDirection(m);
-                break;
-            case CALIBRATE:
                 break;
             default:
                 System.out.println("Error in Robot.move()!");
                 break;
         }
 
-        sendMovement(m, sendMoveToAndroid);
+        sendMovement(m);
         updateTouchedGoal();
     }
 
     /**
      * Overloaded method that calls this.move(MOVEMENT m, boolean sendMoveToAndroid = true).
      */
-    public void move(MOVEMENT m) {
-        this.move(m, true);
-    }
 
     public void moveSimulate(MOVEMENT m){
         switch (m) {
@@ -299,34 +280,15 @@ public class RobotReal extends Robot{
                     break;
             }
             break;
-//        case BACKWARD:
-//            switch (this.orientation) {
-//                case North:
-//                    posRow++;
-//                    break;
-//                case East:
-//                    posCol--;
-//                    break;
-//                case South:
-//                    posRow--;
-//                    break;
-//                case West:
-//                    posCol++;
-//                    break;
-//            }
-//            break;
         case RIGHT_TURN:
         case LEFT_TURN:
         case TURN_AROUND:
             this.orientation = findNewDirection(m);
             break;
-        case CALIBRATE:
-            break;
         default:
             System.out.println("Error in Robot.move()!");
             break;
     }
-
         updateTouchedGoal();
     }
 
@@ -334,13 +296,10 @@ public class RobotReal extends Robot{
     /**
      * Uses the Communication to send the next movement to the robot.
      */
-    private void sendMovement(MOVEMENT m, boolean sendMoveToAndroid) {
+    private void sendMovement(MOVEMENT m) {
         Communication comm = Communication.getCommunication();
-        comm.sendMsg(CommunicationConstants.ARDUINO, Character.toString(MOVEMENT.print(m)));
-        if (m != MOVEMENT.CALIBRATE && sendMoveToAndroid) {
-            String androidMsg = "{move:" +   MOVEMENT.print(m) + "}";
-            comm.sendMsg(CommunicationConstants.ANDROID, androidMsg);
-        }
+        String androidMsg = "an|{move:" +   MOVEMENT.print(m) + "}";
+        comm.sendMsg(CommunicationConstants.ARDUINO, MOVEMENT.print(m) + "_"+ androidMsg); // For back to back message to arduino and android
     }
 
     private Orientation findNewDirection(MOVEMENT m) {
@@ -379,33 +338,33 @@ public class RobotReal extends Robot{
                 FrontLeftSR.setSensor(this.posRow - 1, this.posCol - 1, this.orientation);
                 FrontCenterSR.setSensor(this.posRow - 1, this.posCol, this.orientation);
                 FrontRightSR.setSensor(this.posRow - 1, this.posCol + 1, this.orientation);
-                LeftLeftLR.setSensor(this.posRow + 1, this.posCol - 1, findNewDirection(MOVEMENT.LEFT_TURN));
-                LeftCenterSR.setSensor(this.posRow, this.posCol-1, findNewDirection(MOVEMENT.LEFT_TURN));
-                RightRightSR.setSensor(this.posRow + 1, this.posCol + 1, findNewDirection(MOVEMENT.RIGHT_TURN));
+                LeftRightSR.setSensor(this.posRow - 1, this.posCol - 1, findNewDirection(MOVEMENT.LEFT_TURN));
+                LeftCenterLR.setSensor(this.posRow, this.posCol-1, findNewDirection(MOVEMENT.LEFT_TURN));
+                RightCenterSR.setSensor(this.posRow, this.posCol + 1, findNewDirection(MOVEMENT.RIGHT_TURN));
                 break;
             case East:
                 FrontLeftSR.setSensor(this.posRow - 1, this.posCol + 1, this.orientation);
                 FrontCenterSR.setSensor(this.posRow, this.posCol+1, this.orientation);
                 FrontRightSR.setSensor(this.posRow + 1, this.posCol + 1, this.orientation);
-                LeftLeftLR.setSensor(this.posRow - 1, this.posCol - 1, findNewDirection(MOVEMENT.LEFT_TURN));
-                LeftCenterSR.setSensor(this.posRow - 1 , this.posCol, findNewDirection(MOVEMENT.LEFT_TURN));
-                RightRightSR.setSensor(this.posRow + 1, this.posCol - 1, findNewDirection(MOVEMENT.RIGHT_TURN));
+                LeftRightSR.setSensor(this.posRow - 1, this.posCol + 1, findNewDirection(MOVEMENT.LEFT_TURN));
+                LeftCenterLR.setSensor(this.posRow - 1 , this.posCol, findNewDirection(MOVEMENT.LEFT_TURN));
+                RightCenterSR.setSensor(this.posRow + 1, this.posCol, findNewDirection(MOVEMENT.RIGHT_TURN));
                 break;
             case South:
                 FrontLeftSR.setSensor(this.posRow + 1, this.posCol + 1, this.orientation);
                 FrontCenterSR.setSensor(this.posRow + 1, this.posCol, this.orientation);
                 FrontRightSR.setSensor(this.posRow + 1, this.posCol - 1, this.orientation);
-                LeftLeftLR.setSensor(this.posRow - 1, this.posCol + 1, findNewDirection(MOVEMENT.LEFT_TURN));
-                LeftCenterSR.setSensor(this.posRow, this.posCol + 1, findNewDirection(MOVEMENT.LEFT_TURN));
-                RightRightSR.setSensor(this.posRow - 1, this.posCol - 1, findNewDirection(MOVEMENT.RIGHT_TURN));
+                LeftRightSR.setSensor(this.posRow + 1, this.posCol + 1, findNewDirection(MOVEMENT.LEFT_TURN));
+                LeftCenterLR.setSensor(this.posRow, this.posCol + 1, findNewDirection(MOVEMENT.LEFT_TURN));
+                RightCenterSR.setSensor(this.posRow, this.posCol - 1, findNewDirection(MOVEMENT.RIGHT_TURN));
                 break;
             case West:
                 FrontLeftSR.setSensor(this.posRow + 1, this.posCol - 1, this.orientation);
                 FrontCenterSR.setSensor(this.posRow, this.posCol - 1, this.orientation);
                 FrontRightSR.setSensor(this.posRow - 1, this.posCol - 1, this.orientation);
-                LeftLeftLR.setSensor(this.posRow + 1, this.posCol + 1, findNewDirection(MOVEMENT.LEFT_TURN));
-                LeftCenterSR.setSensor(this.posRow + 1, this.posCol, findNewDirection(MOVEMENT.LEFT_TURN));
-                RightRightSR.setSensor(this.posRow - 1, this.posCol + 1, findNewDirection(MOVEMENT.RIGHT_TURN));
+                LeftRightSR.setSensor(this.posRow + 1, this.posCol - 1, findNewDirection(MOVEMENT.LEFT_TURN));
+                LeftCenterLR.setSensor(this.posRow + 1, this.posCol, findNewDirection(MOVEMENT.LEFT_TURN));
+                RightCenterSR.setSensor(this.posRow - 1, this.posCol, findNewDirection(MOVEMENT.RIGHT_TURN));
                 break;
         }
     }
@@ -418,36 +377,34 @@ public class RobotReal extends Robot{
      */
     public int[] senseMap(Map explorationMap) {
         int[] result = new int[6];
-
+            System.out.println("Waiting for sensor readings..");
             Communication comm = Communication.getCommunication();
             String msg = comm.recvMsg();
             String[] msgArr = msg.split(";");
 
-//            if (msgArr[0].equals(CommunicationConstants.SENSOR_DATA)) {
                 result[0] = (int)Double.parseDouble(msgArr[0]);  //FL
                 result[1] = (int)Double.parseDouble(msgArr[1]);  //FC
                 result[2] = (int)Double.parseDouble(msgArr[2]);  //FR
-                result[3] = (int)Double.parseDouble(msgArr[3]);  //LC  This is  because of the order of the sensor reading sent
-                result[4] = (int)Double.parseDouble(msgArr[4]);  //LL
+                result[3] = (int)Double.parseDouble(msgArr[3]);  //LC
+                result[4] = (int)Double.parseDouble(msgArr[4]);  //LR
                 result[5] = (int)Double.parseDouble(msgArr[5]);  //RR
-//            }
+
 
             // LOGGING
-            System.out.println("Received Sensor Readings: ");
             System.out.print("Front Left:" + result[0]);
             System.out.print("; Front Center:" + result[1]);
             System.out.print("; Front Right:" + result[2]);
             System.out.print("; Left Center:" + result[3]);
-            System.out.print("; Left Left:" + result[4]);
-            System.out.print("; Right Right:" + result[5]);
+            System.out.print("; Left Right:" + result[4]);
+            System.out.print("; Right Center:" + result[5]);
             System.out.println();
 
             FrontLeftSR.senseReal(explorationMap, result[0]+1);
             FrontCenterSR.senseReal(explorationMap, result[1]+1);
             FrontRightSR.senseReal(explorationMap, result[2]+1);
-            LeftCenterSR.senseReal(explorationMap, result[3]+1);
-            LeftLeftLR.senseReal(explorationMap, result[4]+1);
-            RightRightSR.senseReal(explorationMap, result[5]+1);
+            LeftCenterLR.senseReal(explorationMap, result[3]+1);
+            LeftRightSR.senseReal(explorationMap, result[4]+1);
+            RightCenterSR.senseReal(explorationMap, result[5]+1);
 
             String[] p1p2 =  MapDescriptor.generateMapDescriptor(explorationMap.arena);  // This ret
             String anMssg = "{p1:\"" + p1p2[0] + "\",p2:\"" + p1p2[1] + "\"}";
@@ -462,12 +419,29 @@ public class RobotReal extends Robot{
         result[0] = FrontRightSR.sense(explorationMap, realMap);
         result[1] = FrontCenterSR.sense(explorationMap, realMap);
         result[2] = FrontLeftSR.sense(explorationMap, realMap);
-        result[3] = LeftCenterSR.sense(explorationMap, realMap);
-        result[4] = LeftLeftLR.sense(explorationMap, realMap);
-        result[5] = RightRightSR.sense(explorationMap, realMap);
+        result[3] = LeftCenterLR.sense(explorationMap, realMap);
+        result[4] = LeftRightSR.sense(explorationMap, realMap);
+        result[5] = RightCenterSR.sense(explorationMap, realMap);
 
         return result;
     }
+
+    public boolean getCalibMode(){
+        return calibMode;
+    }
+
+    public void setCalibMode(boolean calib){
+        this.calibMode = calib;
+    }
+
+    public void setClickingRandomPicture(boolean val){
+        clickingRandomPicture = val;
+    }
+
+    public boolean getIfClickingRandomPicture(){
+        return clickingRandomPicture;
+    }
+
 
 }
 

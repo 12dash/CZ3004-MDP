@@ -230,6 +230,7 @@ public class Arena {
 
         if (obstacle) {
             this.grids[row][col].setType(Type.OBSTACLE);
+            this.grids[row][col].setAcc(false);
             removePaddingFromNonObstacles();
             addPaddingToExploredCells();
         }
@@ -247,5 +248,42 @@ public class Arena {
         return !areValidCoordinates(row, col) || this.grids[row][col].isObstacle();
     }
 
+    // Returns cood of any surrounding (left, right, top, bottom) explored and free cell starting from bottom left to top right
+
+    public int[] checkSurroundingExploredAndFree(int row, int col){
+        int[] rowsToCheck = new int[]{0, 2, 0, -2}; //{ 2,  2, 2, 2, 2, 1, 0, -1, -2, -2, -2, -2, -2, -1,  0,  1};
+        int[] colsToCheck = new int[]{-2, 0, 2, 0}; //{-2, -1, 0, 1, 2, 2, 2,  2,  2,  1,  0, -1, -2, -2, -2, -2};
+
+        for(int i = 0; i < rowsToCheck.length; i++){
+            int r = row + rowsToCheck[i];
+            int c = col + colsToCheck[i];
+            if(areValidCoordinates(r,c) && getGrid(r,c).isExplored() && getGrid(r,c).getAcc()){
+                return new int[]{r,c};
+            }
+        }
+        return new int[]{-1, -1};
+    }
+
+  // Gets if (x2, y2) is north, east, south or west to (x1, y1) (Not considered for N-E, S-E etc.)
+  // ** OTHERWISE JUST RETURNS NORTH-EAST **
+    public Orientation getRelativeOrientation(int x1, int y1, int x2, int y2){
+        if(x2 > x1){
+            return Orientation.East;
+        }
+        else if(x2 < x1){
+            return Orientation.West;
+        }
+
+        else if(y2 > y1){
+            return Orientation.South;
+        }
+
+        else if(y2 < y1){
+            return Orientation.North;
+        }
+        return Orientation.NorthEast;
+    }
 
 }
+
+

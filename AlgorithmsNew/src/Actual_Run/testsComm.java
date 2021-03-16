@@ -1,23 +1,41 @@
 package Actual_Run;
 
+import Algo.Exploration;
 import Communication.*;
 import Communication.CommunicationConstants;
 import Environment.Arena;
+import Environment.ArenaConstants;
 import Robot.RobotConstants;
 import Simulator.Map;
+import Simulator.SimulatorConstants;
+import Utility.FileManager;
 import Utility.MapDescriptor;
 import javafx.scene.shape.MoveTo;
+import Exploration.ExplorationAlgo;
+import Robot.RobotConstants.MOVEMENT;
 
+import javax.swing.*;
+import java.awt.*;
 import java.util.Scanner;
 
 public class testsComm {
+
+    public static Map map;
+    private static int timeLimit = ArenaConstants.MAX_TIME_LIMIT;
+    private static int coverage = ArenaConstants.MAX_COVERAGE;
+
+    private static JFrame _appFrame = null;         // application JFrame
+    private static JPanel _mapCards = null;         // JPanel for map views
 
     public static void main(String[] args){
 
 //        testRobotMovements();
 //        testMapDescriptor();
-        testSendComm();
-    }
+//        testSendComm();
+//        goToIslands();
+//        testExploration();
+        testIR();
+        }
 
 
     public static void testMapDescriptor(){
@@ -58,36 +76,114 @@ public class testsComm {
         }
     }
 
-    public void testExploration(){
-
+    public static void testExploration(){
+        map = new Map(new Arena(false), false, true);
+        displayAll();
         int[] result = new int[6];
         Communication comm = Communication.getCommunication();
         comm.openConnection();
 
         Scanner sc = new Scanner(System.in);
 
-        while(true){
+
+        ExplorationAlgo e = new ExplorationAlgo(map, timeLimit, coverage, comm);
+
+        while(true) {
             String inp = sc.nextLine();
-            comm.sendMsg(CommunicationConstants.ARDUINO, inp);
-            String msg = comm.recvMsg();
-            String[] msgArr = msg.split(";");
+            MOVEMENT m = null;
+            switch (inp) {
+                case "E":
+                    comm.sendMsg(CommunicationConstants.ARDUINO, CommunicationConstants.START_EPLORATION);
+                    break;
+                case "0":
+                    m = MOVEMENT.FORWARD;
+                    break;
+                case "L":
+                    m = MOVEMENT.LEFT_TURN;
+                    break;
+                case "R":
+                    m = MOVEMENT.RIGHT_TURN;
+                    break;
+                case "I":
+                    m = MOVEMENT.TURN_AROUND;
+                    break;
+                default:
+                    m = MOVEMENT.ERROR;
+            }
+            if (!inp.equals("E") && !m.equals(MOVEMENT.ERROR))
+                map.robotReal.move(m);
 
-            result[0] = (int)Double.parseDouble(msgArr[0]);  //FL
-            result[1] = (int)Double.parseDouble(msgArr[1]);  //FC
-            result[2] = (int)Double.parseDouble(msgArr[2]);  //FR
-            result[3] = (int)Double.parseDouble(msgArr[3]);  //LC  This is  because of the order of the sensor reading sent
-            result[4] = (int)Double.parseDouble(msgArr[4]);  //LL
-            result[5] = (int)Double.parseDouble(msgArr[5]);  //RR
+//            comm.sendMsg(CommunicationConstants.ARDUINO, inp);
 
-            // LOGGING
-            System.out.println("Received Sensor Readings: ");
-            System.out.print("Front Left:" + result[0]);
-            System.out.print("; Front Center:" + result[1]);
-            System.out.print("; Front Right:" + result[2]);
-            System.out.print("; Left Center:" + result[3]);
-            System.out.print("; Left Left:" + result[4]);
-            System.out.print("; Right Right:" + result[5]);
-            System.out.println();
+            e.senseAndRepaint(false);
+//
+        }
+    }
+
+
+    public static void goToIslands(){
+        int i = ArenaConstants.ARENA_ROWS;
+        int j = -1;
+
+        while (i != 0 || j != ArenaConstants.ARENA_COLS - 1){
+            if (i > 0) {
+                i--;
+            }
+            if (j < ArenaConstants.ARENA_COLS - 1) {
+                j++;
+            }
+
+            for (int c = 0; c <= j; c++) {
+                System.out.println(i + "," + c);
+            }
+            for (int r = i+1; r <= ArenaConstants.ARENA_ROWS - 1; r++) {
+                System.out.println(r + "," + j);
+            }
+
+        }
+    }
+
+
+    public static void displayAll() {
+
+        _appFrame = new JFrame();
+        _appFrame.setTitle("Simulator");
+        _appFrame.setSize(new Dimension(SimulatorConstants.DEFAULT_WIDTH, SimulatorConstants.DEFAULT_HEIGHT));
+        _mapCards = new JPanel(new CardLayout());
+
+        initialiseMap();
+
+        Container contentPane = _appFrame.getContentPane();
+        contentPane.add(_mapCards, BorderLayout.CENTER);
+
+        _appFrame.setVisible(true);
+        _appFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+    }
+
+    private static void initialiseMap() {
+        _mapCards.add(map, "MAP");
+        CardLayout cl = ((CardLayout) _mapCards.getLayout());
+        cl.show(_mapCards, "MAP");
+    }
+
+
+//    private static void loadMap(Map map){
+//        String[] p_string = FileManager.readFile(INPUT_MAP_FILE);
+//        int[][] obs = MapDescriptor.getMap(p_string[0], p_string[1]);
+//        map.arena.make_arena(obs);
+//        map.arena.setExplored();
+//        map.repaint();
+//    }
+
+    public static void testIR(){
+        Communication comm = Communication.getCommunication();
+        comm.openConnection();
+        while (true){
+            Scanner sc = new Scanner(System.in);
+            String a =sc.nextLine();
+            comm.sendMsg(CommunicationConstants.IR, "{\"coords\":["+ a +",9],\"nearby\":\"True\"}");
+            String b  = comm.recvMsg();
+            System.out.println(b);
         }
     }
 }

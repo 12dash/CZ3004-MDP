@@ -4,6 +4,7 @@ public class CommunicationConstants {
 
     public static final String ANDROID = "an";
     public static final String ARDUINO = "ar";
+    public static final String IR = "ir"; // TODO: Check this with RPI
 
     public static final String START = "start";
     public static final String WAYPOINT = "waypoint";
@@ -13,7 +14,15 @@ public class CommunicationConstants {
     public static final String EXPLORATION = "ES";          // Android --> PC: Exploration
     public static final String START_EPLORATION = "E";      // PC --> Arduino: Start Exploration
     public static final String GO_HOME = "GH";              // PC --> Arduino: Once the exploration is complete
-    public static final String INITIAL_CALIBRATION = "Z";   // pc --> Arduino: Initial Calibration, Facing EAST
+
+    public static final String FINISH = ""; // TODO: Finalise this protocol
+
+    // CALIBRATION CONSTANTS
+    public static final String CALI_FRONT = "H";
+    public static final String CALI_RIGHT = "T";
+    public static final String CALI_LEFT = "J";
+    public static final String CALI_RIGHT_FRONT = "K";
+    public static final String CALI_LEFT_FRONT = "M";
 
     //TODO: Finalize this ^ initial calibration with arduino
 
