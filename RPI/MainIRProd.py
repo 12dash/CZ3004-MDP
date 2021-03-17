@@ -68,13 +68,20 @@ class Main(threading.Thread):
             json_incoming = json.loads(msg_lst[1])
 
             if "coords" in json_incoming:
+              # Check if nearby is in message
+              if "nearby" in json_incoming:
+                nearby = json_incoming["nearby"]
+              else:
+                print("Algo PC: Please indicate whether obstacle is nearby or not")
+              
+              # Get coords of message
               coords = json_incoming["coords"]
 
               # RPI to take picture on command from ALGO PC
               image_arr = self.rpi_camera.capture_image()
 
               # after picture is taken, send to IR PC -> Image Array and Coords
-              json_msg = {"imageArr" : image_arr, "coords": coords }
+              json_msg = {"imageArr" : image_arr, "coords": coords, "nearby" : nearby }
               self.ir_pc_queue.put_nowait(json.dumps(json_msg, cls=NumpyEncoder)) 
               print("Sent image and coords to IR PC")
 
