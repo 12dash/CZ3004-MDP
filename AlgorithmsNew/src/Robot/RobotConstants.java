@@ -5,7 +5,7 @@ import Values.Orientation;
 import java.util.HashMap;
 
 public class RobotConstants {
-    public static final int SPEED = 10;                             // delay between movements (ms)
+    public static final int SPEED = 100;                             // delay between movements (ms)
     public static final Orientation START_DIR = Orientation.East;  // start direction
     public static final int START_ROW = 18;                          // row no. of start cell
     public static final int START_COL = 1;                          // col no. of start cell
@@ -35,37 +35,35 @@ public class RobotConstants {
     }
 
 
-    // TODO: Finalise protocol for these commands: most importantly backward, calibrate
     // FOR EXPLORATION
     public enum MOVEMENT {
-        FORWARD, BACKWARD, RIGHT_TURN, LEFT_TURN, TURN_AROUND, CALIBRATE, ERROR;
+        FORWARD, RIGHT_TURN, LEFT_TURN, TURN_AROUND, ERROR;
 
         public static char print(MOVEMENT m) {
             switch (m) {
                 case FORWARD:
                     return '0';
-                case BACKWARD:
-                    return 'B';
                 case RIGHT_TURN:
                     return 'R';
                 case LEFT_TURN:
                     return 'L';
                 case TURN_AROUND:
                     return 'I';
-                case CALIBRATE:
-                    return 'C';
                 case ERROR:
                 default:
-                    return 'E';
+                    return 'X';
             }
         }
     }
 
-    //TODO: Ask for these ranges from Arduino
+    //TODO: Finalise these ranges from Arduino
 
     public static final int SENSOR_SHORT_RANGE_L = 1;               // range of short range sensor (cells)
     public static final int SENSOR_SHORT_RANGE_H = 2;               // range of short range sensor (cells)
     public static final int SENSOR_LONG_RANGE_L = 3;                // range of long range sensor (cells)
-    public static final int SENSOR_LONG_RANGE_H = 4;                // range of long range sensor (cells)
+    public static final int SENSOR_LONG_RANGE_H = 8;                // range of long range sensor (cells)
+
+    public static final int NUM_MOVES_AFTER_CLICK_PICTURE = 5;
+    public static final int NUM_MOVES_AFTER_CALIBRATE = 3;
 
 }

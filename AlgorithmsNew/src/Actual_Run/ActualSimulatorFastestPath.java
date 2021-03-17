@@ -26,7 +26,7 @@ public class ActualSimulatorFastestPath {
     //          SET THESE VALUES
     //#############################################
 
-    private static String INPUT_MAP_FILE = "example_2.txt";
+    private static String INPUT_MAP_FILE = "final.txt";
     private static int wayP_x = 12;   // Default Waypoint
     private static int wayP_y = 12;   // Default Waypoint
 
@@ -45,19 +45,21 @@ public class ActualSimulatorFastestPath {
         while (true) {
 
             String msg = comm.recvMsg();
-            String[] msgArr = msg.split(":");
 
-            if (msgArr[0].equals(CommunicationConstants.WAYPOINT)) {
-                wayP_x = Integer.parseInt(msgArr[1]);
-                wayP_y = Integer.parseInt(msgArr[2]);
-                setWayPoint(wayP_x, wayP_y);
-            }
-
-            else if (msgArr[0].equals(CommunicationConstants.START)) {
-                if (msgArr[1].equals(CommunicationConstants.FASTEST_PATH)) {
-                    fastestPath();
+            if(msg.indexOf(':') != -1) {
+                String[] msgArr = msg.split(":");
+                if (msgArr[0].equals(CommunicationConstants.WAYPOINT)) {
+                    wayP_x = Integer.parseInt(msgArr[1]);
+                    wayP_y = Integer.parseInt(msgArr[2]);
+                    setWayPoint(wayP_x, wayP_y);
+                } else if (msgArr[0].equals(CommunicationConstants.START)) {
+                    if (msgArr[1].equals(CommunicationConstants.FASTEST_PATH)) {
+                        fastestPath();
+                    }
                 }
-
+            }
+            else{
+                System.out.println("Not a valid command: Doesn't have a colon (:) ");
             }
         }
     }
