@@ -299,7 +299,8 @@ public class RobotReal extends Robot{
     private void sendMovement(MOVEMENT m) {
         Communication comm = Communication.getCommunication();
         String androidMsg = "an|{move:" +   MOVEMENT.print(m) + "}";
-        comm.sendMsg(CommunicationConstants.ARDUINO, MOVEMENT.print(m) + "_"+ androidMsg); // For back to back message to arduino and android
+        comm.sendMsg(CommunicationConstants.ANDROID, androidMsg);
+        comm.sendMsg(CommunicationConstants.ARDUINO, Character.toString(MOVEMENT.print(m))); // For back to back message to arduino and android
     }
 
     private Orientation findNewDirection(MOVEMENT m) {
@@ -380,6 +381,11 @@ public class RobotReal extends Robot{
             System.out.println("Waiting for sensor readings..");
             Communication comm = Communication.getCommunication();
             String msg = comm.recvMsg();
+            while(msg.indexOf(';') == -1){
+                System.out.println("INVALID SENSOR READINGS : DOESN'T HAVE ; (SEMICOLON)");
+                System.out.println();
+                msg = comm.recvMsg();
+            }
             String[] msgArr = msg.split(";");
 
                 result[0] = (int)Double.parseDouble(msgArr[0]);  //FL

@@ -75,9 +75,7 @@ public class ExplorationAlgo {
 
         // Sends command to android to start exploration: E
         if (!simulate) Communication.getCommunication().sendMsg(CommunicationConstants.ARDUINO, CommunicationConstants.START_EPLORATION);
-
         senseAndRepaint(this.simulate);
-        areaExplored = calculateAreaExplored();
 
         explorationLoop(exploredMap.robotReal.getRobotPosRow(), exploredMap.robotReal.getRobotPosCol());
     }
@@ -96,12 +94,10 @@ public class ExplorationAlgo {
             areaExplored = calculateAreaExplored();
             if (exploredMap.robotReal.getRobotPosRow() == r && exploredMap.robotReal.getRobotPosCol() == c) {
                 break; // TODO: Breaks after reaching home
-//                if (areaExplored >= coverageLimit) {
-//                    break;
-//                }
             }
-        } while (areaExplored <= coverageLimit && System.currentTimeMillis() <= endTime && !comm.isTaskFinish());
-        System.out.println("FINISHED TASK");
+        } while (System.currentTimeMillis() <= endTime && !comm.isTaskFinish());
+
+        System.out.println("FINISHED TASK: TIME LIMIT UP ");
         exploredMap.repaint();
     }
 
@@ -245,39 +241,39 @@ public class ExplorationAlgo {
 
         switch (exploredMap.robotReal.getOrientation()) {
             case North:
-                if(exploredMap.arena.areValidCoordinates(botRow + 1, botCol + 1) && exploredMap.arena.getGrid(botRow + 1, botCol + 1).isObstacle()){
-                    cood = new int[]{botRow+1 , botCol+1 };
+                if(exploredMap.arena.areValidCoordinates(botRow + 1, botCol + 2) && exploredMap.arena.getGrid(botRow + 1, botCol + 2).isObstacle()){
+                    cood = new int[]{botRow+1 , botCol+2 };
                 }
-                else if (exploredMap.arena.areValidCoordinates(botRow, botCol + 1) && exploredMap.arena.getGrid(botRow, botCol + 1).isObstacle()){
-                    cood = new int[]{botRow, botCol+1};
+                else if (exploredMap.arena.areValidCoordinates(botRow, botCol + 2) && exploredMap.arena.getGrid(botRow, botCol + 2).isObstacle()){
+                    cood = new int[]{botRow, botCol+2};
                 }
                 break;
 
             case East:
-                if(exploredMap.arena.areValidCoordinates(botRow + 1, botCol - 1) && exploredMap.arena.getGrid(botRow + 1, botCol - 1).isObstacle()){
-                    cood = new int[]{botRow+1 ,botCol-1};
+                if(exploredMap.arena.areValidCoordinates(botRow + 2, botCol - 1) && exploredMap.arena.getGrid(botRow + 2, botCol - 1).isObstacle()){
+                    cood = new int[]{botRow+2 ,botCol-1};
                 }
-                else if (exploredMap.arena.areValidCoordinates(botRow + 1, botCol) && exploredMap.arena.getGrid(botRow + 1, botCol).isObstacle()){
-                    cood = new int[]{botRow+1 ,botCol};
+                else if (exploredMap.arena.areValidCoordinates(botRow + 2, botCol) && exploredMap.arena.getGrid(botRow + 2, botCol).isObstacle()){
+                    cood = new int[]{botRow+2 ,botCol};
                 }
                 break;
 
             case South:
-                if(exploredMap.arena.areValidCoordinates(botRow - 1, botCol - 1) && exploredMap.arena.getGrid(botRow - 1, botCol -1).isObstacle()){
-                    cood = new int[]{botRow-1 , botCol-1 };
+                if(exploredMap.arena.areValidCoordinates(botRow - 1, botCol - 2) && exploredMap.arena.getGrid(botRow - 1, botCol -2).isObstacle()){
+                    cood = new int[]{botRow-1 , botCol-2 };
                 }
-                else if(exploredMap.arena.areValidCoordinates(botRow, botCol - 1) && exploredMap.arena.getGrid(botRow, botCol - 1).isObstacle()){
-                    cood = new int[]{botRow, botCol-1 };
+                else if(exploredMap.arena.areValidCoordinates(botRow, botCol - 2) && exploredMap.arena.getGrid(botRow, botCol - 2).isObstacle()){
+                    cood = new int[]{botRow, botCol-2 };
                 }
                 break;
 
             case West:
-                if (exploredMap.arena.areValidCoordinates(botRow - 1, botCol + 1) && exploredMap.arena.getGrid(botRow - 1, botCol + 1).isObstacle()) {
-                    cood = new int[]{botRow-1, botCol+1 };
+                if (exploredMap.arena.areValidCoordinates(botRow - 2, botCol + 1) && exploredMap.arena.getGrid(botRow - 2, botCol + 1).isObstacle()) {
+                    cood = new int[]{botRow-2, botCol+1 };
                 }
 
-                else if (exploredMap.arena.areValidCoordinates(botRow - 1, botCol) && exploredMap.arena.getGrid(botRow - 1, botCol).isObstacle()){
-                     cood = new int[]{botRow-1, botCol};
+                else if (exploredMap.arena.areValidCoordinates(botRow - 2, botCol) && exploredMap.arena.getGrid(botRow - 2, botCol).isObstacle()){
+                     cood = new int[]{botRow-2, botCol};
                  }
                 break;
         }

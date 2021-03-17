@@ -13,9 +13,10 @@ public class CommunicationConstants {
     public static final String FASTEST_PATH = "FS";         // Android --> PC: Fastest Path
     public static final String EXPLORATION = "ES";          // Android --> PC: Exploration
     public static final String START_EPLORATION = "E";      // PC --> Arduino: Start Exploration
+
     public static final String GO_HOME = "GH";              // PC --> Arduino: Once the exploration is complete
 
-    public static final String FINISH = ""; // TODO: Finalise this protocol
+    public static final String FINISH = "done"; // TODO: Finalise this protocol
 
     // CALIBRATION CONSTANTS
     public static final String CALI_FRONT = "H";
@@ -23,6 +24,10 @@ public class CommunicationConstants {
     public static final String CALI_LEFT = "J";
     public static final String CALI_RIGHT_FRONT = "K";
     public static final String CALI_LEFT_FRONT = "M";
+    public static final String CALIBRATION_ACKNOWLEDGMENT = "A";
+
+    public static final String IMAGE_CAPTURED = "{\"imageCaptured\" : \"true\"}";
+
 
     //TODO: Finalize this ^ initial calibration with arduino
 

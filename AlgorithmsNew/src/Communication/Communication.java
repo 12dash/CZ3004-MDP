@@ -66,10 +66,12 @@ public class Communication{
         try {
             String input = reader.readLine();
             System.out.println("Message Received: " + input);
-            while(input.equals(CommunicationConstants.FINISH)){
+
+            if(input.equals(CommunicationConstants.FINISH)){
+                System.out.println("TASK FINISH: ALL 5 IMAGES FOUND");
                 this.taskFinish = true;
-                input = reader.readLine();
-                System.out.println("Message Received: " + input);
+                System.out.println();
+                throw new Exception();
             }
             return input;
 
@@ -108,7 +110,7 @@ public class Communication{
         try {
             String outputMsg;
             outputMsg = recipient + "|" + message;
-            System.out.println("Sending out message: " + outputMsg);
+            System.out.println("Sending out message: " + outputMsg + "_");
             writer.write(outputMsg);
             writer.flush();
         } catch (IOException e) {
@@ -126,7 +128,12 @@ public class Communication{
     // SENDS TO ARDUINO
     public void sendCalibrationAndWaitForAcknowledge(String mssg) throws InterruptedException {
         sendMsg(CommunicationConstants.ARDUINO, mssg);
-        recvMsg();
+        String msg = recvMsg();
+        while(!msg.equals(CommunicationConstants.CALIBRATION_ACKNOWLEDGMENT)){
+            System.out.println("INVALID CALIBRATION ACKNOWLEDGMENT");
+            System.out.println();
+            msg = recvMsg();
+        }
     }
 
     public boolean isTaskFinish(){
@@ -136,7 +143,11 @@ public class Communication{
     public void clickPictureAndWaitforAcknowledge(int x, int y, boolean nearby){
         String IRMessage = "{\"coords\":[" + x + "," + y + "],\"nearby\":" + nearby + "}";
         sendMsg(CommunicationConstants.IR, IRMessage);
-        recvMsg();
-
+        String msg = recvMsg();
+        while(!msg.equals(CommunicationConstants.IMAGE_CAPTURED)){
+            System.out.println("INVALID IMAGE CAPTURE ACKNOWLEDGMENT");
+            System.out.println();
+            recvMsg();
+        }
     }
 }
