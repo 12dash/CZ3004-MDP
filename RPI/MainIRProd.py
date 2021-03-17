@@ -53,57 +53,39 @@ class Main(threading.Thread):
   def read_from_pc(self, android_queue, arduino_queue):
     while self.pc_connection.connected:
       msg = self.pc_connection.read_from_client()
-      if "_" in msg: # This is for multi-recipients (From Algo PC to Android and Arduino)
-        msg_1, msg_2 = msg.split("_")
-        
-        # First Message
-        msg_lst_1 = msg_1.split("|")
-        header = msg_lst_1[0]
-        if header == "an":
-          android_queue.put_nowait(msg_lst_1[1])
-        elif header == "ar":
-          arduino_queue.put_nowait(msg_lst_1[1])
-        else:
-          print("Invalid recipient from PC")
-        
-        # Second Message
-        msg_lst_2 = msg_2.split("|")
-        header = msg_lst_2[0]
-        if header == "an":
-          android_queue.put_nowait(msg_lst_2[1])
-        elif header == "ar":
-          arduino_queue.put_nowait(msg_lst_2[1])
-        else:
-          print("Invalid recipient from PC")
+      if "_" in msg: # This is for multi-recipients implementation
+        msgs_lst = msg.split("_")
+        msgs_lst = msgs_lst[:len(msgs_lst) - 1]
 
-      else: # Single recipient
-        msg_lst = msg.split("|")
-        header = msg_lst[0]
+        for msg in msgs_lst:
+          msg_lst = msg.split("|")
+          header = msg_lst[0]
+          if header == "an":
+            android_queue.put_nowait(msg_lst[1])
+          elif header == "ar":
+            arduino_queue.put_nowait(msg_lst[1])
+          elif header == "ir":
+            json_incoming = json.loads(msg_lst[1])
 
-        if header == "an":
-          android_queue.put_nowait(msg_lst[1])
-        elif header == "ar":
-          arduino_queue.put_nowait(msg_lst[1])
-        elif header == "ir":
-          json_incoming = json.loads(msg_lst[1])
+            if "coords" in json_incoming:
+              coords = json_incoming["coords"]
 
-          if "coords" in json_incoming:
-            coords = json_incoming["coords"]
+              # RPI to take picture on command from ALGO PC
+              image_arr = self.rpi_camera.capture_image()
 
-            # RPI to take picture on command from ALGO PC
-            image_arr = self.rpi_camera.capture_image()
+              # after picture is taken, send to IR PC -> Image Array and Coords
+              json_msg = {"imageArr" : image_arr, "coords": coords }
+              self.ir_pc_queue.put_nowait(json.dumps(json_msg, cls=NumpyEncoder)) 
+              print("Sent image and coords to IR PC")
 
-            # after picture is taken, send to IR PC -> Image Array and Coords
-            json_msg = {"imageArr" : image_arr, "coords": coords }
-            self.ir_pc_queue.put_nowait(json.dumps(json_msg, cls=NumpyEncoder)) 
-            print("Sent image and coords to IR PC")
-
-            # after picture is taken, tell Algo to resume movement
-            resume_msg = {"imageCaptured" : "true" }
-            self.pc_queue.put_nowait(json.dumps(resume_msg))
-        else:
-          print("Invalid recipient from PC")
-
+              # after picture is taken, tell Algo to resume movement
+              resume_msg = {"imageCaptured" : "true" }
+              self.pc_queue.put_nowait(json.dumps(resume_msg))
+          else:
+            print("Invalid recipient from PC")
+      else:
+        print("Invalid format received from PC: please append _ to every single message")
+          
   def send_to_ir_pc(self, ir_pc_queue):
     # After image is captured, send to IR PC for IR processing
     while self.ir_pc_connection.connected:
