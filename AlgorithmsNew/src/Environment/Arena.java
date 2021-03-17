@@ -25,17 +25,22 @@ public class Arena {
         Initialize the arena setting the grids as :
             1. Type = Free
             2. Accessible = True
-            3. Explored = False
+            3. Explored = setExplore (Function Parameter)
          */
         for (int i = 0; i < ArenaConstants.ARENA_ROWS; i++) {
             for (int j = 0; j < ArenaConstants.ARENA_COLS; j++) {
                 //Grids(Type type, boolean acc, int x , int y)
-                this.grids[i][j] = new Grid(Type.FREE, true, j, i, setExplored);
+                if(inStartZone(i,j) || inGoalZone(i, j)){
+                    this.grids[i][j] = new Grid(Type.FREE, true, j, i, true);
+                }
+                else {
+                    this.grids[i][j] = new Grid(Type.FREE, true, j, i, setExplored);
+                }
             }
         }
 
         //Add the border to the padding.
-        getBorderPadding();
+        addBorderPadding();
     }
 
     public void checkCellModifyAcc(int i, int j) {
@@ -46,6 +51,26 @@ public class Arena {
             if (this.grids[j][i].getAcc()) this.grids[j][i].setAcc(false);
         }
     }
+
+//    public void markStartNGoalZoneAsExplored(){
+//
+//        //Start Zone
+//        for (int r = ArenaConstants.ARENA_ROWS-1; r >= ArenaConstants.ARENA_ROWS - 3; r-- ) { // from rows 17 to 19
+//            for (int c  = 0; c <=2; c ++){
+//                this.grids[r][c].isExplored();
+//            }
+//        }
+//
+//        //Goal Zone
+//        for (int r = 0; r <=2; r ++){
+//            for (int c = ArenaConstants.ARENA_COLS-3; c <=ArenaConstants.ARENA_COLS-1; c++){
+//                this.grids[r][c].isExplored();
+//            }
+//        }
+//
+//
+//    }
+
 
     public void addNeighbourPadding(int i, int j) {
         /*
@@ -74,7 +99,7 @@ public class Arena {
         checkCellModifyAcc(x_2, y_2);//Down - Right
     }
 
-    public void getBorderPadding() {
+    public void addBorderPadding() {
         /*
         Method for padding the borders of the arena.
          */
@@ -166,6 +191,7 @@ public class Arena {
         return (row >= ArenaConstants.GOAL_ROW - 1 && row <= ArenaConstants.GOAL_ROW + 1 && col >= ArenaConstants.GOAL_COL - 1 && col <= ArenaConstants.GOAL_COL + 1);
     }
 
+    // Removes padding around the obstacles apart from the padding near border of the arena
     private void removePaddingFromNonObstacles(){
         for (int i = 0; i < ArenaConstants.ARENA_ROWS; i++) {
             for (int j = 0; j < ArenaConstants.ARENA_COLS; j++) {
@@ -174,6 +200,7 @@ public class Arena {
                 }
             }
         }
+        addBorderPadding();
     }
 
 
@@ -203,6 +230,7 @@ public class Arena {
 
         if (obstacle) {
             this.grids[row][col].setType(Type.OBSTACLE);
+            this.grids[row][col].setAcc(false);
             removePaddingFromNonObstacles();
             addPaddingToExploredCells();
         }
@@ -220,5 +248,42 @@ public class Arena {
         return !areValidCoordinates(row, col) || this.grids[row][col].isObstacle();
     }
 
+    // Returns cood of any surrounding (left, right, top, bottom) explored and free cell starting from bottom left to top right
+
+    public int[] checkSurroundingExploredAndFree(int row, int col){
+        int[] rowsToCheck = new int[]{0, 2, 0, -2}; //{ 2,  2, 2, 2, 2, 1, 0, -1, -2, -2, -2, -2, -2, -1,  0,  1};
+        int[] colsToCheck = new int[]{-2, 0, 2, 0}; //{-2, -1, 0, 1, 2, 2, 2,  2,  2,  1,  0, -1, -2, -2, -2, -2};
+
+        for(int i = 0; i < rowsToCheck.length; i++){
+            int r = row + rowsToCheck[i];
+            int c = col + colsToCheck[i];
+            if(areValidCoordinates(r,c) && getGrid(r,c).isExplored() && getGrid(r,c).getAcc()){
+                return new int[]{r,c};
+            }
+        }
+        return new int[]{-1, -1};
+    }
+
+  // Gets if (x2, y2) is north, east, south or west to (x1, y1) (Not considered for N-E, S-E etc.)
+  // ** OTHERWISE JUST RETURNS NORTH-EAST **
+    public Orientation getRelativeOrientation(int x1, int y1, int x2, int y2){
+        if(x2 > x1){
+            return Orientation.East;
+        }
+        else if(x2 < x1){
+            return Orientation.West;
+        }
+
+        else if(y2 > y1){
+            return Orientation.South;
+        }
+
+        else if(y2 < y1){
+            return Orientation.North;
+        }
+        return Orientation.NorthEast;
+    }
 
 }
+
+

@@ -191,7 +191,7 @@ public class MapDescriptor {
 
 
         while (p2_list.size() % 16 != 0) {
-            p2_list.add(0,0);
+            p2_list.add(0);
         }
         StringBuilder p2_string = new StringBuilder();
 
@@ -202,8 +202,6 @@ public class MapDescriptor {
             int d = p2_list.get(i * 4 + 3);
             p2_string.append(mappingBooleanToHexadecimal(a, b, c, d));
         }
-        System.out.println("P1 string : " + p1_string);
-        System.out.println("P2 string : " + p2_string);
         return new String[]{p1_string.toString(), p2_string.toString()};
     }
 }
