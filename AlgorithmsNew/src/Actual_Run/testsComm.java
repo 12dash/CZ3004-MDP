@@ -1,10 +1,12 @@
 package Actual_Run;
 
+import Algo.AStar;
 import Algo.Exploration;
 import Communication.*;
 import Communication.CommunicationConstants;
 import Environment.Arena;
 import Environment.ArenaConstants;
+import Environment.Grid;
 import Robot.RobotConstants;
 import Simulator.Map;
 import Simulator.SimulatorConstants;
@@ -16,6 +18,7 @@ import Robot.RobotConstants.MOVEMENT;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class testsComm {
@@ -34,7 +37,14 @@ public class testsComm {
 //        testSendComm();
 //        goToIslands();
 //        testExploration();
-        testIR();
+//        testIR();
+        Map realMap = new Map(new Arena(true), true, true);
+        AStar astar = new AStar();
+        astar.startSearch(realMap.arena, realMap.arena.getGrid(18, 1), realMap.arena.getGrid(11, 5), false);
+        ArrayList<Grid> path = new ArrayList<>(astar.solution);
+        for( Grid g : path){
+            System.out.println(g.getX() +  ", " + g.getY());
+        }
         }
 
 
