@@ -50,7 +50,7 @@ class Main(threading.Thread):
         msg = pc_queue.get_nowait()
         self.pc_connection.send_to_client(msg)
 
-  def read_from_pc(self, android_queue, arduino_queue):
+  def read_from_pc(self, android_queue, arduino_queue, pc_queue, ir_pc_queue):
     while self.pc_connection.connected:
       msg = self.pc_connection.read_from_client()
       if "_" in msg: # This is for multi-recipients implementation
@@ -65,29 +65,35 @@ class Main(threading.Thread):
           elif header == "ar":
             arduino_queue.put_nowait(msg_lst[1])
           elif header == "ir":
-            json_incoming = json.loads(msg_lst[1])
+            # If exploration is done but we have NOT got 5 nearby images OR 6mins is up
+            # Tell IR PC to output results (Display img on PC and output on Android)
+            if msg_lst[1] == "complete":
+              ir_pc_queue.put_nowait("complete")
+            # Do normal image processing workflow
+            else:
+              json_incoming = json.loads(msg_lst[1])
 
-            if "coords" in json_incoming:
-              # Check if nearby is in message
-              if "nearby" in json_incoming:
-                nearby = json_incoming["nearby"]
-              else:
-                print("Algo PC: Please indicate whether obstacle is nearby or not")
-              
-              # Get coords of message
-              coords = json_incoming["coords"]
+              if "coords" in json_incoming:
+                # Check if nearby is in message
+                if "nearby" in json_incoming:
+                  nearby = json_incoming["nearby"]
+                else:
+                  print("Algo PC: Please indicate whether obstacle is nearby or not")
+                
+                # Get coords of message
+                coords = json_incoming["coords"]
 
-              # RPI to take picture on command from ALGO PC
-              image_arr = self.rpi_camera.capture_image()
+                # RPI to take picture on command from ALGO PC
+                image_arr = self.rpi_camera.capture_image()
 
-              # after picture is taken, send to IR PC -> Image Array and Coords
-              json_msg = {"imageArr" : image_arr, "coords": coords, "nearby" : nearby }
-              self.ir_pc_queue.put_nowait(json.dumps(json_msg, cls=NumpyEncoder)) 
-              print("Sent image and coords to IR PC")
+                # after picture is taken, send to IR PC -> Image Array and Coords
+                json_msg = {"imageArr" : image_arr, "coords": coords, "nearby" : nearby }
+                ir_pc_queue.put_nowait(json.dumps(json_msg, cls=NumpyEncoder)) 
+                print("Sent image and coords to IR PC")
 
-              # after picture is taken, tell Algo to resume movement
-              resume_msg = {"imageCaptured" : "true" }
-              self.pc_queue.put_nowait(json.dumps(resume_msg))
+                # after picture is taken, tell Algo to resume movement
+                resume_msg = {"imageCaptured" : "true" }
+                pc_queue.put_nowait(json.dumps(resume_msg))
           else:
             print("Invalid recipient from PC")
       else:
@@ -156,7 +162,7 @@ class Main(threading.Thread):
   
   def start_multi_threads(self):
     # PC Write and Read Multi-threading
-    pc_read_thread = threading.Thread(target = self.read_from_pc, args = (self.android_queue, self.arduino_queue) )
+    pc_read_thread = threading.Thread(target = self.read_from_pc, args = (self.android_queue, self.arduino_queue, self.pc_queue, self.ir_pc_queue) )
     pc_write_thread = threading.Thread(target = self.send_to_pc, args = (self.pc_queue,) )
 
      # ANDROID Write and Read Multi-threading
