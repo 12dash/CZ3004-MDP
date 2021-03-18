@@ -12,9 +12,11 @@ Algo -> Arduino: ar|"0,L,R,5" -- Refer to Arduino commmands list for more.
 // For Image Recognition
 Algo -> RPI: ir|{"coords":[x,y],"nearby":True} -- Tells RPI to capture. 
 RPI -> Algo: {"imageCaptured" : "true"} -- After image has been taken, RPI tells Algo to resume movement
-RPI -> PC: {"imageArr": <3d pixel array>, "coords": [x,y] }
-PC -> Android: an|{"image":[x,y,id]}
+RPI -> IR PC: {"imageArr": <3d pixel array>, "coords": [x,y] }
+IR PC -> Android: an|{"image":[ [x1,y1,id1], [x2,y2,id2], [x3,y3,id3], [x4,y4,id4], [x5,y5,id5] ]}
 IR PC -> Algo: pc|done         -- After 5 images have been captured, tell Algo to stop moving.
+
+Algo PC -> IR PC: ir|complete_  -- After 6mins is up and exploration is done, tell IR PC to output
 
 // For Exploration 
 Algo -> Arduino: ar|"L"
