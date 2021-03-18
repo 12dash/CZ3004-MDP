@@ -57,37 +57,33 @@ class PcConnectionClient:
     img_path = os.listdir("./output")
     new_im = Image.new('RGB', (256*5,256))
     x_offset = 0
-    coords_ids_lst = []
+
+    img_op_count = 0 # Safe check
     for i in img_info:
       if img_info[i][-1] == "True":
         img_temp = Image.open(f"output/{img_info[i][1]}")    
         new_im.paste(img_temp,(x_offset,0))
         x_offset += img_temp.size[0]
 
-        # Collate all results into an array of arrays (x,y,id)
-        img_coords = img_info[i][0]
-        coords_ids_lst.append([img_coords[0], img_coords[1], i])
-
+        img_op_count += 1
         # Break when image count == 5
-        if len(coords_ids_lst) == 5:
+        if img_op_count == 5:
           break
 
     new_im.save("final.jpg")
 
-    # Send to Android image results
-    json_outgoing = json.dumps({"image": coords_ids_lst})
-    self.send_to_server_ir_data(f"an|{json_outgoing}") 
     # Finally tell Algo we are done
     self.send_to_server_ir_data("pc|done")
   
   def output_nearby_and_far_images(self):
-  # When NEARBY images count >=5, display images and send to PC done.
+  # When we have < 5 imgs and needs to terminate, display images and send to PC done.
     # Display images
     print("Output Nearby and Far images and send to android results")
     img_path = os.listdir("./output")
     new_im = Image.new('RGB', (256*5,256))
     x_offset = 0
-    coords_ids_lst = []
+
+    img_op_count = 0 # Safe check
     for i in img_info:
       # Get all the nearby first
       if img_info[i][-1] == "True":
@@ -95,12 +91,9 @@ class PcConnectionClient:
         new_im.paste(img_temp,(x_offset,0))
         x_offset += img_temp.size[0]
 
-        # Collate all results into an array of arrays (x,y,id)
-        img_coords = img_info[i][0]
-        coords_ids_lst.append([img_coords[0], img_coords[1], i])
-
+        img_op_count += 1
         # Break when image count == 5
-        if len(coords_ids_lst) == 5:
+        if img_op_count == 5:
           break
     
     # Finally, get the remaining Far ones (TODO: Currently randomly picking Far ones)
@@ -111,19 +104,12 @@ class PcConnectionClient:
         new_im.paste(img_temp,(x_offset,0))
         x_offset += img_temp.size[0]
 
-        # Collate all results into an array of arrays (x,y,id)
-        img_coords = img_info[i][0]
-        coords_ids_lst.append([img_coords[0], img_coords[1], i])
-
         # Break when image count == 5
-        if len(coords_ids_lst) == 5:
+        if img_op_count == 5:
           break
 
     new_im.save("final.jpg")
 
-    # Send to Android image results
-    json_outgoing = json.dumps({"image": coords_ids_lst})
-    self.send_to_server_ir_data(f"an|{json_outgoing}") 
     # Finally tell Algo we are done
     self.send_to_server_ir_data("pc|done")
 
@@ -155,11 +141,17 @@ class PcConnectionClient:
             if (i not in img_info.keys()):
               print(f"New image seen id={i} coords={coords}")
               img_info[i] = [coords, path, nearby]
-            # If image has been deteted previously and NEARBY, update this.
+              # Always send to Android image results
+              json_outgoing = json.dumps({"image": [coords[0], coords[1], i]})
+              self.send_to_server_ir_data(f"an|{json_outgoing}") 
             else:
-              if(nearby == "True"):
-                print(f"Old image seen, update img_info id={i} coords={coords}")
+              # If image has been detected previously and WAS NOT NEARBY, update this and send.
+              if(img_info[i][-1] != "True"):
+                print(f"Old image seen and previously far, update img_info id={i} coords={coords}")
                 img_info[i] = [coords, path, nearby]
+                # Always send to Android image results
+                json_outgoing = json.dumps({"image": [coords[0], coords[1], i]})
+                self.send_to_server_ir_data(f"an|{json_outgoing}") 
         print(img_info)
 
         # Output all nearby images
