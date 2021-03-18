@@ -104,6 +104,7 @@ class PcConnectionClient:
         new_im.paste(img_temp,(x_offset,0))
         x_offset += img_temp.size[0]
 
+        img_op_count += 1
         # Break when image count == 5
         if img_op_count == 5:
           break
