@@ -20,6 +20,7 @@ import javax.swing.plaf.basic.BasicInternalFrameTitlePane;
 import java.sql.Time;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 
@@ -38,6 +39,7 @@ public class ExplorationAlgo {
     private Communication comm;
     private int numMoves = 0;
     private boolean exploreLoop = true;
+
 
 
     public ExplorationAlgo(Map exploredMap, int timeLimit, int coverageLimit, Communication comm) {
@@ -185,6 +187,7 @@ public class ExplorationAlgo {
 
         else numMoves++ ;
 
+
     }
 
     /**
@@ -232,7 +235,7 @@ public class ExplorationAlgo {
                 break;
         }
 
-        return calibrationBlockInFront >= 2;
+        return calibrationBlockInFront >= 3;
     }
 
     /**
@@ -331,7 +334,7 @@ public class ExplorationAlgo {
             exploredMap.arena.grids[blockCood[0]][blockCood[1]].setPictureClicked(true);
             blockCood[0] = ArenaConstants.ARENA_ROWS - blockCood[0] - 1;  // Convert to physical coordinate system format
             if(!simulate) {
-                comm.clickPictureAndWaitforAcknowledge(blockCood[0], blockCood[1], true);
+                comm.clickPictureAndWaitforAcknowledge(blockCood[1],  blockCood[0], true);
             }
             System.out.println("Clicked Nearby Picture of: (" + blockCood[1] + "," + blockCood[0] + ")");
         }
@@ -357,11 +360,13 @@ public class ExplorationAlgo {
         // 2nd TURN
         //-----------
         exploredMap.robotReal.move(MOVEMENT.LEFT_TURN);
+        lastCalibrate++;
         senseAndRepaint(simulate);
         if(!simulate && canCalibrate(exploredMap.robotReal.getOrientation())){
             comm.sendCalibrationAndWaitForAcknowledge(CommunicationConstants.CALI_FRONT);
             lastCalibrate = 0;
         }
+
         randomCood = getRandomCoordinate();
         comm.clickPictureAndWaitforAcknowledge(randomCood[0], randomCood[1], false);
 
@@ -379,6 +384,7 @@ public class ExplorationAlgo {
         // 4th TURN
         //----------
         exploredMap.robotReal.move(MOVEMENT.LEFT_TURN);
+        lastCalibrate++;
         senseAndRepaint(simulate);
 
         exploredMap.robotReal.setClickingRandomPicture(false);
@@ -494,9 +500,29 @@ public class ExplorationAlgo {
     }
 
     private int[] getRandomCoordinate(){
+        Random r = new Random();
+        int x = r.nextInt(15);
+        int y = r.nextInt(20);
 
-//        int[] cood = new int[]{1, 1};
+        return new int[]{x, y};
+
+//        switch (exploredMap.robotReal.getOrientation()){
+//            case North:
+//                int min_left = Math.max(0, exploredMap.robotReal.getRobotPosCol()-2);
+//                int max_left = Math.min(ArenaConstants.ARENA_COLS-1, exploredMap.robotReal.getRobotPosCol()+2);
+//                int bottom = exploredMap.robotReal.getRobotPosRow();
+//                int top = 0;
 //
+//                for(int r = bottom; r >= top; r --){
+//                    for(int c = min_left; c <= max_left; c++){
+//                        if(exploredMap.arena.getGrid(r, c).isObstacle()){
+//                            return new int[]{}
+//                        }
+//                    })
+//                }
+//        }
+//////        int[] cood = new int[]{1, 1};
+////
 //        int front_close = 0;
 //        int front_far = 0;
 //        int side_left = 0;
@@ -580,7 +606,7 @@ public class ExplorationAlgo {
 //            exploredMap.arena.getGrid()
 //        }
 
-        return new int[]{1, 1};
+
     }
 
 
@@ -596,21 +622,23 @@ public class ExplorationAlgo {
 
         // FOR EVERY STEP
 
-        if(caliFront) {
+        if(caliFront && caliRight){
+            cali = CommunicationConstants.CALI_RIGHT_FRONT;
+            if (simulate) simulateCalibration(CommunicationConstants.CALI_RIGHT_FRONT);
+            else comm.sendCalibrationAndWaitForAcknowledge(CommunicationConstants.CALI_RIGHT_FRONT);
+
+        }
+        else if(caliFront && caliLeft){
+            cali = CommunicationConstants.CALI_LEFT_FRONT;
+            if (simulate) simulateCalibration(CommunicationConstants.CALI_LEFT_FRONT);
+            else comm.sendCalibrationAndWaitForAcknowledge(CommunicationConstants.CALI_LEFT_FRONT);
+        }
+
+
+        else if(caliFront) {
             cali = CommunicationConstants.CALI_FRONT;
             if (simulate) simulateCalibration(CommunicationConstants.CALI_FRONT);
             else comm.sendCalibrationAndWaitForAcknowledge(CommunicationConstants.CALI_FRONT);
-
-            if (caliRight) {
-                cali = CommunicationConstants.CALI_RIGHT_FRONT;
-                if (simulate) simulateCalibration(CommunicationConstants.CALI_RIGHT_FRONT);
-                else comm.sendCalibrationAndWaitForAcknowledge(CommunicationConstants.CALI_RIGHT_FRONT);
-
-            } else if (caliLeft) { // So that doesn't calibrate immediately after a previous one
-                cali = CommunicationConstants.CALI_LEFT_FRONT;
-                if (simulate) simulateCalibration(CommunicationConstants.CALI_LEFT_FRONT);
-                else comm.sendCalibrationAndWaitForAcknowledge(CommunicationConstants.CALI_LEFT_FRONT);
-            }
         }
 
 

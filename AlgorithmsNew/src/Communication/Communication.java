@@ -141,7 +141,13 @@ public class Communication{
     }
 
     public void clickPictureAndWaitforAcknowledge(int x, int y, boolean nearby){
-        String IRMessage = "{\"coords\":[" + x + "," + y + "],\"nearby\":" + nearby + "}";
+        String IRMessage;
+        if(nearby) {
+            IRMessage = "{\"coords\":[" + x + "," + y + "],\"nearby\":\"True\"}";
+        }
+        else{
+            IRMessage = "{\"coords\":[" + x + "," + y + "],\"nearby\":\"False\"}";
+        }
         sendMsg(CommunicationConstants.IR, IRMessage);
         String msg = recvMsg();
         while(!msg.equals(CommunicationConstants.IMAGE_CAPTURED)){

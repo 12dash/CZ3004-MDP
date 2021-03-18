@@ -5,7 +5,7 @@ import Values.Orientation;
 import java.util.HashMap;
 
 public class RobotConstants {
-    public static final int SPEED = 50;                             // delay between movements (ms)
+    public static final int SPEED = 500;                             // delay between movements (ms)
     public static final Orientation START_DIR = Orientation.East;  // start direction
     public static final int START_ROW = 18;                          // row no. of start cell
     public static final int START_COL = 1;                          // col no. of start cell
@@ -57,12 +57,14 @@ public class RobotConstants {
     }
 
 
-    public static final int SENSOR_SHORT_RANGE_L = 1;               // range of short range sensor (cells)
-    public static final int SENSOR_SHORT_RANGE_H = 1;               // range of short range sensor (cells)
-    public static final int SENSOR_LONG_RANGE_L = 3;                // range of long range sensor (cells)
-    public static final int SENSOR_LONG_RANGE_H = 5;                // range of long range sensor (cells)
+    public static final int SENSOR_FRONT_SHORT_RANGE_L = 1;               // range of short range sensor (cells)
+    public static final int SENSOR_FRONT_SHORT_RANGE_H = 1;               // range of short range sensor (cells)
+    public static final int SENSOR_LEFT_RIGHT_SHORT_RANGE_L = 1;               // range of short range sensor (cells)
+    public static final int SENSOR_LEFT_RIGHT_SHORT_RANGE_H = 3;               // range of short range sensor (cells)
+    public static final int SENSOR_LONG_RANGE_L = 4;                // range of long range sensor (cells)
+    public static final int SENSOR_LONG_RANGE_H = 7;                // range of long range sensor (cells)
 
-    public static final int NUM_MOVES_AFTER_CLICK_PICTURE = 5;
-    public static final int NUM_MOVES_AFTER_CALIBRATE = 2;
+    public static final int NUM_MOVES_AFTER_CLICK_PICTURE = 10;
+    public static final int NUM_MOVES_AFTER_CALIBRATE = 3;
 
 }
