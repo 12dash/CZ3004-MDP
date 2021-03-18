@@ -47,7 +47,7 @@ class PcConnectionClient:
     def get_number_img():
       a = 0
       for i in img_info:
-        if(img_info[i][-1]):
+        if(img_info[i][-1] == "True"):
           a+=1
       return a
     while self.connected:
@@ -56,7 +56,7 @@ class PcConnectionClient:
 
         arr = np.asarray(obj["imageArr"]).astype(np.uint8) #convert to numpy arr        
         coords = obj["coords"]
-        nearby = True
+        nearby = obj["nearby"]
 
         img = Image.fromarray(arr)
         path = f"{obj['coords']}.jpg"
@@ -66,21 +66,21 @@ class PcConnectionClient:
         # Sabrina: Predict Image ID here
         predicted_img = detect(path)
 
-        if predicted_img == -1:
+        if predicted_img == [-1]:
           print("Removed file")
-          os.remove(f"output/{path}")
+          #os.remove(f"output/{path}")
           #Then send to android
 
-          json_outgoing = json.dumps({"image": [coords[0], coords[1], predicted_img[0]]})
+          json_outgoing = json.dumps({"image": [coords[0], coords[1],-1]})
           self.send_to_server_ir_data(f"an|{json_outgoing}")
         else:
           for i in predicted_img:
             if (i not in img_info.keys()):
               img_info[i] = [coords, path, nearby]     
             else:
-              if(img_info[i][-1] == False):
+              if(nearby == "True"):
                 img_info[i] = [coords, path, nearby]
-
+        print(img_info)
         if(get_number_img() >= 5):
           img_path = os.listdir("./output")
           new_im = Image.new('RGB', (256*5,256))
@@ -91,7 +91,7 @@ class PcConnectionClient:
               x_offset += img_temp.size[0]
           new_im.save("final.jpg")
           self.send_to_server_ir_data("pc|done")
-          print(img_info)
+          
           return 
 
   # Modified version of reading -- reading image from RPI

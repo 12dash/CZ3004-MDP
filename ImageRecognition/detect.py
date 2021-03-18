@@ -17,7 +17,7 @@ from utils.torch_utils import select_device, load_classifier, time_synchronized
 
 def detect(path, save_img=False):
 
-    qwe = -1
+    qwe = [-1]
    
     source = f"raw/{path}"
     weights = "weights/best.pt"
@@ -79,7 +79,7 @@ def detect(path, save_img=False):
         pred = model(img, augment=False)[0]
 
         # Apply NMS
-        pred = non_max_suppression(pred,0.6, 0.50, classes=None, agnostic=False)
+        pred = non_max_suppression(pred,0.55, 0.50, classes=None, agnostic=False)
         print("\n\nOriginal : ",(pred))
         t2 = time_synchronized()
 
