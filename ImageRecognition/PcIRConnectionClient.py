@@ -107,9 +107,14 @@ class PcConnectionClient:
     self.send_to_server_ir_data("pc|done")
 
   def rename_image(self, path, id):
-    img = cv2.imread(f"output/{path}")     
-    cv2.imwrite(f"output/{id}", img) 
-    os.remove(f"output/{path}")
+    try:
+      print(path)
+      print(id)
+      img = cv2.imread(f"output/{path}")     
+      cv2.imwrite(f"output/{id}.jpg", img) 
+      os.remove(f"output/{path}")
+    except Exception as e:
+      print(e)
     return
 
 
@@ -122,6 +127,11 @@ class PcConnectionClient:
         coords = obj["coords"]
         nearby = obj["nearby"]
 
+        if nearby == "done":
+            self.output_nearby_and_far_images()
+            return
+
+
         img = Image.fromarray(arr)
         path = f"{obj['coords']}.jpg"
         img.save(f"raw/{path}")
@@ -132,8 +142,7 @@ class PcConnectionClient:
         # If no bounding box
         if predicted_img == [-1]:
           print("Removed file, no image detected")
-          #os.remove(f"output/{path}")
-        
+          os.remove(f"output/{path}")        
         # Else if image found successfully
         else:
           for j in predicted_img:
@@ -141,16 +150,16 @@ class PcConnectionClient:
             # If image has not been detected previously, store it
             if (i not in img_info.keys()):
               print(f"New image seen id={i} coords={coords}")
-              img_info[i] = [coords, path, nearby]
               self.rename_image(path,i)
+              img_info[i] = [coords, f"{i}.jpg", nearby]              
               # Always send to Android image results
               json_outgoing = json.dumps({"image": [coords[0], coords[1], i]})
               self.send_to_server_ir_data(f"an|{json_outgoing}") 
             else:
               # If image has been detected previously and WAS NOT NEARBY, update this and send.
-              if(img_info[i][-1] != "True"):
+              if nearby == "True":
                 print(f"Old image seen and previously far, update img_info id={i} coords={coords}")
-                img_info[i] = [coords, path, nearby]
+                img_info[i] = [coords,f"{i}.jpg", nearby]
                 self.rename_image(path,i)
                 # Always send to Android image results
                 json_outgoing = json.dumps({"image": [coords[0], coords[1], i]})
@@ -171,10 +180,9 @@ class PcConnectionClient:
         bs = self.client.recv(15)
 
         # When exploration is done or 6 mins is up
-        if bs.decode(FORMAT) == "complete":
-          self.output_nearby_and_far_images()
-          return
-        else:
+        # if bs.decode(FORMAT) == "complete":
+
+        if True:
           (length,) = unpack('>Q', bs)
           msg = b''
 
