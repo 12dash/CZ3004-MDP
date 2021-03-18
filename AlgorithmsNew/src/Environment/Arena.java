@@ -237,6 +237,7 @@ public class Arena {
         else{
             this.grids[row][col].setType(Type.FREE);
             removePaddingFromNonObstacles();
+            this.grids[row][col].setAcc(true);
             addPaddingToExploredCells();
         }
     }

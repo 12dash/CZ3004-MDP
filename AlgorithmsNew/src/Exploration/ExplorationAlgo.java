@@ -2,6 +2,7 @@ package Exploration;
 
 import Algo.AStar;
 import Algo.ExplorationUtility;
+import Environment.Arena;
 import Environment.ArenaConstants;
 import Environment.Grid;
 import Robot.RobotConstants;
@@ -11,7 +12,12 @@ import Communication.Communication;
 import Communication.CommunicationConstants;
 import Robot.RobotConstants.MOVEMENT;
 import Robot.RobotReal;
+import javafx.scene.shape.MoveTo;
 
+import javax.annotation.processing.SupportedSourceVersion;
+import javax.swing.plaf.ComponentInputMapUIResource;
+import javax.swing.plaf.basic.BasicInternalFrameTitlePane;
+import java.sql.Time;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
@@ -31,6 +37,7 @@ public class ExplorationAlgo {
     private boolean calibrationMode = false;
     private Communication comm;
     private int numMoves = 0;
+    private boolean exploreLoop = true;
 
 
     public ExplorationAlgo(Map exploredMap, int timeLimit, int coverageLimit, Communication comm) {
@@ -77,7 +84,41 @@ public class ExplorationAlgo {
         if (!simulate) Communication.getCommunication().sendMsg(CommunicationConstants.ARDUINO, CommunicationConstants.START_EPLORATION);
         senseAndRepaint(this.simulate);
 
-        explorationLoop(exploredMap.robotReal.getRobotPosRow(), exploredMap.robotReal.getRobotPosCol());
+        explore();
+
+    }
+
+    public void explore() throws InterruptedException {
+
+        while(System.currentTimeMillis() <= endTime && !comm.isTaskFinish()){
+            if(exploreLoop){
+                explorationLoop(exploredMap.robotReal.getRobotPosRow(), exploredMap.robotReal.getRobotPosCol());
+                exploreLoop = false;
+            }
+            else{
+                /**
+                * Looks for a cell nearby to an island, tries to go to it
+                * If reaches successfully, sets exploreLoop to true
+                * else will just run again in next loop (cause exploreLoop is false)
+                * returns -1  if no more islands left
+                */
+
+                 if (goToIslandLoop() == -1){
+                     System.out.println("EXPLORATION COMPLETE: NO MORE ISLANDS LEFT");
+                     break;
+                 }
+            }
+        }
+
+        if(System.currentTimeMillis() >= endTime){
+            System.out.println("FINISHED TASK: TIMES UP");
+        }
+        else if(comm.isTaskFinish()){
+            System.out.println("ALL 5 IMAGES TAKEN");
+        }
+
+        if(!simulate) comm.sendMsg(CommunicationConstants.IR, CommunicationConstants.IR_TASK_COMPLETE);
+
     }
 
     /**
@@ -87,17 +128,16 @@ public class ExplorationAlgo {
      * 3. System.currentTimeMillis() > endTime
      */
     private void explorationLoop(int r, int c) throws InterruptedException {
+        clickPicture();
         do {
-
             nextMove();
 
-            areaExplored = calculateAreaExplored();
             if (exploredMap.robotReal.getRobotPosRow() == r && exploredMap.robotReal.getRobotPosCol() == c) {
-                break; // TODO: Breaks after reaching home
+                break;
             }
         } while (System.currentTimeMillis() <= endTime && !comm.isTaskFinish());
 
-        System.out.println("FINISHED TASK: TIME LIMIT UP ");
+        System.out.println("FINISHED LOOP");
         exploredMap.repaint();
     }
 
@@ -198,38 +238,40 @@ public class ExplorationAlgo {
     /**
      * Turns the robot to the required direction.
      */
-    private void turnBotDirection(Orientation targetDir) throws InterruptedException {
+    private MOVEMENT turnBotDirection(Orientation targetDir) throws InterruptedException {
         int numOfTurn = Math.abs(Orientation.ORIENTATION_MAPPINGS.get(exploredMap.robotReal.getOrientation()) - Orientation.ORIENTATION_MAPPINGS.get(targetDir));
         if (numOfTurn > 2) numOfTurn = numOfTurn % 2;
 
         if (numOfTurn == 1) {
             if (Orientation.getNextOrientation(exploredMap.robotReal.getOrientation()) == targetDir) {
-                moveBot(MOVEMENT.RIGHT_TURN);
+
+                return MOVEMENT.RIGHT_TURN;
             } else {
-                moveBot(MOVEMENT.LEFT_TURN);
+                return MOVEMENT.LEFT_TURN;
             }
         } else if (numOfTurn == 2) {
-            moveBot(MOVEMENT.TURN_AROUND);
+            return MOVEMENT.TURN_AROUND;
         }
+        return MOVEMENT.FORWARD;
     }
 
 
-    private void exploreIslands() throws InterruptedException {
-
-        Grid curGrid = exploredMap.arena.getGrid(exploredMap.robotReal.getRobotPosRow(), exploredMap.robotReal.getRobotPosCol());
-        RobotReal tempRobot = new RobotReal(curGrid);
-
-        IslandExploration islandExploration = new IslandExploration(exploredMap.arena, tempRobot);
-        while ((islandExploration.percentExplored < ArenaConstants.MAX_COVERAGE_PERCENTAGE) && (System.currentTimeMillis() < endTime)) {
-            exploredMap.robotReal.setPath(islandExploration.getPathtoNearestUnexplored());
-            islandExploration.percentExplored = ExplorationUtility.percentExplore(exploredMap.arena);
-            String commandString = exploredMap.robotReal.generateMovementCommands(exploredMap.robotReal.getOrientation());
-            if (exploredMap.robotReal.getRobotPosRow() != ArenaConstants.START_ROW || exploredMap.robotReal.getRobotPosCol() != ArenaConstants.START_COL) {
-                break;
-            }
-        }
-        goHome();
-    }
+//    private void exploreIslands() throws InterruptedException {
+//
+//        Grid curGrid = exploredMap.arena.getGrid(exploredMap.robotReal.getRobotPosRow(), exploredMap.robotReal.getRobotPosCol());
+//        RobotReal tempRobot = new RobotReal(curGrid);
+//
+//        IslandExploration islandExploration = new IslandExploration(exploredMap.arena, tempRobot);
+//        while ((islandExploration.percentExplored < ArenaConstants.MAX_COVERAGE_PERCENTAGE) && (System.currentTimeMillis() < endTime)) {
+//            exploredMap.robotReal.setPath(islandExploration.getPathtoNearestUnexplored());
+//            islandExploration.percentExplored = ExplorationUtility.percentExplore(exploredMap.arena);
+//            String commandString = exploredMap.robotReal.generateMovementCommands(exploredMap.robotReal.getOrientation());
+//            if (exploredMap.robotReal.getRobotPosRow() != ArenaConstants.START_ROW || exploredMap.robotReal.getRobotPosCol() != ArenaConstants.START_COL) {
+//                break;
+//            }
+//        }
+//        goHome();
+//    }
 
 
     // Returns the coods of right block if can click picture, else [-1,-1]
@@ -282,7 +324,6 @@ public class ExplorationAlgo {
     }
 
 
-
     private void clickPicture(){
         int[] blockCood =  shouldClickPicture();
 
@@ -292,12 +333,11 @@ public class ExplorationAlgo {
             if(!simulate) {
                 comm.clickPictureAndWaitforAcknowledge(blockCood[0], blockCood[1], true);
             }
-            System.out.println("Clicked Nearby Picture at: (" + blockCood[0] + "," + blockCood[1] + ")");
+            System.out.println("Clicked Nearby Picture of: (" + blockCood[1] + "," + blockCood[0] + ")");
         }
     }
 
 
-    // TODO: Finalise protocol for just clicking picture
     public void turnAroundAndClickPicture() throws InterruptedException {
         exploredMap.robotReal.setClickingRandomPicture(true);
 
@@ -305,9 +345,10 @@ public class ExplorationAlgo {
         //-----------
 
         exploredMap.robotReal.move(MOVEMENT.LEFT_TURN);
+        senseAndRepaint(simulate);
         if (canCalibrate(exploredMap.robotReal.getOrientation())){
             comm.sendCalibrationAndWaitForAcknowledge(CommunicationConstants.CALI_FRONT);
-            senseAndRepaint(simulate);
+            lastCalibrate =0;
         }
         int[] randomCood = getRandomCoordinate();
         comm.clickPictureAndWaitforAcknowledge(randomCood[0], randomCood[1], false);
@@ -316,11 +357,11 @@ public class ExplorationAlgo {
         // 2nd TURN
         //-----------
         exploredMap.robotReal.move(MOVEMENT.LEFT_TURN);
+        senseAndRepaint(simulate);
         if(!simulate && canCalibrate(exploredMap.robotReal.getOrientation())){
             comm.sendCalibrationAndWaitForAcknowledge(CommunicationConstants.CALI_FRONT);
+            lastCalibrate = 0;
         }
-        senseAndRepaint(simulate);
-
         randomCood = getRandomCoordinate();
         comm.clickPictureAndWaitforAcknowledge(randomCood[0], randomCood[1], false);
 
@@ -328,11 +369,10 @@ public class ExplorationAlgo {
         //-----------
 
         exploredMap.robotReal.move(MOVEMENT.LEFT_TURN);
+        senseAndRepaint(simulate);
         if(!simulate && canCalibrate(exploredMap.robotReal.getOrientation())){
             comm.sendCalibrationAndWaitForAcknowledge(CommunicationConstants.CALI_FRONT);
         }
-        senseAndRepaint(simulate);
-
         randomCood = getRandomCoordinate();
         comm.clickPictureAndWaitforAcknowledge(randomCood[0], randomCood[1], false);
 
@@ -347,11 +387,11 @@ public class ExplorationAlgo {
 
     // return location of the explored free cell near an unclicked obstacle, else return 0;
 
-    public int[] getIslandCell(){
+    public int[][] getIslandCellAndNearbyCell(){
 
         int i = ArenaConstants.ARENA_ROWS;
         int j = -1;
-
+        int[] noNeighbour = new int[]{-1,- 1};
         while (i != 0 || j != ArenaConstants.ARENA_COLS - 1) {
             if (i > 0) {
                 i--;
@@ -360,53 +400,186 @@ public class ExplorationAlgo {
                 j++;
             }
 
-            int[] noNeighbour = new int[]{-1,- 1};
-
             for (int c = 0; c <= j; c++) {
                 if (exploredMap.arena.getGrid(i, c).isObstacle() && !exploredMap.arena.getGrid(i, c).getPictureClicked()) {
                     int[] nearByCell = exploredMap.arena.checkSurroundingExploredAndFree(i,c);
                     if(!Arrays.equals(nearByCell, noNeighbour)){
-                        return new int[]{i, c};
+                        return new int[][]{new int[]{i, c}, nearByCell};
                     }
                 }
             }
 
             for (int r = i + 1; r <= ArenaConstants.ARENA_ROWS - 1; r++) {
-                if (!exploredMap.arena.getGrid(r, j).getPictureClicked()) {
+                if (exploredMap.arena.getGrid(r, j).isObstacle() && !exploredMap.arena.getGrid(r, j).getPictureClicked()) {
                     int[] nearByCell = exploredMap.arena.checkSurroundingExploredAndFree(r,j);
                     if(!Arrays.equals(nearByCell, noNeighbour)){
-                        return new int[]{r, j};
+                        return new int[][]{new int[] {r, j}, nearByCell};
                     }
                 }
 
             }
         }
-        return new int[]{-1, -1};
+        return new int[][]{noNeighbour, noNeighbour};
     }
 
-    public void goToIslandLoop(int[] islandCell){
+    public int goToIslandLoop() throws InterruptedException {
 
         // The nearby cell to which the robot can go
-        int[] nearByCell = exploredMap.arena.checkSurroundingExploredAndFree(islandCell[0], islandCell[1]);
-        Orientation relativeOrientation = exploredMap.arena.getRelativeOrientation(nearByCell[0], nearByCell[1], islandCell[0], islandCell[1]);
-        //This realativeOrientaion should be to the right of the bot, so we get the counter-clockwise orientation
-        Orientation botFinalOrientaion = Orientation.getPreviousOrientation(relativeOrientation);
+        int[][] cells = getIslandCellAndNearbyCell();
+        int[] islandCell = cells[0];
+        int[] nearByCell = cells[1];
 
-        int botX = exploredMap.robotReal.getRobotPosCol();
-        int botY = exploredMap.robotReal.getRobotPosRow();
-                while(botX != nearByCell[0] && botX != nearByCell[1]){
+        if (islandCell[0] != -1 && islandCell[1] != -1 && nearByCell[0] != -1 && nearByCell[1] != -1) {
+            Orientation relativeOrientation = exploredMap.arena.getRelativeOrientation(nearByCell[1], nearByCell[0], islandCell[1], islandCell[0]);
+            //This realativeOrientaion should be to the right of the bot, so we get the counter-clockwise orientation
+            Orientation botFinalOrientaion = Orientation.getPreviousOrientation(relativeOrientation);
+//            System.out.println(botFinalOrientaion);
+            int botX = exploredMap.robotReal.getRobotPosCol();
+            int botY = exploredMap.robotReal.getRobotPosRow();
 
-            AStar astar = new AStar();
-            astar.startSearch(exploredMap.arena, exploredMap.arena.getGrid(botX, botY), exploredMap.arena.getGrid(islandCell[0], islandCell[1]), false);
-            ArrayList<Grid> path = new ArrayList<>(astar.solution);
+//            System.out.println(botX + ", " + botY);
+//            System.out.println(nearByCell[1] + ", " + nearByCell[0]);
 
-            botX = exploredMap.robotReal.getRobotPosCol();
-            botY = exploredMap.robotReal.getRobotPosRow();
+            // The map might change while the robot is moving
+//            System.out.println(exploredMap.arena.getGrid(nearByCell[0], nearByCell[1]).getAcc());
+//            System.out.println(exploredMap.arena.getGrid(islandCell[0], islandCell[1]).isObstacle());
+//            System.out.println(botY != nearByCell[0]);
+//            System.out.println(botX != nearByCell[1]);
+//            System.out.println(System.currentTimeMillis() <= endTime);
+//            System.out.println(!comm.isTaskFinish());
+            while (exploredMap.arena.getGrid(nearByCell[0], nearByCell[1]).getAcc() && exploredMap.arena.getGrid(islandCell[0], islandCell[1]).isObstacle() && (botY != nearByCell[0] || botX != nearByCell[1]) && System.currentTimeMillis() <= endTime && !comm.isTaskFinish()) {
 
+                AStar astar = new AStar();
+
+                astar.startSearch(exploredMap.arena, exploredMap.arena.getGrid(botY, botX), exploredMap.arena.getGrid(nearByCell[0], nearByCell[1]), false);
+                ArrayList<Grid> path = new ArrayList<>(astar.solution);
+
+                System.out.println(path.get(1).getX() + ", " + path.get(1).getY() );
+
+                if (simulate) {
+                    TimeUnit.MILLISECONDS.sleep(RobotConstants.SPEED);
+                    exploredMap.robotReal.moveSimulate(getNextMove(path.get(1)));
+                } else {
+                    exploredMap.robotReal.move(getNextMove(path.get(1)));
+                }
+
+                senseAndRepaint(simulate);
+                botX = exploredMap.robotReal.getRobotPosCol();
+                botY = exploredMap.robotReal.getRobotPosRow();
+                calibrateRobot();
+            }
+
+            if (exploredMap.robotReal.getRobotPosRow() == nearByCell[0] && exploredMap.robotReal.getRobotPosCol() == nearByCell[1]) {
+                if (!exploredMap.robotReal.getOrientation().equals(botFinalOrientaion)) {
+                    MOVEMENT m = turnBotDirection(botFinalOrientaion);
+
+                    if (simulate) {
+                        TimeUnit.MILLISECONDS.sleep(RobotConstants.SPEED);
+                        exploredMap.robotReal.moveSimulate(m);
+                    } else {
+                        exploredMap.robotReal.move(m);
+                    }
+
+                    senseAndRepaint(simulate);
+                }
+                exploreLoop = true;
+            }
+            return 0;
         }
+
+        else{
+            return -1;
+        }
+
     }
 
     private int[] getRandomCoordinate(){
+
+//        int[] cood = new int[]{1, 1};
+//
+//        int front_close = 0;
+//        int front_far = 0;
+//        int side_left = 0;
+//        int side_right = 0;
+//        switch (exploredMap.robotReal.getOrientation()) {
+//            case North:
+//                front_close = exploredMap.robotReal.getRobotPosRow() - 2;
+//                front_far = 0;
+//                side_left = 0;
+//                side_right = ArenaConstants.ARENA_COLS -1;
+//
+////                int y = front_close;
+////                int x_left = 0;
+////                int x_right = 0;
+////                int botX  = exploredMap.robotReal.getRobotPosCol();
+////
+//                for (int i = front_close; i >= front_far; i--){
+//                    for(int j = side_left; j < side_t; j++){
+//                        exploredMap.arena.getGrid(i, j).isObstacle(){
+//                            return new int[]{j, Arei}
+//                        }
+//                    }
+//                }
+//
+//                while(y <= front_far){
+//
+//                    if (exploredMap.arena.getGrid(botX - x_left, y).isObstacle()){
+//                        return new int[]{botX - x_left, y};
+//                    }
+//                    if (exploredMap.arena.getGrid(botX+x_right, y).isObstacle()){
+//                        return new int[]{botX+x_right, y};
+//                    }
+//                    y ++;
+//                    if ( botX - x_left > side_left){
+//                        x_left++;
+//                    }
+//                    if(botX + x_left > side_left){
+//                        x
+//                    }
+//                }
+//
+//
+//                break;
+//
+//            case East:
+//                front_close = exploredMap.robotReal.getRobotPosCol() + 2;
+//                front_far = ArenaConstants.ARENA_COLS - 1;
+//                side_left = 0;
+//                side_right = ArenaConstants.ARENA_ROWS -1;
+//                break;
+//
+//            case South:
+//                front_close = exploredMap.robotReal.getRobotPosRow() + 2;
+//                front_far = ArenaConstants.ARENA_ROWS - 1;
+//                side_left = ArenaConstants.ARENA_COLS - 1;
+//                side_right = 0;
+//                break;
+//
+//            case West:
+//                front_close = exploredMap.robotReal.getRobotPosCol() - 2;
+//                front_far = 0;
+//                side_left = ArenaConstants.ARENA_ROWS - 1;
+//                side_right = 0;
+//                break;
+//
+//        }
+//
+//        switch(exploredMap.robotReal.getOrientation()){
+//            case North:
+//                int
+//        }
+//
+//        if(exploredMap.arena.getGrid())
+//
+//        int y = front_close;
+//        int x_left = 1;
+//        int x_right = 1;
+//
+//        while(y <= front_far){
+//
+//            exploredMap.arena.getGrid()
+//        }
+
         return new int[]{1, 1};
     }
 
@@ -428,16 +601,15 @@ public class ExplorationAlgo {
             if (simulate) simulateCalibration(CommunicationConstants.CALI_FRONT);
             else comm.sendCalibrationAndWaitForAcknowledge(CommunicationConstants.CALI_FRONT);
 
-            if (caliRight && lastCalibrate > 1) {
+            if (caliRight) {
                 cali = CommunicationConstants.CALI_RIGHT_FRONT;
                 if (simulate) simulateCalibration(CommunicationConstants.CALI_RIGHT_FRONT);
                 else comm.sendCalibrationAndWaitForAcknowledge(CommunicationConstants.CALI_RIGHT_FRONT);
 
-            } else if (caliLeft && lastCalibrate > 1) { // So that doesn't calibrate immediately after a previous one
+            } else if (caliLeft) { // So that doesn't calibrate immediately after a previous one
                 cali = CommunicationConstants.CALI_LEFT_FRONT;
                 if (simulate) simulateCalibration(CommunicationConstants.CALI_LEFT_FRONT);
                 else comm.sendCalibrationAndWaitForAcknowledge(CommunicationConstants.CALI_LEFT_FRONT);
-
             }
         }
 
@@ -676,10 +848,10 @@ public class ExplorationAlgo {
 //        astar.startSearch(exploredMap.arena, robotCurGrid, homeGrid, false);
 //        exploredMap.robotReal.setPath(astar.solution);
 //        String commandString = exploredMap.robotReal.generateMovementCommands(exploredMap.robotReal.getOrientation());
-//        commandString = CommunicationConstants.GO_HOME + ":" + commandString;      // TODO: Finalise on this protocol
+//        commandString = CommunicationConstants.GO_HOME + ":" + commandString;
 //        comm.sendMsg(CommunicationConstants.ARDUINO, commandString);
 //
-//        //TODO: Do we need to calibrate after reaching home?
+//
 //        turnBotDirection(Orientation.East);
 //        comm.sendMsg(CommunicationConstants.ARDUINO, CommunicationConstants.INITIAL_CALIBRATION);
 //
@@ -736,7 +908,50 @@ public class ExplorationAlgo {
         exploredMap.robotReal.setClickingRandomPicture(false);
     }
 
+    public MOVEMENT getNextMove(Grid nextGrid) throws InterruptedException {
+        int botX = exploredMap.robotReal.getRobotPosCol();
+        int botY = exploredMap.robotReal.getRobotPosRow();
+        Orientation relativeOrientaion = exploredMap.arena.getRelativeOrientation(botX, botY, nextGrid.getX(), nextGrid.getY());
+        return turnBotDirection(relativeOrientaion);
+    }
+
+    public void debugAcc(){
+        for(int i = 0; i< ArenaConstants.ARENA_ROWS ; i++){
+            for(int j = 0; j<ArenaConstants.ARENA_COLS; j++){
+                if(exploredMap.arena.getGrid(i, j).getAcc())
+                    System.out.print("T ");
+                else System.out.print("F ");
+            }
+            System.out.println();
+        }
+    }
+
+    public void debugObst(){
+        for(int i = 0; i< ArenaConstants.ARENA_ROWS ; i++){
+            for(int j = 0; j<ArenaConstants.ARENA_COLS; j++){
+                if(exploredMap.arena.getGrid(i, j).isObstacle())
+                    System.out.print("T ");
+                else System.out.print("F ");
+            }
+            System.out.println();
+        }
+
+    }
+
+    public void debugExplored() {
+        for (int i = 0; i < ArenaConstants.ARENA_ROWS; i++) {
+            for (int j = 0; j < ArenaConstants.ARENA_COLS; j++) {
+                if (exploredMap.arena.getGrid(i, j).isExplored())
+                    System.out.print("O ");
+                else System.out.print(". ");
+            }
+            System.out.println();
+        }
+    }
+
+
 }
+
 
 
 

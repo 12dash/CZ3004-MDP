@@ -109,8 +109,8 @@ public class Communication{
     public void sendMsg(String recipient, String message) {
         try {
             String outputMsg;
-            outputMsg = recipient + "|" + message;
-            System.out.println("Sending out message: " + outputMsg + "_");
+            outputMsg = recipient + "|" + message + "_";
+            System.out.println("Sending out message: " + outputMsg);
             writer.write(outputMsg);
             writer.flush();
         } catch (IOException e) {

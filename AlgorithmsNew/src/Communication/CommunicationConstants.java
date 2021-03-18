@@ -4,7 +4,7 @@ public class CommunicationConstants {
 
     public static final String ANDROID = "an";
     public static final String ARDUINO = "ar";
-    public static final String IR = "ir"; // TODO: Check this with RPI
+    public static final String IR = "ir";
 
     public static final String START = "start";
     public static final String WAYPOINT = "waypoint";
@@ -27,9 +27,10 @@ public class CommunicationConstants {
     public static final String CALIBRATION_ACKNOWLEDGMENT = "A";
 
     public static final String IMAGE_CAPTURED = "{\"imageCaptured\" : \"true\"}";
+    public static final String IR_TASK_COMPLETE = ""; // TODO Finalise this protocol
 
 
-    //TODO: Finalize this ^ initial calibration with arduino
+
 
 //    public static final String MAP_STRINGS = "MAP";         // PC --> Android
 //    public static final String BOT_POS = "BOT_POS";         // PC --> Android

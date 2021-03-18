@@ -171,6 +171,7 @@ public class AStar {
                 return;
             } else if ((!GoalState) && candidateNode.grid.equals(this.end)) {
                 // To reach a particular grid such as the waypoint.
+
                 getSolution();
                 return;
             } else {

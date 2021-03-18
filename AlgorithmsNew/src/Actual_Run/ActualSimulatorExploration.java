@@ -26,7 +26,7 @@ public class ActualSimulatorExploration {
     public static Map map;   // real arena
     private static final Communication comm = Communication.getCommunication();
 
-    private static String INPUT_MAP_FILE = "example_1.txt";
+    private static String INPUT_MAP_FILE = "example_4.txt";
 
     //#############################################
     //          SET THESE VALUES
