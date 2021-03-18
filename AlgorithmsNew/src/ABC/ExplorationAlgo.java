@@ -35,6 +35,18 @@ public class ExplorationAlgo {
     private int numMoves = 0;
     private boolean exploreLoop = true;
 
+    private boolean bottomLeft = false;
+    private boolean bottomRight = false;
+    private boolean middleRight = false;
+    private boolean topRight= false;
+    private boolean topLeft = false;
+    private boolean middleLeft = false;
+
+    private int leftC = 5;
+    private int rightC = 11;
+    private int middleC = 10;
+
+
     private ArrayList<Grid> lastTenGrids = new ArrayList<>();
     private HashMap<Grid, Integer> counter = new HashMap<>();
 
@@ -173,17 +185,18 @@ public class ExplorationAlgo {
         senseAndRepaint(simulate); // Waits for sense and then repaints immediately
 
         calibrateRobot();
+        takePicture();
 //        clickPicture();
 
-        if(numMoves > RobotConstants.NUM_MOVES_AFTER_CLICK_PICTURE){
-            if(!simulate) turnAroundAndClickPicture();
-            else simulateTurnAroundAndClickPictures();
-
-            numMoves = 0;
-            System.out.println("Clicked Random Pictures at: (" + exploredMap.robotReal.getRobotPosCol() + "," + (ArenaConstants.ARENA_ROWS - exploredMap.robotReal.getRobotPosRow() -1) + ")");
-        }
-
-        else numMoves++ ;
+//        if(numMoves > RobotConstants.NUM_MOVES_AFTER_CLICK_PICTURE){
+//            if(!simulate) turnAroundAndClickPicture();
+//            else simulateTurnAroundAndClickPictures();
+//
+//            numMoves = 0;
+//            System.out.println("Clicked Random Pictures at: (" + exploredMap.robotReal.getRobotPosCol() + "," + (ArenaConstants.ARENA_ROWS - exploredMap.robotReal.getRobotPosRow() -1) + ")");
+//        }
+//
+//        else numMoves++ ;
 
 
     }
@@ -354,6 +367,9 @@ public class ExplorationAlgo {
         int[] randomCood = getRandomCoordinate();
         comm.clickPictureAndWaitforAcknowledge(randomCood[0], randomCood[1], false);
 
+        if(System.currentTimeMillis() > endTime || comm.isTaskFinish()) {
+            return;
+        }
 
         // 2nd TURN
         //-----------
@@ -363,6 +379,10 @@ public class ExplorationAlgo {
         if(!simulate && canCalibrate(exploredMap.robotReal.getOrientation())){
             comm.sendCalibrationAndWaitForAcknowledge(CommunicationConstants.CALI_FRONT);
             lastCalibrate = 0;
+        }
+
+        if(System.currentTimeMillis() > endTime || comm.isTaskFinish()) {
+            return;
         }
 
         randomCood = getRandomCoordinate();
@@ -376,6 +396,11 @@ public class ExplorationAlgo {
         if(!simulate && canCalibrate(exploredMap.robotReal.getOrientation())){
             comm.sendCalibrationAndWaitForAcknowledge(CommunicationConstants.CALI_FRONT);
         }
+
+        if(System.currentTimeMillis() > endTime || comm.isTaskFinish()) {
+            return;
+        }
+
         randomCood = getRandomCoordinate();
         comm.clickPictureAndWaitforAcknowledge(randomCood[0], randomCood[1], false);
 
@@ -1053,10 +1078,46 @@ public class ExplorationAlgo {
                 return 4;
             }
         }
-
-
     }
 
+    public void takePicture() throws InterruptedException {
+        int botX = exploredMap.robotReal.getRobotPosCol();
+        int botY = exploredMap.robotReal.getRobotPosRow();
+
+        if(!bottomLeft && botX == leftC && botY > middleC){
+            if(!simulate) turnAroundAndClickPicture();
+            else simulateTurnAroundAndClickPictures();
+            bottomLeft = true;
+        }
+
+        else if(!bottomRight && botX == rightC && botY > middleC){
+            if(!simulate) turnAroundAndClickPicture();
+            else simulateTurnAroundAndClickPictures();
+            bottomRight = true;
+        }
+        else if(!middleRight && botY == middleC && (botX > (leftC+rightC/2))){
+            if(!simulate) turnAroundAndClickPicture();
+            else simulateTurnAroundAndClickPictures();
+            middleRight = true;
+        }
+        else if(!topRight && botX == rightC && botY < middleC){
+            if(!simulate) turnAroundAndClickPicture();
+            else simulateTurnAroundAndClickPictures();
+            topRight = true;
+        }
+
+        else if(!topLeft && botX == leftC && botY < middleC){
+            if(!simulate) turnAroundAndClickPicture();
+            else simulateTurnAroundAndClickPictures();
+            topLeft = true;
+        }
+
+        else if(!middleLeft && botY == middleC && (botX < (leftC+rightC/2))){
+            if(!simulate) turnAroundAndClickPicture();
+            else simulateTurnAroundAndClickPictures();
+            middleLeft = true;
+        }
+    }
 
 }
 
