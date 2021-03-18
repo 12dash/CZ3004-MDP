@@ -356,6 +356,10 @@ public class ExplorationAlgo {
         int[] randomCood = getRandomCoordinate();
         comm.clickPictureAndWaitforAcknowledge(randomCood[0], randomCood[1], false);
 
+        if(System.currentTimeMillis() > endTime || comm.isTaskFinish()) {
+            return;
+        }
+
 
         // 2nd TURN
         //-----------
@@ -365,6 +369,10 @@ public class ExplorationAlgo {
         if(!simulate && canCalibrate(exploredMap.robotReal.getOrientation())){
             comm.sendCalibrationAndWaitForAcknowledge(CommunicationConstants.CALI_FRONT);
             lastCalibrate = 0;
+        }
+
+        if(System.currentTimeMillis() > endTime || comm.isTaskFinish()) {
+            return;
         }
 
         randomCood = getRandomCoordinate();
@@ -378,6 +386,11 @@ public class ExplorationAlgo {
         if(!simulate && canCalibrate(exploredMap.robotReal.getOrientation())){
             comm.sendCalibrationAndWaitForAcknowledge(CommunicationConstants.CALI_FRONT);
         }
+
+        if(System.currentTimeMillis() > endTime || comm.isTaskFinish()) {
+            return;
+        }
+
         randomCood = getRandomCoordinate();
         comm.clickPictureAndWaitforAcknowledge(randomCood[0], randomCood[1], false);
 

@@ -1004,7 +1004,7 @@ public class ExplorationAlgo {
     public void findRightWall() {
 
             exploredMap.robotReal.move(turnBotDirection(getClosestWall()));
-            while(lookForward()){
+            while(lookForward() && System.currentTimeMillis() <= endTime && !comm.isTaskFinish()){
                 exploredMap.robotReal.move(MOVEMENT.FORWARD);
             }
             exploredMap.robotReal.move(MOVEMENT.LEFT_TURN);
