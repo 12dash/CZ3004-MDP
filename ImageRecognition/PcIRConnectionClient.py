@@ -3,6 +3,7 @@ import threading
 import json
 import queue
 import numpy as np
+import cv2
 from config import *
 from struct import unpack
 import os
@@ -14,15 +15,6 @@ from PIL import Image
 from ipython_genutils.py3compat import xrange
 
 img_info = {}
-
-prev = False
-
-obs = []
-for i in range(20):
-  for j in range(15):
-    obs.append([])
-
-img_grid = []
 
 class PcConnectionClient:
   def __init__(self):
@@ -114,6 +106,13 @@ class PcConnectionClient:
     # Finally tell Algo we are done
     self.send_to_server_ir_data("pc|done")
 
+  def rename_image(self, path, id):
+    img = cv2.imread(f"output/{path}")     
+    cv2.imwrite(f"output/{id}", img) 
+    os.remove(f"output/{path}")
+    return
+
+
   def process_image(self, processing_queue):
     while self.connected:
       if not processing_queue.empty():
@@ -128,7 +127,7 @@ class PcConnectionClient:
         img.save(f"raw/{path}")
 
         # Do processing here
-        predicted_img = detect(path)
+        predicted_img = detect(path)        
 
         # If no bounding box
         if predicted_img == [-1]:
@@ -137,11 +136,13 @@ class PcConnectionClient:
         
         # Else if image found successfully
         else:
-          for i in predicted_img:
+          for j in predicted_img:
+            i = j[-1]
             # If image has not been detected previously, store it
             if (i not in img_info.keys()):
               print(f"New image seen id={i} coords={coords}")
               img_info[i] = [coords, path, nearby]
+              self.rename_image(path,i)
               # Always send to Android image results
               json_outgoing = json.dumps({"image": [coords[0], coords[1], i]})
               self.send_to_server_ir_data(f"an|{json_outgoing}") 
@@ -150,6 +151,7 @@ class PcConnectionClient:
               if(img_info[i][-1] != "True"):
                 print(f"Old image seen and previously far, update img_info id={i} coords={coords}")
                 img_info[i] = [coords, path, nearby]
+                self.rename_image(path,i)
                 # Always send to Android image results
                 json_outgoing = json.dumps({"image": [coords[0], coords[1], i]})
                 self.send_to_server_ir_data(f"an|{json_outgoing}") 
