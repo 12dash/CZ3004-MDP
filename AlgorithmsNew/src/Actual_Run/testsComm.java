@@ -12,7 +12,6 @@ import Simulator.Map;
 import Simulator.SimulatorConstants;
 import Utility.FileManager;
 import Utility.MapDescriptor;
-import javafx.scene.shape.MoveTo;
 import Exploration.ExplorationAlgo;
 import Robot.RobotConstants.MOVEMENT;
 

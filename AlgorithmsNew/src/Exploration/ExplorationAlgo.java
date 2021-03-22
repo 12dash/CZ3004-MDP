@@ -12,7 +12,6 @@ import Communication.Communication;
 import Communication.CommunicationConstants;
 import Robot.RobotConstants.MOVEMENT;
 import Robot.RobotReal;
-import javafx.scene.shape.MoveTo;
 
 import javax.annotation.processing.SupportedSourceVersion;
 import javax.swing.plaf.ComponentInputMapUIResource;
@@ -45,7 +44,7 @@ public class ExplorationAlgo {
         this.timeLimit = timeLimit;
         this.coverageLimit = coverageLimit;
         this.comm = comm;
-        this.simulate = false;
+        this.simulate = true;
         this.realMap = null;
     }
 
@@ -54,7 +53,7 @@ public class ExplorationAlgo {
         this.timeLimit = timeLimit;
         this.coverageLimit = coverageLimit;
         this.realMap = realMap;
-        this.simulate = true;
+        this.simulate = false;
         this.comm = Communication.getCommunication();
     }
 
