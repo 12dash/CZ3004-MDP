@@ -1,24 +1,19 @@
-package Exploration;
+package ABC;
 
 import Algo.AStar;
-import Algo.ExplorationUtility;
+import Communication.Communication;
+import Communication.CommunicationConstants;
 import Environment.Arena;
 import Environment.ArenaConstants;
 import Environment.Grid;
 import Robot.RobotConstants;
-import Values.Orientation;
-import Simulator.Map;
-import Communication.Communication;
-import Communication.CommunicationConstants;
 import Robot.RobotConstants.MOVEMENT;
-import Robot.RobotReal;
+import Simulator.Map;
+import Values.Orientation;
 
-import javax.annotation.processing.SupportedSourceVersion;
-import javax.swing.plaf.ComponentInputMapUIResource;
-import javax.swing.plaf.basic.BasicInternalFrameTitlePane;
-import java.sql.Time;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
@@ -39,6 +34,21 @@ public class ExplorationAlgo {
     private int numMoves = 0;
     private boolean exploreLoop = true;
 
+    private boolean bottomLeft = false;
+    private boolean bottomRight = false;
+    private boolean middleRight = false;
+    private boolean topRight= false;
+    private boolean topLeft = false;
+    private boolean middleLeft = false;
+
+    private int leftC = 5;
+    private int rightC = 11;
+    private int middleC = 10;
+
+
+    private ArrayList<Grid> lastTenGrids = new ArrayList<>();
+    private HashMap<Grid, Integer> counter = new HashMap<>();
+
 
 
     public ExplorationAlgo(Map exploredMap, int timeLimit, int coverageLimit, Communication comm) {
@@ -46,7 +56,7 @@ public class ExplorationAlgo {
         this.timeLimit = timeLimit;
         this.coverageLimit = coverageLimit;
         this.comm = comm;
-        this.simulate = true;
+        this.simulate = false;
         this.realMap = null;
     }
 
@@ -55,7 +65,7 @@ public class ExplorationAlgo {
         this.timeLimit = timeLimit;
         this.coverageLimit = coverageLimit;
         this.realMap = realMap;
-        this.simulate = false;
+        this.simulate = true;
         this.comm = Communication.getCommunication();
     }
 
@@ -132,7 +142,7 @@ public class ExplorationAlgo {
         clickPicture();
         do {
             nextMove();
-
+            getOutOfLoop();
             if (exploredMap.robotReal.getRobotPosRow() == r && exploredMap.robotReal.getRobotPosCol() == c) {
                 break;
             }
@@ -174,17 +184,18 @@ public class ExplorationAlgo {
         senseAndRepaint(simulate); // Waits for sense and then repaints immediately
 
         calibrateRobot();
-        clickPicture();
+        takePicture();
+//        clickPicture();
 
-        if(numMoves > RobotConstants.NUM_MOVES_AFTER_CLICK_PICTURE){
-            if(!simulate) turnAroundAndClickPicture();
-            else simulateTurnAroundAndClickPictures();
-
-            numMoves = 0;
-            System.out.println("Clicked Random Pictures at: (" + exploredMap.robotReal.getRobotPosCol() + "," + (ArenaConstants.ARENA_ROWS - exploredMap.robotReal.getRobotPosRow() -1) + ")");
-        }
-
-        else numMoves++ ;
+//        if(numMoves > RobotConstants.NUM_MOVES_AFTER_CLICK_PICTURE){
+//            if(!simulate) turnAroundAndClickPicture();
+//            else simulateTurnAroundAndClickPictures();
+//
+//            numMoves = 0;
+//            System.out.println("Clicked Random Pictures at: (" + exploredMap.robotReal.getRobotPosCol() + "," + (ArenaConstants.ARENA_ROWS - exploredMap.robotReal.getRobotPosRow() -1) + ")");
+//        }
+//
+//        else numMoves++ ;
 
 
     }
@@ -240,7 +251,7 @@ public class ExplorationAlgo {
     /**
      * Turns the robot to the required direction.
      */
-    private MOVEMENT turnBotDirection(Orientation targetDir) throws InterruptedException {
+    private MOVEMENT turnBotDirection(Orientation targetDir) {
         int numOfTurn = Math.abs(Orientation.ORIENTATION_MAPPINGS.get(exploredMap.robotReal.getOrientation()) - Orientation.ORIENTATION_MAPPINGS.get(targetDir));
         if (numOfTurn > 2) numOfTurn = numOfTurn % 2;
 
@@ -358,7 +369,6 @@ public class ExplorationAlgo {
         if(System.currentTimeMillis() > endTime || comm.isTaskFinish()) {
             return;
         }
-
 
         // 2nd TURN
         //-----------
@@ -989,6 +999,124 @@ public class ExplorationAlgo {
         }
     }
 
+    public void getOutOfLoop() {
+        int botRow = exploredMap.robotReal.getRobotPosRow();
+        int botCol = exploredMap.robotReal.getRobotPosCol();
+
+        Grid botGrid = exploredMap.arena.getGrid(botRow, botCol);
+
+        if(counter.containsKey(botGrid)){
+            counter.replace(botGrid, counter.get(botGrid)+1);
+            if(counter.get(botGrid) > 2){
+                findRightWall();
+            }
+        }
+
+        else {
+            if (lastTenGrids.size() < 10) {
+                lastTenGrids.add(botGrid);
+                counter.put(botGrid, 0);
+            } else {
+                counter.remove(lastTenGrids.get(0));
+                lastTenGrids.remove(0);
+                lastTenGrids.add(botGrid);
+                counter.put(botGrid, 0);
+                }
+            }
+    }
+
+    public void findRightWall() {
+
+            exploredMap.robotReal.move(turnBotDirection(getClosestWall()));
+            while(lookForward() && System.currentTimeMillis() <= endTime && !comm.isTaskFinish()){
+                exploredMap.robotReal.move(MOVEMENT.FORWARD);
+            }
+            exploredMap.robotReal.move(MOVEMENT.LEFT_TURN);
+    }
+
+    public Orientation getClosestWall(){
+        int botX = exploredMap.robotReal.getRobotPosCol();
+        int botY = exploredMap.robotReal.getRobotPosRow();
+
+        int eastWall  = ArenaConstants.ARENA_COLS - botX;
+        int westWall  = botX;
+        int northWall = botY;
+        int southWall = ArenaConstants.ARENA_ROWS - botY;
+
+        int closestWall = Math.min(Math.min(Math.min(eastWall, westWall), northWall), southWall);
+
+        if(closestWall == eastWall) return Orientation.East;
+        if(closestWall == southWall) return Orientation.South;
+        if(closestWall == westWall) return Orientation.West;
+        return Orientation.North;
+    }
+
+
+    //Quadrants:
+    // 1 2
+    // 3 4
+    public int getQuadrant(){
+
+        int botX = exploredMap.robotReal.getRobotPosCol();
+        int botY = exploredMap.robotReal.getRobotPosRow();
+
+        if (botY < 10){
+            if(botX < 7){
+                return 1;
+            }
+            else{
+                return 2;
+            }
+        }
+
+        else{
+            if(botX > 7){
+                return 3;
+            }
+            else{
+                return 4;
+            }
+        }
+    }
+
+    public void takePicture() throws InterruptedException {
+        int botX = exploredMap.robotReal.getRobotPosCol();
+        int botY = exploredMap.robotReal.getRobotPosRow();
+
+        if(!bottomLeft && botX == leftC && botY > middleC){
+            if(!simulate) turnAroundAndClickPicture();
+            else simulateTurnAroundAndClickPictures();
+            bottomLeft = true;
+        }
+
+        else if(!bottomRight && botX == rightC && botY > middleC){
+            if(!simulate) turnAroundAndClickPicture();
+            else simulateTurnAroundAndClickPictures();
+            bottomRight = true;
+        }
+        else if(!middleRight && botY == middleC && (botX > (leftC+rightC/2))){
+            if(!simulate) turnAroundAndClickPicture();
+            else simulateTurnAroundAndClickPictures();
+            middleRight = true;
+        }
+        else if(!topRight && botX == rightC && botY < middleC){
+            if(!simulate) turnAroundAndClickPicture();
+            else simulateTurnAroundAndClickPictures();
+            topRight = true;
+        }
+
+        else if(!topLeft && botX == leftC && botY < middleC){
+            if(!simulate) turnAroundAndClickPicture();
+            else simulateTurnAroundAndClickPictures();
+            topLeft = true;
+        }
+
+        else if(!middleLeft && botY == middleC && (botX < (leftC+rightC/2))){
+            if(!simulate) turnAroundAndClickPicture();
+            else simulateTurnAroundAndClickPictures();
+            middleLeft = true;
+        }
+    }
 
 }
 

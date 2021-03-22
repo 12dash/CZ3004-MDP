@@ -195,7 +195,7 @@ public class Arena {
     private void removePaddingFromNonObstacles(){
         for (int i = 0; i < ArenaConstants.ARENA_ROWS; i++) {
             for (int j = 0; j < ArenaConstants.ARENA_COLS; j++) {
-                if (this.grids[i][j].isExplored() && !this.grids[i][j].isObstacle()){
+                if (!this.grids[i][j].isObstacle()){
                     this.grids[i][j].setAcc(true);
                 }
             }
@@ -210,7 +210,7 @@ public class Arena {
          */
         for (int i = 0; i < ArenaConstants.ARENA_ROWS; i++) {
             for (int j = 0; j < ArenaConstants.ARENA_COLS; j++) {
-                if (this.grids[i][j].isExplored() && this.grids[i][j].getType() == Type.OBSTACLE) {
+                if (this.grids[i][j].getType() == Type.OBSTACLE) {
                     this.grids[i][j].setAcc(false);
                     addNeighbourPadding(i, j);
                 }

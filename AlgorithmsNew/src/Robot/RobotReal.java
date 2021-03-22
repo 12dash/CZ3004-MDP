@@ -44,7 +44,7 @@ public class RobotReal extends Robot{
     private final Sensor FrontRightSR;      // front-facing right SR
     private final Sensor LeftRightSR;       // left-facing left SR
     private final Sensor LeftCenterLR;      // left-facing center LR // LONG RANGE
-    private final Sensor RightLeftSR;     // right-facing left SR
+    private final Sensor RightRightSR;     // right-facing left SR
 
     private boolean touchedGoal;
 
@@ -55,12 +55,12 @@ public class RobotReal extends Robot{
         this.posCol = g.getX();
         this.orientation = RobotConstants.START_DIR; // EAST
 
-        FrontLeftSR = new Sensor(RobotConstants.SENSOR_SHORT_RANGE_L, RobotConstants.SENSOR_SHORT_RANGE_H, this.posRow - 1, this.posCol + 1, this.orientation, "FL");
-        FrontCenterSR = new Sensor(RobotConstants.SENSOR_SHORT_RANGE_L, RobotConstants.SENSOR_SHORT_RANGE_H, this.posRow, this.posCol+1, this.orientation, "FC");
-        FrontRightSR = new Sensor(RobotConstants.SENSOR_SHORT_RANGE_L, RobotConstants.SENSOR_SHORT_RANGE_H, this.posRow + 1, this.posCol + 1, this.orientation, "FR");
-        LeftRightSR = new Sensor(RobotConstants.SENSOR_SHORT_RANGE_L, RobotConstants.SENSOR_SHORT_RANGE_H, this.posRow - 1, this.posCol + 1, findNewDirection(MOVEMENT.LEFT_TURN), "LR");
+        FrontLeftSR = new Sensor(RobotConstants.SENSOR_FRONT_SHORT_RANGE_L, RobotConstants.SENSOR_FRONT_SHORT_RANGE_H, this.posRow - 1, this.posCol + 1, this.orientation, "FL");
+        FrontCenterSR = new Sensor(RobotConstants.SENSOR_FRONT_SHORT_RANGE_L, RobotConstants.SENSOR_FRONT_SHORT_RANGE_H, this.posRow, this.posCol+1, this.orientation, "FC");
+        FrontRightSR = new Sensor(RobotConstants.SENSOR_FRONT_SHORT_RANGE_L, RobotConstants.SENSOR_FRONT_SHORT_RANGE_H, this.posRow + 1, this.posCol + 1, this.orientation, "FR");
+        LeftRightSR = new Sensor(RobotConstants.SENSOR_LEFT_RIGHT_SHORT_RANGE_L, RobotConstants.SENSOR_LEFT_RIGHT_SHORT_RANGE_H, this.posRow - 1, this.posCol + 1, findNewDirection(MOVEMENT.LEFT_TURN), "LR");
         LeftCenterLR = new Sensor(RobotConstants.SENSOR_LONG_RANGE_L, RobotConstants.SENSOR_LONG_RANGE_H, this.posRow - 1 , this.posCol, findNewDirection(MOVEMENT.LEFT_TURN), "LC");
-        RightLeftSR = new Sensor(RobotConstants.SENSOR_SHORT_RANGE_L, RobotConstants.SENSOR_SHORT_RANGE_H, this.posRow + 1, this.posCol+1, findNewDirection(MOVEMENT.RIGHT_TURN), "RC");
+        RightRightSR = new Sensor(RobotConstants.SENSOR_FRONT_SHORT_RANGE_L, RobotConstants.SENSOR_FRONT_SHORT_RANGE_H, this.posRow + 1, this.posCol+1, findNewDirection(MOVEMENT.RIGHT_TURN), "RR");
     }
 
 
@@ -341,7 +341,7 @@ public class RobotReal extends Robot{
                 FrontRightSR.setSensor(this.posRow - 1, this.posCol + 1, this.orientation);
                 LeftRightSR.setSensor(this.posRow - 1, this.posCol - 1, findNewDirection(MOVEMENT.LEFT_TURN));
                 LeftCenterLR.setSensor(this.posRow, this.posCol-1, findNewDirection(MOVEMENT.LEFT_TURN));
-                RightLeftSR.setSensor(this.posRow-1, this.posCol + 1, findNewDirection(MOVEMENT.RIGHT_TURN));
+                RightRightSR.setSensor(this.posRow-1, this.posCol + 1, findNewDirection(MOVEMENT.RIGHT_TURN));
                 break;
             case East:
                 FrontLeftSR.setSensor(this.posRow - 1, this.posCol + 1, this.orientation);
@@ -349,7 +349,7 @@ public class RobotReal extends Robot{
                 FrontRightSR.setSensor(this.posRow + 1, this.posCol + 1, this.orientation);
                 LeftRightSR.setSensor(this.posRow - 1, this.posCol + 1, findNewDirection(MOVEMENT.LEFT_TURN));
                 LeftCenterLR.setSensor(this.posRow - 1 , this.posCol, findNewDirection(MOVEMENT.LEFT_TURN));
-                RightLeftSR.setSensor(this.posRow + 1, this.posCol +1, findNewDirection(MOVEMENT.RIGHT_TURN));
+                RightRightSR.setSensor(this.posRow + 1, this.posCol+1, findNewDirection(MOVEMENT.RIGHT_TURN));
                 break;
             case South:
                 FrontLeftSR.setSensor(this.posRow + 1, this.posCol + 1, this.orientation);
@@ -357,7 +357,7 @@ public class RobotReal extends Robot{
                 FrontRightSR.setSensor(this.posRow + 1, this.posCol - 1, this.orientation);
                 LeftRightSR.setSensor(this.posRow + 1, this.posCol + 1, findNewDirection(MOVEMENT.LEFT_TURN));
                 LeftCenterLR.setSensor(this.posRow, this.posCol + 1, findNewDirection(MOVEMENT.LEFT_TURN));
-                RightLeftSR.setSensor(this.posRow+1, this.posCol - 1, findNewDirection(MOVEMENT.RIGHT_TURN));
+                RightRightSR.setSensor(this.posRow+1, this.posCol - 1, findNewDirection(MOVEMENT.RIGHT_TURN));
                 break;
             case West:
                 FrontLeftSR.setSensor(this.posRow + 1, this.posCol - 1, this.orientation);
@@ -365,7 +365,7 @@ public class RobotReal extends Robot{
                 FrontRightSR.setSensor(this.posRow - 1, this.posCol - 1, this.orientation);
                 LeftRightSR.setSensor(this.posRow + 1, this.posCol - 1, findNewDirection(MOVEMENT.LEFT_TURN));
                 LeftCenterLR.setSensor(this.posRow + 1, this.posCol, findNewDirection(MOVEMENT.LEFT_TURN));
-                RightLeftSR.setSensor(this.posRow - 1, this.posCol-1, findNewDirection(MOVEMENT.RIGHT_TURN));
+                RightRightSR.setSensor(this.posRow - 1, this.posCol-1, findNewDirection(MOVEMENT.RIGHT_TURN));
                 break;
         }
     }
@@ -402,7 +402,7 @@ public class RobotReal extends Robot{
             System.out.print("; Front Right:" + result[2]);
             System.out.print("; Left Center:" + result[3]);
             System.out.print("; Left Right:" + result[4]);
-            System.out.print("; Right Center:" + result[5]);
+            System.out.print("; Right Right:" + result[5]);
             System.out.println();
 
             FrontLeftSR.senseReal(explorationMap, result[0]+1);
@@ -410,7 +410,7 @@ public class RobotReal extends Robot{
             FrontRightSR.senseReal(explorationMap, result[2]+1);
             LeftCenterLR.senseReal(explorationMap, result[3]+1);
             LeftRightSR.senseReal(explorationMap, result[4]+1);
-            RightLeftSR.senseReal(explorationMap, result[5]+1);
+            RightRightSR.senseReal(explorationMap, result[5]+1);
 
             String[] p1p2 =  MapDescriptor.generateMapDescriptor(explorationMap.arena);  // This ret
             String anMssg = "{p1:\"" + p1p2[0] + "\",p2:\"" + p1p2[1] + "\"}";
@@ -427,7 +427,7 @@ public class RobotReal extends Robot{
         result[2] = FrontLeftSR.sense(explorationMap, realMap);
         result[3] = LeftCenterLR.sense(explorationMap, realMap);
         result[4] = LeftRightSR.sense(explorationMap, realMap);
-        result[5] = RightLeftSR.sense(explorationMap, realMap);
+        result[5] = RightRightSR.sense(explorationMap, realMap);
 
         return result;
     }

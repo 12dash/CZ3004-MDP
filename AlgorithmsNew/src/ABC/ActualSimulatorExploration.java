@@ -1,21 +1,17 @@
-package Actual_Run;
+package ABC;
 
-import Communication.*;
-import Environment.*;
-import Exploration.ExplorationAlgo;
+import Communication.Communication;
+import Communication.CommunicationConstants;
+import Environment.Arena;
+import Environment.ArenaConstants;
+import ABC.ExplorationAlgo;
 import Simulator.Map;
-
 import Simulator.SimulatorConstants;
 import Utility.FileManager;
 import Utility.MapDescriptor;
-import Values.Orientation;
-import org.w3c.dom.html.HTMLImageElement;
 
-import javax.naming.CommunicationException;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.WindowAdapter;
-import java.nio.file.Watchable;
 
 public class ActualSimulatorExploration {
 
@@ -34,7 +30,8 @@ public class ActualSimulatorExploration {
 
     private static final int timeLimit = ArenaConstants.MAX_TIME_LIMIT;
     private static int coverage = ArenaConstants.MAX_COVERAGE;
-    private static boolean simulate = false;
+    private static boolean simulate = true;
+
 
     //#############################################
     //
