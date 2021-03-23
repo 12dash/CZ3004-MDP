@@ -25,6 +25,7 @@ import Utility.MapDescriptor;
 
 import Robot.RobotConstants.MOVEMENT;
 import Exploration.Sensor;
+import javafx.scene.shape.MoveTo;
 
 public class RobotReal extends Robot{
 
@@ -254,7 +255,46 @@ public class RobotReal extends Robot{
                 break;
         }
 
-        sendMovement(m);
+
+        updateTouchedGoal();
+    }
+
+    // Override for array of movements
+    public void move(MOVEMENT[] m) {
+
+        StringBuilder moveString = new StringBuilder();
+
+        for(MOVEMENT move:m) {
+            switch (move) {
+                case FORWARD:
+                    switch (this.orientation) {
+                        case North:
+                            posRow--; // The rows in grid start from top left as 0
+                            break;
+                        case East:
+                            posCol++;
+                            break;
+                        case South:
+                            posRow++;
+                            break;
+                        case West:
+                            posCol--;
+                            break;
+                    }
+                    break;
+                case RIGHT_TURN:
+                case LEFT_TURN:
+                case TURN_AROUND:
+                    this.orientation = findNewDirection(move);
+                    break;
+                default:
+                    System.out.println("Error in Robot.move()!");
+                    break;
+            }
+        moveString.append(MOVEMENT.print(move));
+        }
+
+        sendMovement(moveString.toString());
         updateTouchedGoal();
     }
 
@@ -262,45 +302,79 @@ public class RobotReal extends Robot{
      * Overloaded method that calls this.move(MOVEMENT m, boolean sendMoveToAndroid = true).
      */
 
-    public void moveSimulate(MOVEMENT m){
-        switch (m) {
-        case FORWARD:
-            switch (this.orientation) {
-                case North:
-                    posRow--; // The rows in grid start from top left as 0
+    public void moveSimulate(MOVEMENT[] m){
+
+        for(MOVEMENT move: m) {
+            switch (move) {
+                case FORWARD:
+                    switch (this.orientation) {
+                        case North:
+                            posRow--; // The rows in grid start from top left as 0
+                            break;
+                        case East:
+                            posCol++;
+                            break;
+                        case South:
+                            posRow++;
+                            break;
+                        case West:
+                            posCol--;
+                            break;
+                    }
                     break;
-                case East:
-                    posCol++;
+                case RIGHT_TURN:
+                case LEFT_TURN:
+                case TURN_AROUND:
+                    this.orientation = findNewDirection(move);
                     break;
-                case South:
-                    posRow++;
-                    break;
-                case West:
-                    posCol--;
+                default:
+                    System.out.println("Error in Robot.move()!");
                     break;
             }
-            break;
-        case RIGHT_TURN:
-        case LEFT_TURN:
-        case TURN_AROUND:
-            this.orientation = findNewDirection(m);
-            break;
-        default:
-            System.out.println("Error in Robot.move()!");
-            break;
-    }
+        }
         updateTouchedGoal();
     }
 
+// Override for array of movements
+
+    public void moveSimulate(MOVEMENT m){
+        switch (m) {
+            case FORWARD:
+                switch (this.orientation) {
+                    case North:
+                        posRow--; // The rows in grid start from top left as 0
+                        break;
+                    case East:
+                        posCol++;
+                        break;
+                    case South:
+                        posRow++;
+                        break;
+                    case West:
+                        posCol--;
+                        break;
+                }
+                break;
+            case RIGHT_TURN:
+            case LEFT_TURN:
+            case TURN_AROUND:
+                this.orientation = findNewDirection(m);
+                break;
+            default:
+                System.out.println("Error in Robot.move()!");
+                break;
+        }
+        updateTouchedGoal();
+    }
 
     /**
      * Uses the Communication to send the next movement to the robot.
      */
-    private void sendMovement(MOVEMENT m) {
+    public void sendMovement(String m) {
         Communication comm = Communication.getCommunication();
-        String androidMsg = "{move:" +   MOVEMENT.print(m) + "}";
+        String androidMsg = "{move:" +  m + "}";
         comm.sendMsg(CommunicationConstants.ANDROID, androidMsg);
-        comm.sendMsg(CommunicationConstants.ARDUINO, Character.toString(MOVEMENT.print(m))); // For back to back message to arduino and android
+        comm.sendMsg(CommunicationConstants.ARDUINO, m); // For back to back message to arduino and android
     }
 
     private Orientation findNewDirection(MOVEMENT m) {

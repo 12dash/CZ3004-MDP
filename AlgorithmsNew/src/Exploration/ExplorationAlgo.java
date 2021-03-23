@@ -64,7 +64,6 @@ public class ExplorationAlgo {
      * Main method that is called to start the exploration.
      */
 
-    //TODO: REMEMBER TO HARD STOP 6 MINUTES
     public void initialCalibration() throws InterruptedException {
         System.out.println("Calibrated at (1, 1)");
         comm.sendCalibrationAndWaitForAcknowledge(CommunicationConstants.CALI_RIGHT);
@@ -130,7 +129,6 @@ public class ExplorationAlgo {
      * 3. System.currentTimeMillis() > endTime
      */
     private void explorationLoop(int r, int c) throws InterruptedException {
-        clickPicture();
         do {
             nextMove();
 
@@ -164,29 +162,25 @@ public class ExplorationAlgo {
      * Moves the bot, repaints the map and calls senseAndRepaint().
      */
     private void moveBot(MOVEMENT m) throws InterruptedException {
+
+        String moveString = "";
+        String cali = calibrateRobot();
+        if(!cali.equals("NIL")){
+            moveString+=cali;
+        }
+
+        moveString+=MOVEMENT.print(m);
+
         if (simulate) {
             TimeUnit.MILLISECONDS.sleep(RobotConstants.SPEED);
             exploredMap.robotReal.moveSimulate(m);
         } else {
             exploredMap.robotReal.move(m);
+            exploredMap.robotReal.sendMovement(moveString);
         }
 
         exploredMap.repaint(); // Repaints after each movement
         senseAndRepaint(simulate); // Waits for sense and then repaints immediately
-
-        calibrateRobot();
-        clickPicture();
-
-        if(numMoves > RobotConstants.NUM_MOVES_AFTER_CLICK_PICTURE){
-            if(!simulate) turnAroundAndClickPicture();
-            else simulateTurnAroundAndClickPictures();
-
-            numMoves = 0;
-            System.out.println("Clicked Random Pictures at: (" + exploredMap.robotReal.getRobotPosCol() + "," + (ArenaConstants.ARENA_ROWS - exploredMap.robotReal.getRobotPosRow() -1) + ")");
-        }
-
-        else numMoves++ ;
-
 
     }
 
@@ -326,84 +320,6 @@ public class ExplorationAlgo {
         return cood;
     }
 
-
-    private void clickPicture(){
-        int[] blockCood =  shouldClickPicture();
-
-        if(blockCood[0] != -1 && blockCood[1] != -1){
-            exploredMap.arena.grids[blockCood[0]][blockCood[1]].setPictureClicked(true);
-            blockCood[0] = ArenaConstants.ARENA_ROWS - blockCood[0] - 1;  // Convert to physical coordinate system format
-            if(!simulate) {
-                comm.clickPictureAndWaitforAcknowledge(blockCood[1],  blockCood[0], true);
-            }
-            System.out.println("Clicked Nearby Picture of: (" + blockCood[1] + "," + blockCood[0] + ")");
-        }
-    }
-
-
-    public void turnAroundAndClickPicture() throws InterruptedException {
-        exploredMap.robotReal.setClickingRandomPicture(true);
-
-        // 1st TURN
-        //-----------
-
-        exploredMap.robotReal.move(MOVEMENT.LEFT_TURN);
-        senseAndRepaint(simulate);
-        if (canCalibrate(exploredMap.robotReal.getOrientation())){
-            comm.sendCalibrationAndWaitForAcknowledge(CommunicationConstants.CALI_FRONT);
-            lastCalibrate =0;
-        }
-        int[] randomCood = getRandomCoordinate();
-        comm.clickPictureAndWaitforAcknowledge(randomCood[0], randomCood[1], false);
-
-        if(System.currentTimeMillis() > endTime || comm.isTaskFinish()) {
-            return;
-        }
-
-
-        // 2nd TURN
-        //-----------
-        exploredMap.robotReal.move(MOVEMENT.LEFT_TURN);
-        lastCalibrate++;
-        senseAndRepaint(simulate);
-        if(!simulate && canCalibrate(exploredMap.robotReal.getOrientation())){
-            comm.sendCalibrationAndWaitForAcknowledge(CommunicationConstants.CALI_FRONT);
-            lastCalibrate = 0;
-        }
-
-        if(System.currentTimeMillis() > endTime || comm.isTaskFinish()) {
-            return;
-        }
-
-        randomCood = getRandomCoordinate();
-        comm.clickPictureAndWaitforAcknowledge(randomCood[0], randomCood[1], false);
-
-        // 3rd TURN
-        //-----------
-
-        exploredMap.robotReal.move(MOVEMENT.LEFT_TURN);
-        senseAndRepaint(simulate);
-        if(!simulate && canCalibrate(exploredMap.robotReal.getOrientation())){
-            comm.sendCalibrationAndWaitForAcknowledge(CommunicationConstants.CALI_FRONT);
-        }
-
-        if(System.currentTimeMillis() > endTime || comm.isTaskFinish()) {
-            return;
-        }
-
-        randomCood = getRandomCoordinate();
-        comm.clickPictureAndWaitforAcknowledge(randomCood[0], randomCood[1], false);
-
-        // 4th TURN
-        //----------
-        exploredMap.robotReal.move(MOVEMENT.LEFT_TURN);
-        lastCalibrate++;
-        senseAndRepaint(simulate);
-
-        exploredMap.robotReal.setClickingRandomPicture(false);
-
-    }
-
     // return location of the explored free cell near an unclicked obstacle, else return 0;
 
     public int[][] getIslandCellAndNearbyCell(){
@@ -512,118 +428,8 @@ public class ExplorationAlgo {
 
     }
 
-    private int[] getRandomCoordinate(){
-        Random r = new Random();
-        int x = r.nextInt(15);
-        int y = r.nextInt(20);
 
-        return new int[]{x, y};
-
-//        switch (exploredMap.robotReal.getOrientation()){
-//            case North:
-//                int min_left = Math.max(0, exploredMap.robotReal.getRobotPosCol()-2);
-//                int max_left = Math.min(ArenaConstants.ARENA_COLS-1, exploredMap.robotReal.getRobotPosCol()+2);
-//                int bottom = exploredMap.robotReal.getRobotPosRow();
-//                int top = 0;
-//
-//                for(int r = bottom; r >= top; r --){
-//                    for(int c = min_left; c <= max_left; c++){
-//                        if(exploredMap.arena.getGrid(r, c).isObstacle()){
-//                            return new int[]{}
-//                        }
-//                    })
-//                }
-//        }
-//////        int[] cood = new int[]{1, 1};
-////
-//        int front_close = 0;
-//        int front_far = 0;
-//        int side_left = 0;
-//        int side_right = 0;
-//        switch (exploredMap.robotReal.getOrientation()) {
-//            case North:
-//                front_close = exploredMap.robotReal.getRobotPosRow() - 2;
-//                front_far = 0;
-//                side_left = 0;
-//                side_right = ArenaConstants.ARENA_COLS -1;
-//
-////                int y = front_close;
-////                int x_left = 0;
-////                int x_right = 0;
-////                int botX  = exploredMap.robotReal.getRobotPosCol();
-////
-//                for (int i = front_close; i >= front_far; i--){
-//                    for(int j = side_left; j < side_t; j++){
-//                        exploredMap.arena.getGrid(i, j).isObstacle(){
-//                            return new int[]{j, Arei}
-//                        }
-//                    }
-//                }
-//
-//                while(y <= front_far){
-//
-//                    if (exploredMap.arena.getGrid(botX - x_left, y).isObstacle()){
-//                        return new int[]{botX - x_left, y};
-//                    }
-//                    if (exploredMap.arena.getGrid(botX+x_right, y).isObstacle()){
-//                        return new int[]{botX+x_right, y};
-//                    }
-//                    y ++;
-//                    if ( botX - x_left > side_left){
-//                        x_left++;
-//                    }
-//                    if(botX + x_left > side_left){
-//                        x
-//                    }
-//                }
-//
-//
-//                break;
-//
-//            case East:
-//                front_close = exploredMap.robotReal.getRobotPosCol() + 2;
-//                front_far = ArenaConstants.ARENA_COLS - 1;
-//                side_left = 0;
-//                side_right = ArenaConstants.ARENA_ROWS -1;
-//                break;
-//
-//            case South:
-//                front_close = exploredMap.robotReal.getRobotPosRow() + 2;
-//                front_far = ArenaConstants.ARENA_ROWS - 1;
-//                side_left = ArenaConstants.ARENA_COLS - 1;
-//                side_right = 0;
-//                break;
-//
-//            case West:
-//                front_close = exploredMap.robotReal.getRobotPosCol() - 2;
-//                front_far = 0;
-//                side_left = ArenaConstants.ARENA_ROWS - 1;
-//                side_right = 0;
-//                break;
-//
-//        }
-//
-//        switch(exploredMap.robotReal.getOrientation()){
-//            case North:
-//                int
-//        }
-//
-//        if(exploredMap.arena.getGrid())
-//
-//        int y = front_close;
-//        int x_left = 1;
-//        int x_right = 1;
-//
-//        while(y <= front_far){
-//
-//            exploredMap.arena.getGrid()
-//        }
-
-
-    }
-
-
-    private void calibrateRobot() throws InterruptedException {
+    private String calibrateRobot() throws InterruptedException {
 
         exploredMap.robotReal.setCalibMode(true);
 
@@ -638,7 +444,6 @@ public class ExplorationAlgo {
         if(caliFront && caliRight){
             cali = CommunicationConstants.CALI_RIGHT_FRONT;
             if (simulate) simulateCalibration(CommunicationConstants.CALI_RIGHT_FRONT);
-            else comm.sendCalibrationAndWaitForAcknowledge(CommunicationConstants.CALI_RIGHT_FRONT);
 
         }
         else if(caliFront && caliLeft){
@@ -683,8 +488,8 @@ public class ExplorationAlgo {
             int botY = ArenaConstants.ARENA_ROWS - exploredMap.robotReal.getRobotPosRow() -1;
             System.out.println(cali + " at (" + botX + "," + botY + ")" );
         }
-
         exploredMap.robotReal.setCalibMode(false);
+        return cali;
     }
 
     public void simulateCalibration(String calib) throws InterruptedException {
@@ -917,38 +722,6 @@ public class ExplorationAlgo {
 //    }
 
 
-    public void simulateTurnAroundAndClickPictures() throws InterruptedException {
-
-        exploredMap.robotReal.setClickingRandomPicture(true);
-
-        // 1st TURN
-        //-----------
-
-        exploredMap.robotReal.moveSimulate(MOVEMENT.LEFT_TURN);
-        senseAndRepaint(simulate);
-        TimeUnit.MILLISECONDS.sleep(2 * RobotConstants.SPEED);
-
-        // 2nd TURN
-        //-----------
-        exploredMap.robotReal.moveSimulate(MOVEMENT.LEFT_TURN);
-        senseAndRepaint(simulate);
-        TimeUnit.MILLISECONDS.sleep(2 * RobotConstants.SPEED);
-
-        // 3rd TURN
-        //-----------
-        exploredMap.robotReal.moveSimulate(MOVEMENT.LEFT_TURN);
-        senseAndRepaint(simulate);
-        TimeUnit.MILLISECONDS.sleep(2 * RobotConstants.SPEED);
-
-        // 4th TURN
-        //-----------
-        exploredMap.robotReal.moveSimulate(MOVEMENT.LEFT_TURN);
-        senseAndRepaint(simulate);
-        TimeUnit.MILLISECONDS.sleep(2 * RobotConstants.SPEED);
-
-        exploredMap.robotReal.setClickingRandomPicture(false);
-    }
-
     public MOVEMENT getNextMove(Grid nextGrid) throws InterruptedException {
         int botX = exploredMap.robotReal.getRobotPosCol();
         int botY = exploredMap.robotReal.getRobotPosRow();
@@ -989,7 +762,6 @@ public class ExplorationAlgo {
             System.out.println();
         }
     }
-
 
 }
 

@@ -39,19 +39,19 @@ public class RobotConstants {
     public enum MOVEMENT {
         FORWARD, RIGHT_TURN, LEFT_TURN, TURN_AROUND, ERROR;
 
-        public static char print(MOVEMENT m) {
+        public static String print(MOVEMENT m) {
             switch (m) {
                 case FORWARD:
-                    return '0';
+                    return "0";
                 case RIGHT_TURN:
-                    return 'R';
+                    return "R";
                 case LEFT_TURN:
-                    return 'L';
+                    return "L";
                 case TURN_AROUND:
-                    return 'I';
+                    return "I";
                 case ERROR:
                 default:
-                    return 'X';
+                    return "X";
             }
         }
     }

@@ -1,10 +1,9 @@
-package ABC;
+package Image_Recognition;
 
 import Communication.Communication;
 import Communication.CommunicationConstants;
 import Environment.Arena;
 import Environment.ArenaConstants;
-import ABC.ExplorationAlgo;
 import Simulator.Map;
 import Simulator.SimulatorConstants;
 import Utility.FileManager;
@@ -30,7 +29,7 @@ public class ActualSimulatorExploration {
 
     private static final int timeLimit = ArenaConstants.MAX_TIME_LIMIT;
     private static int coverage = ArenaConstants.MAX_COVERAGE;
-    private static boolean simulate = true;
+    private static boolean simulate = false;
 
 
     //#############################################

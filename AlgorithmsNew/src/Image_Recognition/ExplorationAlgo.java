@@ -1,16 +1,14 @@
-package ABC;
+package Image_Recognition;
 
 import Algo.AStar;
 import Communication.Communication;
 import Communication.CommunicationConstants;
-import Environment.Arena;
 import Environment.ArenaConstants;
 import Environment.Grid;
 import Robot.RobotConstants;
 import Robot.RobotConstants.MOVEMENT;
 import Simulator.Map;
 import Values.Orientation;
-import javafx.scene.shape.MoveTo;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -46,6 +44,7 @@ public class ExplorationAlgo {
     private int rightC = 11;
     private int middleC = 10;
 
+    int loopNo = 0;
 
     private ArrayList<Grid> lastTenGrids = new ArrayList<>();
     private HashMap<Grid, Integer> counter = new HashMap<>();
@@ -106,6 +105,7 @@ public class ExplorationAlgo {
             if(exploreLoop){
                 explorationLoop(exploredMap.robotReal.getRobotPosRow(), exploredMap.robotReal.getRobotPosCol());
                 exploreLoop = false;
+                loopNo ++;
             }
             else{
                 /**
@@ -186,7 +186,10 @@ public class ExplorationAlgo {
 
         calibrateRobot();
         takePicture();
-//        clickPicture();
+
+        if(loopNo > 0) {
+            clickPicture();
+        }
 
 //        if(numMoves > RobotConstants.NUM_MOVES_AFTER_CLICK_PICTURE){
 //            if(!simulate) turnAroundAndClickPicture();
@@ -1100,7 +1103,7 @@ public class ExplorationAlgo {
             else simulateTurnAroundAndClickPictures();
             middleRight = true;
         }
-        else if(!topRight && botX == rightC && botY < middleC){
+        else if(!topRight && botX == rightC && botY < 3){
             if(!simulate) turnAroundAndClickPicture();
             else simulateTurnAroundAndClickPictures();
             topRight = true;
