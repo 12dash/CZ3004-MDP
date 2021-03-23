@@ -12,7 +12,6 @@ import Communication.Communication;
 import Communication.CommunicationConstants;
 import Robot.RobotConstants.MOVEMENT;
 import Robot.RobotReal;
-import javafx.scene.shape.MoveTo;
 
 import javax.annotation.processing.SupportedSourceVersion;
 import javax.swing.plaf.ComponentInputMapUIResource;
@@ -41,7 +40,7 @@ public class ExplorationAlgo {
     private boolean exploreLoop = true;
 
 
-
+// SIMULATE FALSE
     public ExplorationAlgo(Map exploredMap, int timeLimit, int coverageLimit, Communication comm) {
         this.exploredMap = exploredMap;
         this.timeLimit = timeLimit;
@@ -51,6 +50,7 @@ public class ExplorationAlgo {
         this.realMap = null;
     }
 
+// SIMULATE TRUE
     public ExplorationAlgo(Map exploredMap, Map realMap, int timeLimit, int coverageLimit) {
         this.exploredMap = exploredMap;
         this.timeLimit = timeLimit;
