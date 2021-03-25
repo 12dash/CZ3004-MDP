@@ -108,9 +108,9 @@ public class ExplorationAlgo {
             * returns -1  if no more islands left
             */
 
-        if(calculateAreaExplored() < coverageLimit  && System.currentTimeMillis() < endTime) {
-            exploreIslands();
-        }
+//        if(calculateAreaExplored() < coverageLimit  && System.currentTimeMillis() < endTime) {
+//            exploreIslands();
+//        }
 
         endTime = endTime + ((ArenaConstants.MAX_TIME_LIMIT - ArenaConstants.GO_HOME_TIME_LIMIT)  * 1000);
 
@@ -788,11 +788,11 @@ public class ExplorationAlgo {
                     comm.recvMsg();
                 }
             }
-        }
 
-        if(!simulate) {
-            exploredMap.robotReal.sendMovement(CommunicationConstants.CALI_FRONT + "E");
-            comm.recvMsg();
+            if (!simulate) {
+                exploredMap.robotReal.sendMovement(CommunicationConstants.CALI_FRONT + "E");
+                comm.recvMsg();
+            }
         }
 
 
@@ -806,11 +806,11 @@ public class ExplorationAlgo {
                     comm.recvMsg();
                 }
             }
-        }
 
-        if(!simulate) {
-            exploredMap.robotReal.sendMovement(CommunicationConstants.CALI_FRONT + "E");
-            comm.recvMsg();
+            if (!simulate) {
+                exploredMap.robotReal.sendMovement(CommunicationConstants.CALI_FRONT + "E");
+                comm.recvMsg();
+            }
         }
 
     }
