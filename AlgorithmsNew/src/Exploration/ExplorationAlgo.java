@@ -15,6 +15,7 @@ import Robot.RobotReal;
 import javafx.scene.shape.MoveTo;
 
 import javax.annotation.processing.SupportedSourceVersion;
+import javax.print.attribute.standard.OrientationRequested;
 import javax.swing.plaf.ComponentInputMapUIResource;
 import javax.swing.plaf.basic.BasicInternalFrameTitlePane;
 import java.sql.Time;
@@ -86,7 +87,9 @@ public class ExplorationAlgo {
 
         startTime = System.currentTimeMillis();
         endTime = startTime + (timeLimit * 1000);
+        System.out.println("----------------------------------------");
         System.out.println("Time left to Go Home: " + (endTime -startTime)/1000 + " secs");
+        System.out.println("----------------------------------------");
 
         // Sends command to android to start exploration: E
         if (!simulate) Communication.getCommunication().sendMsg(CommunicationConstants.ARDUINO, CommunicationConstants.START_EPLORATION);
@@ -112,7 +115,9 @@ public class ExplorationAlgo {
         endTime = endTime + ((ArenaConstants.MAX_TIME_LIMIT - ArenaConstants.GO_HOME_TIME_LIMIT)  * 1000);
 
         long curTime = System.currentTimeMillis();
+        System.out.println("----------------------------------------");
         System.out.println("Time left to stop: " + (endTime -curTime)/1000 + " secs");
+        System.out.println("----------------------------------------");
 
         goHome();
         endCalibrations();
@@ -143,7 +148,9 @@ public class ExplorationAlgo {
     private void explorationLoop(int r, int c) throws InterruptedException {
         do {
             long curTime = System.currentTimeMillis();
+            System.out.println("----------------------------------------");
             System.out.println("Time left to Go Home: " + (endTime - curTime)/1000 + " secs");
+            System.out.println("----------------------------------------");
             nextMove();
 
             if (exploredMap.robotReal.getRobotPosRow() == r && exploredMap.robotReal.getRobotPosCol() == c) {
@@ -280,7 +287,9 @@ public class ExplorationAlgo {
 
         while (calculateAreaExplored() < coverageLimit &&  System.currentTimeMillis() < endTime) {
             long curTime = System.currentTimeMillis();
+            System.out.println("----------------------------------------");
             System.out.println("Time left to Go Home: " + (endTime - curTime)/1000 + " secs");
+            System.out.println("----------------------------------------");
 
             Grid curGrid = exploredMap.arena.getGrid(exploredMap.robotReal.getRobotPosRow(), exploredMap.robotReal.getRobotPosCol());
             RobotReal tempRobot = new RobotReal(curGrid);
@@ -297,6 +306,11 @@ public class ExplorationAlgo {
                     }
                     moveBot(m);
                     cur++;
+
+                    curTime = System.currentTimeMillis();
+                    System.out.println("----------------------------------------");
+                    System.out.println("Time left to Go Home: " + (endTime - curTime)/1000 + " secs");
+                    System.out.println("----------------------------------------");
                 }
             }
         }
@@ -635,7 +649,9 @@ public class ExplorationAlgo {
         while (System.currentTimeMillis() < endTime && (bot_X != 1 || bot_Y != 18)) {
 
             long curTime = System.currentTimeMillis();
-            System.out.println("Time left to stop: " + (endTime -curTime)/1000 + " secs");
+            System.out.println("----------------------------------------");
+            System.out.println("Time left to Stop: " + (endTime -curTime)/1000 + " secs");
+            System.out.println("----------------------------------------");
 
             AStar astar = new AStar();
             astar.startSearch(exploredMap.arena, exploredMap.arena.getGrid(bot_Y, bot_X), exploredMap.arena.getGrid(18, 1), false);
@@ -652,7 +668,16 @@ public class ExplorationAlgo {
                     moveBot(m);
                     cur++;
                 }
+                curTime = System.currentTimeMillis();
+                System.out.println("----------------------------------------");
+                System.out.println("Time left to Stop: " + (endTime - curTime)/1000 + " secs");
+                System.out.println("----------------------------------------");
             }
+            else{
+               goSouth();
+               goWest();
+            }
+
             bot_X = exploredMap.robotReal.getRobotPosCol();
             bot_Y = exploredMap.robotReal.getRobotPosRow();
         }
@@ -765,12 +790,75 @@ public class ExplorationAlgo {
             }
         }
 
+        if(!simulate) {
+            exploredMap.robotReal.sendMovement(CommunicationConstants.CALI_FRONT + "E");
+            comm.recvMsg();
+        }
+
+
         if (System.currentTimeMillis() <= endTime) {
-            if(!simulate) {
-                exploredMap.robotReal.sendMovement(CommunicationConstants.CALI_RIGHT_FRONT + "E");
-                comm.recvMsg();
+            MOVEMENT turn = turnBotDirection(Orientation.West);
+            if (!turn.equals(MOVEMENT.FORWARD)) {
+                exploredMap.robotReal.move(turn);
+                exploredMap.repaint();
+                if (!simulate) {
+                    exploredMap.robotReal.sendMovement(MOVEMENT.print(turn));
+                    comm.recvMsg();
+                }
             }
         }
+
+        if(!simulate) {
+            exploredMap.robotReal.sendMovement(CommunicationConstants.CALI_FRONT + "E");
+            comm.recvMsg();
+        }
+
+    }
+
+
+    public void goSouth() throws InterruptedException {
+
+        MOVEMENT m = turnBotDirection(Orientation.South);
+
+        exploredMap.robotReal.move(m);
+        if(!simulate) exploredMap.robotReal.sendMovement(MOVEMENT.print(m));
+        exploredMap.repaint();
+        senseAndRepaint(simulate);
+
+        while(lookForward() && System.currentTimeMillis() <= endTime && !comm.isTaskFinish()){
+            exploredMap.robotReal.move(MOVEMENT.FORWARD);
+            if(!simulate) exploredMap.robotReal.sendMovement(MOVEMENT.print(MOVEMENT.FORWARD));
+            exploredMap.repaint();
+            senseAndRepaint(simulate);
+        }
+
+        exploredMap.robotReal.move(MOVEMENT.RIGHT_TURN);
+        if(!simulate) exploredMap.robotReal.sendMovement(MOVEMENT.print(MOVEMENT.LEFT_TURN));
+        exploredMap.repaint();
+        senseAndRepaint(simulate);
+
+    }
+
+    public void goWest() throws InterruptedException {
+
+        MOVEMENT m = turnBotDirection(Orientation.West);
+
+        exploredMap.robotReal.move(m);
+        if(!simulate) exploredMap.robotReal.sendMovement(MOVEMENT.print(m));
+        exploredMap.repaint();
+        senseAndRepaint(simulate);
+
+        while(lookForward() && System.currentTimeMillis() <= endTime && !comm.isTaskFinish()){
+            exploredMap.robotReal.move(MOVEMENT.FORWARD);
+            if(!simulate) exploredMap.robotReal.sendMovement(MOVEMENT.print(MOVEMENT.FORWARD));
+            exploredMap.repaint();
+            senseAndRepaint(simulate);
+        }
+
+        exploredMap.robotReal.move(MOVEMENT.LEFT_TURN);
+        if(!simulate) exploredMap.robotReal.sendMovement(MOVEMENT.print(MOVEMENT.LEFT_TURN));
+        exploredMap.repaint();
+        senseAndRepaint(simulate);
 
     }
 

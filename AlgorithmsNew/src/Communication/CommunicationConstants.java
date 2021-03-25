@@ -24,7 +24,8 @@ public class CommunicationConstants {
     public static final String CALI_LEFT = "J";
     public static final String CALI_RIGHT_FRONT = "K";
     public static final String CALI_LEFT_FRONT = "M";
-    public static final String CALIBRATION_ACKNOWLEDGMENT = "A";
+    public static final String END_CALIB_COMMAND = "B";
+    public static final String CALIBRATION_ACKNOWLEDGMENT ="Q";
 
     public static final String IMAGE_CAPTURED = "imageCaptured";
     public static final String IR_TASK_COMPLETE = "{\"coords\":[0, 0],\"nearby\":\"done\"}"; // TODO Finalise this protocol
