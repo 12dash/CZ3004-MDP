@@ -108,15 +108,16 @@ public class Map extends JPanel {
                     cellColor = SimulatorConstants.C_START;
                 else if (inGoalZone(row, col))
                     cellColor = SimulatorConstants.C_GOAL;
-                else if(this.arena.grids[row][col].getPictureClicked()){
-                    cellColor = SimulatorConstants.C_PICTURE_CLICKED;
+                else if (!this.arena.grids[row][col].isExplored()){
+                    cellColor = SimulatorConstants.C_UNEXPLORED;
+                }
+                else if(!this.arena.grids[row][col].getAcc() && !this.arena.grids[row][col].isObstacle()){
+                    cellColor = SimulatorConstants.C_INACCESSIBLE;
                 }
                 else if (this.arena.grids[row][col].getType() == Type.OBSTACLE && this.arena.grids[row][col].isExplored() ){
                     cellColor = SimulatorConstants.C_OBSTACLE;
                 }
-                else if (!this.arena.grids[row][col].isExplored()){
-                    cellColor = SimulatorConstants.C_UNEXPLORED;
-                }
+
                     g.setColor(cellColor);
 
                 g.fillRect(_gridCells[row][col].cellX + SimulatorConstants.MAP_X_OFFSET, _gridCells[row][col].cellY, _gridCells[row][col].cellSize, _gridCells[row][col].cellSize);

@@ -26,16 +26,15 @@ public class ActualSimulatorExploration {
     public static Map map;   // real arena
     private static final Communication comm = Communication.getCommunication();
 
-    private static String INPUT_MAP_FILE = "example_1.txt";
+    private static String INPUT_MAP_FILE = "example_5.txt";
 
     //#############################################
     //          SET THESE VALUES
     //#############################################
 
-    private static final int timeLimit = ArenaConstants.MAX_TIME_LIMIT;
+    private static final int timeLimit = ArenaConstants.GO_HOME_TIME_LIMIT;
     private static int coverage = ArenaConstants.MAX_COVERAGE;
-    private static boolean simulate = true
-            ;
+    private static boolean simulate = false;
 
     //#############################################
     //
@@ -57,7 +56,6 @@ public class ActualSimulatorExploration {
                 if (msgArr[0].equals(CommunicationConstants.START)) {
                     if (msgArr[1].equals(CommunicationConstants.EXPLORATION)) {
                         ExplorationAlgo explorationTask = new ExplorationAlgo(map, timeLimit, coverage, comm);
-//                        explorationTask.initialCalibration();
                         explorationTask.runExploration();
                         not_done = false;
                     }

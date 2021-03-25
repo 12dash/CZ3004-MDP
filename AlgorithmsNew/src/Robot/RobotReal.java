@@ -262,8 +262,6 @@ public class RobotReal extends Robot{
     // Override for array of movements
     public void move(MOVEMENT[] m) {
 
-        StringBuilder moveString = new StringBuilder();
-
         for(MOVEMENT move:m) {
             switch (move) {
                 case FORWARD:
@@ -291,10 +289,8 @@ public class RobotReal extends Robot{
                     System.out.println("Error in Robot.move()!");
                     break;
             }
-        moveString.append(MOVEMENT.print(move));
         }
 
-        sendMovement(moveString.toString());
         updateTouchedGoal();
     }
 
@@ -364,7 +360,13 @@ public class RobotReal extends Robot{
                 System.out.println("Error in Robot.move()!");
                 break;
         }
-        updateTouchedGoal();
+//DUBUGGING
+//        System.out.println("------------");
+//        System.out.println(MOVEMENT.print(m));
+//        System.out.println(getOrientation());
+//        System.out.println(getRobotPosCol() + ", "+ getRobotPosRow());
+//        System.out.println("------------");
+//        updateTouchedGoal();
     }
 
     /**
@@ -373,7 +375,7 @@ public class RobotReal extends Robot{
     public void sendMovement(String m) {
         Communication comm = Communication.getCommunication();
         String androidMsg = "{move:" +  m + "}";
-        comm.sendMsg(CommunicationConstants.ANDROID, androidMsg);
+//        comm.sendMsg(CommunicationConstants.ANDROID, androidMsg);
         comm.sendMsg(CommunicationConstants.ARDUINO, m); // For back to back message to arduino and android
     }
 
@@ -489,6 +491,7 @@ public class RobotReal extends Robot{
             String[] p1p2 =  MapDescriptor.generateMapDescriptor(explorationMap.arena);  // This ret
             String anMssg = "{p1:\"" + p1p2[0] + "\",p2:\"" + p1p2[1] + "\"}";
             comm.sendMsg(CommunicationConstants.ANDROID, anMssg);
+
         return result;
     }
 

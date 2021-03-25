@@ -48,7 +48,7 @@ public class Arena {
         Method to check if the position is a valid position in the arena and then change the acc to false
          */
         if (((i >= 0) && (i < ArenaConstants.ARENA_COLS)) && ((j >= 0) && (j < ArenaConstants.ARENA_ROWS))) {
-            if (this.grids[j][i].getAcc()) this.grids[j][i].setAcc(false);
+            this.grids[j][i].setAcc(false);
         }
     }
 
@@ -236,8 +236,8 @@ public class Arena {
         }
         else{
             this.grids[row][col].setType(Type.FREE);
-            removePaddingFromNonObstacles();
             this.grids[row][col].setAcc(true);
+            removePaddingFromNonObstacles();
             addPaddingToExploredCells();
         }
     }

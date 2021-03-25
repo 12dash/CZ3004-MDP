@@ -60,8 +60,8 @@ public class RobotConstants {
     public static final int SENSOR_FRONT_SHORT_RANGE_L = 1;               // range of short range sensor (cells)
     public static final int SENSOR_FRONT_SHORT_RANGE_H = 1;               // range of short range sensor (cells)
     public static final int SENSOR_LEFT_RIGHT_SHORT_RANGE_L = 1;               // range of short range sensor (cells)
-    public static final int SENSOR_LEFT_RIGHT_SHORT_RANGE_H = 3;               // range of short range sensor (cells)
-    public static final int SENSOR_LONG_RANGE_L = 4;                // range of long range sensor (cells)
+    public static final int SENSOR_LEFT_RIGHT_SHORT_RANGE_H = 2;               // range of short range sensor (cells)
+    public static final int SENSOR_LONG_RANGE_L = 3;                // range of long range sensor (cells)
     public static final int SENSOR_LONG_RANGE_H = 7;                // range of long range sensor (cells)
 
     public static final int NUM_MOVES_AFTER_CLICK_PICTURE = 12;

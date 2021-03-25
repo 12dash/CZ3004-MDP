@@ -132,18 +132,32 @@ public class Sensor {
             int row = this.sensorPosRow + (rowInc * i);
             int col = this.sensorPosCol + (colInc * i);
 
-            if (!exploredMap.arena.areValidCoordinates(row, col)) continue;
+            if (!exploredMap.arena.areValidCoordinates(row, col)) {
+                continue;
+            }
+
+            boolean detectedByFrontSensor = id.equals("FL") || id.equals("FC") || id.equals("FR");
 
             exploredMap.arena.setGridExplored(row, col, true);
+            if(detectedByFrontSensor){
+                exploredMap.arena.getGrid(row, col).setFrontSet(true);
+            }
 
             if (sensorVal == i) {
-                exploredMap.arena.setObstacleCell(row, col, true);
+                if(exploredMap.arena.getGrid(row, col).getFrontSet()){
+                    if (detectedByFrontSensor) {
+                        exploredMap.arena.setObstacleCell(row, col, true);
+                    }
+                }
+                else {
+                    exploredMap.arena.setObstacleCell(row, col, true);
+                }
                 break;
             }
 
             // Override previous obstacle value if front sensors detect no obstacle.
             if (exploredMap.arena.getGrid(row, col).isObstacle()) {
-                if (id.equals("FL") || id.equals("FC") || id.equals("FR")) {
+                if (detectedByFrontSensor) {
                     exploredMap.arena.setObstacleCell(row, col, false);
                 } else {
                     break;

@@ -97,14 +97,10 @@ public class IslandExploration {
 //    }
 
     public ArrayList<Grid> getPathtoNearestUnexplored() {
-        if (this.path.size() == 0) {
-            calUnexploredGrids();
-            getCandidatePath();
-            return path;
-        } else {
-            return path;
-        }
-
+        path.clear();
+        calUnexploredGrids();
+        getCandidatePath();
+        return path;
     }
 
 //    public void startSearch() {

@@ -12,7 +12,9 @@ public class ArenaConstants{
     public static final int START_COL = 1;     // col no. of start cell
 
     public static final int MAX_COVERAGE = 300;
-    public static final int MAX_TIME_LIMIT = 345;
+    public static final int GO_HOME_TIME_LIMIT = 270;  // IF 1.5 MINUTES LEFT: GO BACK H0ME
+    public static final int MAX_TIME_LIMIT = 345;  // HARD STOP ON 5 min 45 sec
     public static final int MAX_COVERAGE_PERCENTAGE = 100;
+
 }
 

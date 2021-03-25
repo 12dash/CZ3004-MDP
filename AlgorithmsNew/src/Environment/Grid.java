@@ -10,6 +10,7 @@ public class Grid {
     private final int y;
     private boolean explored;
     private boolean pictureClicked = false;
+    private boolean frontSet = false;
 
     public Grid(Type type, boolean acc, int x, int y, boolean explored) {
 
@@ -72,5 +73,12 @@ public class Grid {
         return this.pictureClicked;
     }
 
+    public void setFrontSet(boolean set){
+        frontSet = set;
+    }
+
+    public boolean getFrontSet(){
+        return frontSet;
+    }
 
 }
