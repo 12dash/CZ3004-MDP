@@ -86,7 +86,7 @@ public class ExplorationAlgo {
 
         startTime = System.currentTimeMillis();
         endTime = startTime + (timeLimit * 1000);
-        System.out.println("Time Left to Go Home: " + (endTime -startTime)/1000 + " secs");
+        System.out.println("Time left to Go Home: " + (endTime -startTime)/1000 + " secs");
 
         // Sends command to android to start exploration: E
         if (!simulate) Communication.getCommunication().sendMsg(CommunicationConstants.ARDUINO, CommunicationConstants.START_EPLORATION);
@@ -112,7 +112,7 @@ public class ExplorationAlgo {
         endTime = endTime + ((ArenaConstants.MAX_TIME_LIMIT - ArenaConstants.GO_HOME_TIME_LIMIT)  * 1000);
 
         long curTime = System.currentTimeMillis();
-        System.out.println("Time Left to stop: " + (endTime -curTime)/1000 + " secs");
+        System.out.println("Time left to stop: " + (endTime -curTime)/1000 + " secs");
 
         goHome();
         endCalibrations();
@@ -143,7 +143,7 @@ public class ExplorationAlgo {
     private void explorationLoop(int r, int c) throws InterruptedException {
         do {
             long curTime = System.currentTimeMillis();
-            System.out.println("Time Left to Go Home: " + (endTime - curTime)/1000 + " secs");
+            System.out.println("Time left to Go Home: " + (endTime - curTime)/1000 + " secs");
             nextMove();
 
             if (exploredMap.robotReal.getRobotPosRow() == r && exploredMap.robotReal.getRobotPosCol() == c) {
@@ -280,7 +280,7 @@ public class ExplorationAlgo {
 
         while (calculateAreaExplored() < coverageLimit &&  System.currentTimeMillis() < endTime) {
             long curTime = System.currentTimeMillis();
-            System.out.println("Time Left to Go Home: " + (endTime - curTime)/1000 + " secs");
+            System.out.println("Time left to Go Home: " + (endTime - curTime)/1000 + " secs");
 
             Grid curGrid = exploredMap.arena.getGrid(exploredMap.robotReal.getRobotPosRow(), exploredMap.robotReal.getRobotPosCol());
             RobotReal tempRobot = new RobotReal(curGrid);
@@ -635,7 +635,7 @@ public class ExplorationAlgo {
         while (System.currentTimeMillis() < endTime && (bot_X != 1 || bot_Y != 18)) {
 
             long curTime = System.currentTimeMillis();
-            System.out.println("Time Left to stop: " + (endTime -curTime)/1000 + " secs");
+            System.out.println("Time left to stop: " + (endTime -curTime)/1000 + " secs");
 
             AStar astar = new AStar();
             astar.startSearch(exploredMap.arena, exploredMap.arena.getGrid(bot_Y, bot_X), exploredMap.arena.getGrid(18, 1), false);
