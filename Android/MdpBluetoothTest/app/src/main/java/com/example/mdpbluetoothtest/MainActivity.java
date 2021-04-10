@@ -38,6 +38,7 @@ import org.json.JSONObject;
 import java.lang.reflect.Array;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -46,12 +47,11 @@ public class MainActivity extends AppCompatActivity {
     TextView currentStatusTextView;
     ToggleButton setWayPointToggleBtn, setStartPointToggleBtn;
     ImageButton obstacleImageBtn, clearImageBtn;
-    Button resetMapBtn, fastestPathBtn, explorationPathBtn, f1Btn, f2Btn, updateBtn;
+    Button resetMapBtn, fastestPathBtn, explorationPathBtn, f1Btn, f2Btn, updateBtn, irBtn, calibrateBtn;
     Switch manualAutoToggleBtn, tiltSwitch;
     MazeView mazeView;
     ReconfigureFragment reconfigureFragment = new ReconfigureFragment();
     StringFragment stringFragment = new StringFragment();
-
 
     // Non UI Components - Sensors, Services
     BluetoothConnectionService bluetoothConnectionService;
@@ -86,10 +86,7 @@ public class MainActivity extends AppCompatActivity {
         sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         sharedPreferences = this.getSharedPreferences("Shared Preferences", Context.MODE_PRIVATE);
 
-        editor = sharedPreferences.edit();
-        editor.putString("IMAGE","");
-        editor.commit();
-        imagecoordList.clear();
+
 
         f1Btn = findViewById(R.id.btn_F1);
         f1Btn.setOnClickListener(new View.OnClickListener() {
@@ -97,7 +94,12 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 String F1 = sharedPreferences.getString("F1", "");
                 Log.d(TAG, F1);
-                moveRobotUI(F1);
+                if (F1.equals("L") || F1.equals("R") || F1.equals("0")) {
+                    moveRobotUI(F1);
+                }
+                else {
+                    bluetoothConnectionService.write(F1);
+                }
             }
         });
 
@@ -106,7 +108,9 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 String F2 = sharedPreferences.getString("F2", "");
-                moveRobotUI(F2);
+                if (F2.equals("L") || F2.equals("R") || F2.equals("0")) {
+                    moveRobotUI(F2);
+                }
             }
         });
 
@@ -118,7 +122,7 @@ public class MainActivity extends AppCompatActivity {
         arrowLeftImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                moveRobotUI("left");
+                moveRobotUI("L");
             }
         });
 
@@ -126,7 +130,7 @@ public class MainActivity extends AppCompatActivity {
         arrowRightImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                moveRobotUI("right");
+                moveRobotUI("R");
             }
         });
 
@@ -134,7 +138,7 @@ public class MainActivity extends AppCompatActivity {
         arrowUpImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                moveRobotUI("forward");
+                moveRobotUI("0");
             }
         });
 
@@ -147,15 +151,15 @@ public class MainActivity extends AppCompatActivity {
                 if(tiltIsAllowedFlag) {
                     if (y < -2) {
                         Log.d(TAG, "onSensorChanged: " + "Sensor Move Forward Detected");
-                        moveRobotUI("forward");
+                        moveRobotUI("ar|0");
                     } else if (y > 2) {
                         Log.d(TAG, "onSensorChanged: " + "Sensor Move Backward Detected");
                     } else if (x > 2) {
                         Log.d(TAG, "onSensorChanged: " + "Sensor Move Left Detected");
-                        moveRobotUI("left");
+                        moveRobotUI("ar|L");
                     } else if (x < -2) {
                         Log.d(TAG, "onSensorChanged: " + "Sensor Move Right Detected");
-                        moveRobotUI("right");
+                        moveRobotUI("ar|R");
                     }
 
                     tiltIsAllowedFlag = false;
@@ -200,7 +204,7 @@ public class MainActivity extends AppCompatActivity {
         fastestPathBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                bluetoothConnectionService.write("pc|{\"start\" : \"FS\"}");
+                bluetoothConnectionService.write("pc|start:FS");
                 updateStatus("Fastest Path Started");
             }
         });
@@ -209,10 +213,29 @@ public class MainActivity extends AppCompatActivity {
         explorationPathBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                bluetoothConnectionService.write("pc|{\"start\" : \"ES\"}");
+                bluetoothConnectionService.write("pc|start:ES");
                 updateStatus("Exploration Path Started");
             }
         });
+
+        irBtn = findViewById(R.id.irBtn);
+        irBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                bluetoothConnectionService.write("pc|start:IR");
+                updateStatus("Image Recognition Started");
+            }
+        });
+
+        calibrateBtn = findViewById(R.id.calibrateButton);
+        calibrateBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                bluetoothConnectionService.write("ar|T");
+                updateStatus("Calibrating Robot...");
+            }
+        });
+
 
         setStartPointToggleBtn = findViewById(R.id.setStartPointToggleBtn);
         setStartPointToggleBtn.setOnClickListener(new View.OnClickListener() {
@@ -264,8 +287,9 @@ public class MainActivity extends AppCompatActivity {
                 manualUpdateRequest = true;
                 bluetoothConnectionService.write("pc|{\"sendArena\" : \"true\"}");
                 try {
-//                     String message = "{\"map\":[{\"explored\": \"ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff\",\"length\":300,\"obstacle\":\"00000000000000000706180400080010001e000400000000200044438f840000000000000080\"}]}";
-//                     mazeView.setReceivedJsonObject(new JSONObject(message));
+                    //try p1 p2 string here
+                    String message = "{\"p1\":\"C7000C001C008003000600000000000000000000000000000000000000000000000000000003\",\"p2\":\"2918\"}";
+                    mazeView.setReceivedJsonObject(new JSONObject(message));
                     mazeView.updateMapInformation();
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -324,7 +348,7 @@ public class MainActivity extends AppCompatActivity {
                         mazeView.setAutoUpdate(false);
                         mazeView.toggleCheckedBtn("None");
                         updateBtn.setClickable(true);
-                        updateBtn.setTextColor(Color.BLACK);
+                        updateBtn.setTextColor(Color.WHITE);
 //                        ControlFragment.getCalibrateButton().setClickable(true);
 //                        ControlFragment.getCalibrateButton().setTextColor(Color.BLACK);
                         manualAutoToggleBtn.setText("MANUAL");
@@ -407,24 +431,45 @@ public class MainActivity extends AppCompatActivity {
             }
 
             try {
-                  // This branch is only for demo-ing. Allows Status to be updated even when in Manual Mode.
-                  if (messageValue.length() > 8 && messageValue.substring(2,8).equals("status") && !mazeView.getAutoUpdate()){
+                // This branch is only for demo-ing. Allows Status to be updated even when in Manual Mode.
+                if (messageValue.length() > 8 && messageValue.substring(2,8).equals("status") && !mazeView.getAutoUpdate()){
                     JSONObject statusJsonObject = new JSONObject(messageValue);
                     currentStatusTextView.setText(statusJsonObject.getString("status"));
                 }
 //                else if (messageValue.startsWith("{\"image\"")) {
-                  else if (messageValue.length() > 8 && messageValue.substring(2,7).equals("image")){
+                else if (messageValue.length() > 8 && messageValue.substring(2,7).equals("image")){
                     JSONObject jsonObject = new JSONObject(messageValue);
                     JSONArray jsonArray = jsonObject.getJSONArray("image");
+                    int xCoordinate = jsonArray.getInt(0);
+                    int yCoordinate = jsonArray.getInt(1);
+                    int imageId = jsonArray.getInt(2);
+
+                    boolean exists = false;
+                    for(ArrayList<Integer> imageInfo : imagecoordList) {
+                        if(imageInfo.get(2) == imageId){ // If imageId already exists
+                            exists = true;
+
+                            //Change the block status to obstacle, Note the + 1, since the coordinate system is problematic
+                            int oldX = imageInfo.get(0) + 1;
+                            int oldY = imageInfo.get(1) + 1;
+                            mazeView.setObstacleCoord(oldX, oldY);
+
+                            imageInfo.set(0, xCoordinate);
+                            imageInfo.set(1, yCoordinate);
+                        }
+                    }
+
+                    if (!exists) {
+                        ArrayList<Integer> imgCoord = new ArrayList<Integer>();
+                        imgCoord.add(xCoordinate);
+                        imgCoord.add(yCoordinate);
+                        imgCoord.add(imageId);
+                        imagecoordList.add(imgCoord);
+                    }
+
                     mazeView.drawImageNumberCell(jsonArray.getInt(0),jsonArray.getInt(1),jsonArray.getInt(2));
+
                     editor = sharedPreferences.edit();
-
-                    ArrayList<Integer> imgcoord = new ArrayList<Integer>();
-                    imgcoord.add(jsonArray.getInt(0));
-                    imgcoord.add(jsonArray.getInt(1));
-                    imgcoord.add(jsonArray.getInt(2));
-                    imagecoordList.add(imgcoord);
-
                     editor.putString("IMAGE", imagecoordList.toString());
                     editor.commit();
                     Log.d("IMAGE", imagecoordList.toString());
@@ -457,18 +502,18 @@ public class MainActivity extends AppCompatActivity {
         else if (mazeView.getCanDrawRobot() && !mazeView.getAutoUpdate()) {
             mazeView.moveRobot(direction);
             switch(direction) {
-                case "left":
+                case "L":
                     updateStatus("turning " + direction);
-                    bluetoothDirectionMsg = "A|";
+                    bluetoothDirectionMsg = "L";
                     break;
-                case "right":
+                case "R":
                     updateStatus("turning " + direction);
-                    bluetoothDirectionMsg = "D|";
+                    bluetoothDirectionMsg = "R";
                     break;
-                case "forward":
+                case "0":
                     if (mazeView.getValidPosition()) {
                         updateStatus("moving forward");
-                        bluetoothDirectionMsg = "W|";
+                        bluetoothDirectionMsg = "0";
                     }
                     else
                         updateStatus("Unable to move forward");

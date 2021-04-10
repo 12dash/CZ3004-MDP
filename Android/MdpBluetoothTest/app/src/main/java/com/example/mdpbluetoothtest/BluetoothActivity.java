@@ -14,6 +14,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -21,6 +23,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -110,7 +113,13 @@ public class BluetoothActivity extends AppCompatActivity {
 
             if (action.equals(BluetoothDevice.ACTION_FOUND)) {
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-                btDevices.add(device);
+                if (device.getAddress().startsWith("38:00:25:3C:FB:1C") || device.getAddress().startsWith("B8:27:EB:BA:8D:EE") || device.getAddress().startsWith("30:24:32:ED"))
+                {
+                    Toast.makeText(context, "added" + device.getAddress(), Toast.LENGTH_SHORT).show();
+                    btDevices.add(0, device);
+                }
+                else
+                    btDevices.add(device);
                 Log.d(TAG, "Receiver3 : " + device.getName() + ": " + device.getAddress());
                 deviceListAdapter = new DeviceListAdapter(context, R.layout.device_adapter_view, btDevices);
                 lvDevices.setAdapter(deviceListAdapter);
@@ -280,7 +289,7 @@ public class BluetoothActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if (bluetoothConnectionService != null) {
-                    bluetoothConnectionService.write("A");
+                    bluetoothConnectionService.write("ar|L");
                 }
                 else
                     Toast.makeText(BluetoothActivity.this, "Please Connect with another device first", Toast.LENGTH_SHORT).show();
@@ -292,7 +301,7 @@ public class BluetoothActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if (bluetoothConnectionService != null) {
-                    bluetoothConnectionService.write("D");
+                    bluetoothConnectionService.write("ar|R");
                 }
                 else
                     Toast.makeText(BluetoothActivity.this, "Please Connect with another device first", Toast.LENGTH_SHORT).show();
@@ -304,56 +313,56 @@ public class BluetoothActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if (bluetoothConnectionService != null) {
-                    bluetoothConnectionService.write("W");
+                    bluetoothConnectionService.write("ar|0");
                 }
                 else
                     Toast.makeText(BluetoothActivity.this, "Please Connect with another device first", Toast.LENGTH_SHORT).show();
             }
         });
 
-//        SensorEventListener tiltSensorEventListener = new SensorEventListener() {
-//            @Override
-//            public void onSensorChanged(SensorEvent sensorEvent){
-//                float x = sensorEvent.values[0];
-//                float y = sensorEvent.values[1];
-//                Log.d(TAG, "onSensorChanged: " + String.format("(%.2f, %.2f)", x, y));
-//
-//                if (y < -2) {
-//                    Log.d(TAG, "onSensorChanged: " + "Sensor Move Forward Detected");
-//                    bluetoothConnectionService.write("W");
-//                } else if (y > 2) {
-//                    Log.d(TAG, "onSensorChanged: " + "Sensor Move Backward Detected");
-//                } else if (x > 2) {
-//                    Log.d(TAG, "onSensorChanged: " + "Sensor Move Left Detected");
-//                    bluetoothConnectionService.write("A");
-//                } else if (x < -2) {
-//                    Log.d(TAG, "onSensorChanged: " + "Sensor Move Right Detected");
-//                    bluetoothConnectionService.write("D");
-//                }
-//            }
-//
-//            @Override
-//            public void onAccuracyChanged(Sensor sensor, int i) {
-//                return;
-//            }
-//        };
-//
-//        accelerometerSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-//        tiltSwitch = findViewById(R.id.tiltSwitch);
-//        tiltSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-//            @Override
-//            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-//                if(tiltSwitch.isChecked()){
-//                    Toast.makeText(BluetoothActivity.this, "Tilt Controls are turned On", Toast.LENGTH_SHORT).show();
-//                    Log.d(TAG, "onCheckedChanged: Tilt is turned On");
-//
-//                    sensorManager.registerListener(tiltSensorEventListener, accelerometerSensor, 1000 * 1000 * 1);
-//                }
-//                else {
-//                    sensorManager.unregisterListener(tiltSensorEventListener, accelerometerSensor);
-//                }
-//            }
-//        });
+        SensorEventListener tiltSensorEventListener = new SensorEventListener() {
+            @Override
+            public void onSensorChanged(SensorEvent sensorEvent){
+                float x = sensorEvent.values[0];
+                float y = sensorEvent.values[1];
+                Log.d(TAG, "onSensorChanged: " + String.format("(%.2f, %.2f)", x, y));
+
+                if (y < -2) {
+                    Log.d(TAG, "onSensorChanged: " + "Sensor Move Forward Detected");
+                    bluetoothConnectionService.write("ar|0");
+                } else if (y > 2) {
+                    Log.d(TAG, "onSensorChanged: " + "Sensor Move Backward Detected");
+                } else if (x > 2) {
+                    Log.d(TAG, "onSensorChanged: " + "Sensor Move Left Detected");
+                    bluetoothConnectionService.write("ar|L");
+                } else if (x < -2) {
+                    Log.d(TAG, "onSensorChanged: " + "Sensor Move Right Detected");
+                    bluetoothConnectionService.write("ar|R");
+                }
+            }
+
+            @Override
+            public void onAccuracyChanged(Sensor sensor, int i) {
+                return;
+            }
+        };
+
+        accelerometerSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        tiltSwitch = findViewById(R.id.tiltSwitch);
+        tiltSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                if(tiltSwitch.isChecked()){
+                    Toast.makeText(BluetoothActivity.this, "Tilt Controls are turned On", Toast.LENGTH_SHORT).show();
+                    Log.d(TAG, "onCheckedChanged: Tilt is turned On");
+
+                    sensorManager.registerListener(tiltSensorEventListener, accelerometerSensor, 1000 * 1000 * 1);
+                }
+                else {
+                    sensorManager.unregisterListener(tiltSensorEventListener, accelerometerSensor);
+                }
+            }
+        });
     }
 
     @Override

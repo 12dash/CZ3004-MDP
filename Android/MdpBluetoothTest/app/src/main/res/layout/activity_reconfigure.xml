@@ -5,6 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/reconfigure_layout"
     android:layout_width="match_parent"
+    android:background="#99D9EA"
     android:layout_height="wrap_content"
     android:minWidth="500dp"
     tools:context=".ReconfigureFragment"
